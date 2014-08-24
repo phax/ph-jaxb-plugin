@@ -22,7 +22,9 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class CJAXB22
 {
-  public static final String NSURI_PHLOC = "http://www.phloc.com/ns/jaxb22/plugin";
+  public static final String NSURI_PH = "http://www.helger.com/namespaces/jaxb22/plugin";
+
+  public static final String PLUGIN_NAME = "ph-jaxb22-plugin";
 
   private CJAXB22 ()
   {}

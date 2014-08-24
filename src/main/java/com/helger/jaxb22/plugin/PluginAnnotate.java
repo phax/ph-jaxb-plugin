@@ -43,13 +43,13 @@ import com.sun.tools.xjc.outline.Outline;
 /**
  * Create Nonnull/Nullable annotations in all bean generated objects as well as
  * in the ObjectFactory classes
- * 
+ *
  * @author Philip Helger
  */
 @IsSPIImplementation
 public class PluginAnnotate extends Plugin
 {
-  private static final String OPT = "Xphloc-annotate";
+  private static final String OPT = "Xph-annotate";
 
   @Override
   public String getOptionName ()
@@ -66,7 +66,7 @@ public class PluginAnnotate extends Plugin
   @Override
   public List <String> getCustomizationURIs ()
   {
-    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PHLOC);
+    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
   }
 
   @Override

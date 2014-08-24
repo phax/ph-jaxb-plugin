@@ -37,13 +37,13 @@ import com.sun.tools.xjc.outline.Outline;
  * Plugin implementation, that sets the default locale to "en_US" so that the
  * comments are generated in the chosen locale instead of the platform default
  * locale.
- * 
+ *
  * @author Philip Helger
  */
 @IsSPIImplementation
 public class PluginDefaultLocale extends Plugin
 {
-  private static final String OPT = "Xphloc-default-locale";
+  private static final String OPT = "Xph-default-locale";
 
   @Override
   public String getOptionName ()
@@ -60,7 +60,7 @@ public class PluginDefaultLocale extends Plugin
   @Override
   public List <String> getCustomizationURIs ()
   {
-    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PHLOC);
+    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
   }
 
   @Override

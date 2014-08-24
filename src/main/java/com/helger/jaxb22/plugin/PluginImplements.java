@@ -46,7 +46,7 @@ import com.sun.tools.xjc.outline.Outline;
 @IsSPIImplementation
 public class PluginImplements extends Plugin
 {
-  private static final String OPT = "Xphloc-implements";
+  private static final String OPT = "Xph-implements";
   private List <String> m_aInterfaces;
 
   @Override
@@ -78,7 +78,7 @@ public class PluginImplements extends Plugin
   @Override
   public List <String> getCustomizationURIs ()
   {
-    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PHLOC);
+    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
   }
 
   @Override

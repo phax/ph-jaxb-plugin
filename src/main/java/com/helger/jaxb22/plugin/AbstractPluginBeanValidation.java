@@ -86,7 +86,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
   @Override
   public List <String> getCustomizationURIs ()
   {
-    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PHLOC);
+    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
   }
 
   @Override

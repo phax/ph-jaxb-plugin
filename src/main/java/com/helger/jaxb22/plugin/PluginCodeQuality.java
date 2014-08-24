@@ -40,13 +40,13 @@ import com.sun.tools.xjc.outline.Outline;
 /**
  * Improved the code quality by avoiding some compiler warnings, and by making
  * special constants accessible from the outside.
- * 
+ *
  * @author Philip Helger
  */
 @IsSPIImplementation
 public class PluginCodeQuality extends Plugin
 {
-  private static final String OPT = "Xphloc-code-quality";
+  private static final String OPT = "Xph-code-quality";
 
   @Override
   public String getOptionName ()
@@ -63,7 +63,7 @@ public class PluginCodeQuality extends Plugin
   @Override
   public List <String> getCustomizationURIs ()
   {
-    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PHLOC);
+    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
   }
 
   @Override

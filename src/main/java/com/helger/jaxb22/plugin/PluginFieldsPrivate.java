@@ -34,13 +34,13 @@ import com.sun.tools.xjc.outline.Outline;
 
 /**
  * Plugin that makes all fields private instead of the default "protected"
- * 
+ *
  * @author Philip Helger
  */
 @IsSPIImplementation
 public class PluginFieldsPrivate extends Plugin
 {
-  private static final String OPT = "Xphloc-fields-private";
+  private static final String OPT = "Xph-fields-private";
 
   @Override
   public String getOptionName ()
@@ -57,7 +57,7 @@ public class PluginFieldsPrivate extends Plugin
   @Override
   public List <String> getCustomizationURIs ()
   {
-    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PHLOC);
+    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
   }
 
   @Override

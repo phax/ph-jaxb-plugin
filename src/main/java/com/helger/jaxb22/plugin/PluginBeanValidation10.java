@@ -17,15 +17,14 @@
  */
 package com.helger.jaxb22.plugin;
 
-
 /**
  * big thanks to original author: cocorossello
- * 
+ *
  * @author Philip Helger
  */
 public class PluginBeanValidation10 extends AbstractPluginBeanValidation
 {
-  private static final String OPT = "Xphloc-bean-validation10";
+  private static final String OPT = "Xph-bean-validation10";
 
   public PluginBeanValidation10 ()
   {

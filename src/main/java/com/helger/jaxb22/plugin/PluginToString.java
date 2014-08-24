@@ -42,13 +42,13 @@ import com.sun.tools.xjc.outline.Outline;
 /**
  * Add default toString method using the {@link ToStringGenerator} from
  * phloc-commons.
- * 
+ *
  * @author Philip Helger
  */
 @IsSPIImplementation
 public class PluginToString extends Plugin
 {
-  private static final String OPT = "Xphloc-tostring";
+  private static final String OPT = "Xph-tostring";
 
   @Override
   public String getOptionName ()
@@ -65,7 +65,7 @@ public class PluginToString extends Plugin
   @Override
   public List <String> getCustomizationURIs ()
   {
-    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PHLOC);
+    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
   }
 
   @Override
@@ -105,7 +105,7 @@ public class PluginToString extends Plugin
       }
       mToString.body ()._return (aInvocation.invoke ("toString"));
 
-      mToString.javadoc ().add ("Created by phloc-jaxb22-plugin -" + OPT);
+      mToString.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
     }
     return true;
   }
