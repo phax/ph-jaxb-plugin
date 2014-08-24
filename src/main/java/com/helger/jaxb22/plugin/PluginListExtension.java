@@ -43,9 +43,9 @@ import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
 /**
- * Extend all bean List<?> getters with additional method to query the content:
- * boolean has...Entries(), boolean hasNo...Entries(), int get...Count() and T
- * get...AtIndex(int)
+ * Extend all bean List&lt;?&gt; getters with additional method to query the
+ * content: boolean has...Entries(), boolean hasNo...Entries(), int
+ * get...Count() and T get...AtIndex(int)
  *
  * @author Philip Helger
  */
