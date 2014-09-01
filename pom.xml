@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2006-2014 phloc systems (www.phloc.com)
     Copyright (C) 2014 Philip Helger (www.helger.com)
     philip[at]helger[dot]com
 
@@ -30,6 +29,7 @@
   <name>ph-jaxb22-plugin</name>
   <description>JAXB 2.2 plugin to improve created output</description>
   <url>https://github.com/phax/ph-jaxb22-plugin</url>
+  <inceptionYear>2014</inceptionYear>
   
   <licenses>
     <license>

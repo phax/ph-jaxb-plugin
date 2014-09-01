@@ -1,5 +1,4 @@
 /**
- * Copyright (C) 2006-2014 phloc systems (www.phloc.com)
  * Copyright (C) 2014 Philip Helger (www.helger.com)
  * philip[at]helger[dot]com
  *
@@ -40,8 +39,7 @@ import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
 
 /**
- * Add default toString method using the {@link ToStringGenerator} from
- * phloc-commons.
+ * Add default toString method using the {@link ToStringGenerator} class.
  *
  * @author Philip Helger
  */
@@ -59,7 +57,7 @@ public class PluginToString extends Plugin
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + "    :  auto implement toString";
+    return "  -" + OPT + "    :  auto implement toString using com.helger.commons.string.ToStringGenerator";
   }
 
   @Override

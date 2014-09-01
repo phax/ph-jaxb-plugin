@@ -1,5 +1,4 @@
 /**
- * Copyright (C) 2006-2014 phloc systems (www.phloc.com)
  * Copyright (C) 2014 Philip Helger (www.helger.com)
  * philip[at]helger[dot]com
  *
@@ -63,7 +62,9 @@ public class PluginEqualsHashCode extends Plugin
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + "    :  auto implement equals and hashCode";
+    return "  -" +
+           OPT +
+           "    :  auto implement equals and hashCode using com.helger.commons.equals.EqualsUtils and com.helger.commons.hash.HashCodeGenerator";
   }
 
   @Override
