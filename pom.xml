@@ -61,7 +61,7 @@
   </developers>
   
   <properties>
-    <jaxb.version>2.2.7</jaxb.version>
+    <jaxb.version>2.2.11</jaxb.version>
   </properties>
 
   <dependencies>
