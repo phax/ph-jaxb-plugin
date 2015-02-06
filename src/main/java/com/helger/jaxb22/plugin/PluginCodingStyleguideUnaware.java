@@ -32,6 +32,7 @@ import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.model.CElementInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
+import com.sun.tools.xjc.outline.EnumOutline;
 import com.sun.tools.xjc.outline.Outline;
 
 /**
@@ -72,6 +73,13 @@ public class PluginCodingStyleguideUnaware extends Plugin
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
       final JDefinedClass jClass = aClassOutline.implClass;
+      jClass.annotate (CodingStyleguideUnaware.class);
+    }
+
+    // For all enums
+    for (final EnumOutline aClassOutline : aOutline.getEnums ())
+    {
+      final JDefinedClass jClass = aClassOutline.clazz;
       jClass.annotate (CodingStyleguideUnaware.class);
     }
 
