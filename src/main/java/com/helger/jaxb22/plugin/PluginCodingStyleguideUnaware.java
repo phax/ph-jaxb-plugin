@@ -16,9 +16,8 @@
  */
 package com.helger.jaxb22.plugin;
 
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -27,12 +26,11 @@ import org.xml.sax.ErrorHandler;
 import com.helger.commons.annotations.CodingStyleguideUnaware;
 import com.helger.commons.annotations.IsSPIImplementation;
 import com.helger.commons.collections.ContainerHelper;
+import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JPackage;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
-import com.sun.tools.xjc.model.CElementInfo;
-import com.sun.tools.xjc.outline.ClassOutline;
-import com.sun.tools.xjc.outline.EnumOutline;
 import com.sun.tools.xjc.outline.Outline;
 
 /**
@@ -69,33 +67,24 @@ public class PluginCodingStyleguideUnaware extends Plugin
                       @Nonnull final Options aOpts,
                       @Nonnull final ErrorHandler aErrorHandler)
   {
-    // For all classes
-    for (final ClassOutline aClassOutline : aOutline.getClasses ())
-    {
-      final JDefinedClass jClass = aClassOutline.implClass;
-      jClass.annotate (CodingStyleguideUnaware.class);
-    }
+    final JCodeModel aCodeModel = aOutline.getCodeModel ();
 
-    // For all enums
-    for (final EnumOutline aClassOutline : aOutline.getEnums ())
+    // For all packages
+    final Iterator <JPackage> itPackages = aCodeModel.packages ();
+    while (itPackages.hasNext ())
     {
-      final JDefinedClass jClass = aClassOutline.clazz;
-      jClass.annotate (CodingStyleguideUnaware.class);
-    }
+      final JPackage aPackage = itPackages.next ();
 
-    // Get all unique ObjectFactory classes
-    final Set <JDefinedClass> aObjFactories = new HashSet <JDefinedClass> ();
-    for (final CElementInfo ei : aOutline.getModel ().getAllElements ())
-    {
-      final JDefinedClass aClass = aOutline.getPackageContext (ei._package ())
-                                           .objectFactoryGenerator ()
-                                           .getObjectFactory ();
-      aObjFactories.add (aClass);
-    }
+      // For all classes in the package
+      final Iterator <JDefinedClass> itClasses = aPackage.classes ();
+      while (itClasses.hasNext ())
+      {
+        final JDefinedClass aDefinedClass = itClasses.next ();
 
-    // Manipulate all ObjectFactory classes
-    for (final JDefinedClass aObjFactory : aObjFactories)
-      aObjFactory.annotate (CodingStyleguideUnaware.class);
+        // Add annotation
+        aDefinedClass.annotate (CodingStyleguideUnaware.class);
+      }
+    }
 
     return true;
   }
