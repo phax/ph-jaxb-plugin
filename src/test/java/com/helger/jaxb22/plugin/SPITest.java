@@ -16,20 +16,15 @@
  */
 package com.helger.jaxb22.plugin;
 
-import java.io.File;
-
 import org.junit.Test;
 
-import com.sun.tools.xjc.Driver;
+import com.helger.commons.mock.PHTestUtils;
 
-public class XJCLoaderTest
+public class SPITest
 {
   @Test
-  public void testLoadXJC () throws Throwable
+  public void testBasic () throws Exception
   {
-    // Don't use Driver.main because it calls System.exit
-    Driver.run (new String [] { new File ("src/test/resources/changelog-1.0.xsd").getAbsolutePath (),
-                               "-d",
-                               new File ("target").getAbsolutePath () }, System.out, System.out);
+    PHTestUtils.testIfAllSPIImplementationsAreValid ();
   }
 }

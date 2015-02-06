@@ -21,18 +21,13 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.xml.sax.ErrorHandler;
 
+import com.helger.commons.annotations.CodingStyleguideUnaware;
 import com.helger.commons.annotations.IsSPIImplementation;
-import com.helger.commons.annotations.ReturnsMutableObject;
 import com.helger.commons.collections.ContainerHelper;
-import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JType;
-import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.model.CElementInfo;
@@ -40,15 +35,15 @@ import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
 /**
- * Create {@link Nonnull}/{@link Nullable} annotations in all bean generated
- * objects as well as in the ObjectFactory classes
+ * Create {@link CodingStyleguideUnaware} annotations in all bean generated
+ * classes as well as in the ObjectFactory classes
  *
  * @author Philip Helger
  */
 @IsSPIImplementation
-public class PluginAnnotate extends Plugin
+public class PluginCodingStyleguideUnaware extends Plugin
 {
-  private static final String OPT = "Xph-annotate";
+  private static final String OPT = "Xph-csu";
 
   @Override
   public String getOptionName ()
@@ -59,7 +54,7 @@ public class PluginAnnotate extends Plugin
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + " :  add Nullable/Nonnull annotations to getters and setters";
+    return "  -" + OPT + "       :  add CodingStyleguideUnaware annotations to all classes";
   }
 
   @Override
@@ -73,38 +68,14 @@ public class PluginAnnotate extends Plugin
                       @Nonnull final Options aOpts,
                       @Nonnull final ErrorHandler aErrorHandler)
   {
-    final JCodeModel aCodeModel = aOutline.getCodeModel ();
     // For all classes
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
       final JDefinedClass jClass = aClassOutline.implClass;
-      for (final JMethod aMethod : ContainerHelper.newList (jClass.methods ()))
-      {
-        final List <JVar> aParams = aMethod.params ();
-        if (aMethod.name ().startsWith ("get") && aParams.isEmpty ())
-        {
-          final JType aReturnType = aMethod.type ();
-          // Find e.g. List<ItemListType> getItemList()
-          if (aReturnType.name ().startsWith ("List<"))
-          {
-            aMethod.annotate (Nonnull.class);
-            aMethod.annotate (ReturnsMutableObject.class).param ("reason", "JAXB implementation style");
-          }
-          else
-            if (!aReturnType.isPrimitive ())
-              aMethod.annotate (Nullable.class);
-        }
-        else
-          if (aMethod.type () == aCodeModel.VOID && aMethod.name ().startsWith ("set") && aParams.size () == 1)
-          {
-            final JVar aParam = aParams.get (0);
-            if (!aParam.type ().isPrimitive ())
-              aParam.annotate (Nullable.class);
-          }
-      }
+      jClass.annotate (CodingStyleguideUnaware.class);
     }
 
-    // Get all ObjectFactory classes
+    // Get all unique ObjectFactory classes
     final Set <JDefinedClass> aObjFactories = new HashSet <JDefinedClass> ();
     for (final CElementInfo ei : aOutline.getModel ().getAllElements ())
     {
@@ -116,28 +87,7 @@ public class PluginAnnotate extends Plugin
 
     // Manipulate all ObjectFactory classes
     for (final JDefinedClass aObjFactory : aObjFactories)
-      for (final JMethod aMethod : aObjFactory.methods ())
-      {
-        final List <JVar> aParams = aMethod.params ();
-        if (aMethod.name ().startsWith ("create") &&
-            aMethod.type ().name ().startsWith ("JAXBElement<") &&
-            aParams.size () == 1)
-        {
-          // Modify all JAXBElement<T> createT (Object o) methods
-
-          // Modify parameter
-          aParams.get (0).annotate (Nullable.class);
-
-          // Modify method
-          aMethod.annotate (Nonnull.class);
-        }
-        else
-          if (aMethod.name ().startsWith ("create") && aParams.isEmpty ())
-          {
-            // Modify all Object createObject() methods
-            aMethod.annotate (Nonnull.class);
-          }
-      }
+      aObjFactory.annotate (CodingStyleguideUnaware.class);
 
     return true;
   }
