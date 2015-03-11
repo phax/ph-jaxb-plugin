@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotations.IsSPIImplementation;
-import com.helger.commons.collections.ContainerHelper;
+import com.helger.commons.collections.CollectionHelper;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
@@ -68,7 +68,7 @@ public class PluginListExtension extends Plugin
   @Override
   public List <String> getCustomizationURIs ()
   {
-    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
+    return CollectionHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
   }
 
   @Override
@@ -98,7 +98,7 @@ public class PluginListExtension extends Plugin
         }
       }
 
-      for (final JMethod aMethod : ContainerHelper.newList (jClass.methods ()))
+      for (final JMethod aMethod : CollectionHelper.newList (jClass.methods ()))
         if (aMethod.name ().startsWith ("get") && aMethod.params ().isEmpty ())
         {
           final JType aReturnType = aMethod.type ();

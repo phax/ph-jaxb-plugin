@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotations.IsSPIImplementation;
-import com.helger.commons.collections.ContainerHelper;
+import com.helger.commons.collections.CollectionHelper;
 import com.helger.commons.locale.LocaleCache;
 import com.helger.commons.string.StringHelper;
 import com.sun.tools.xjc.BadCommandLineException;
@@ -59,7 +59,7 @@ public class PluginDefaultLocale extends Plugin
   @Override
   public List <String> getCustomizationURIs ()
   {
-    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
+    return CollectionHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
   }
 
   @Override

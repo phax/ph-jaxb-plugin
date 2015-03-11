@@ -31,7 +31,7 @@ import javax.validation.constraints.Size;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.collections.ContainerHelper;
+import com.helger.commons.collections.CollectionHelper;
 import com.helger.commons.math.MathHelper;
 import com.helger.commons.string.StringParser;
 import com.sun.codemodel.JAnnotationUse;
@@ -61,7 +61,7 @@ import com.sun.xml.xsom.impl.parser.DelayedRef;
 
 /**
  * big thanks to original author: cocorossello
- * 
+ *
  * @author Philip Helger
  */
 public abstract class AbstractPluginBeanValidation extends Plugin
@@ -85,7 +85,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
   @Override
   public List <String> getCustomizationURIs ()
   {
-    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
+    return CollectionHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
   }
 
   @Override

@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotations.IsSPIImplementation;
-import com.helger.commons.collections.ContainerHelper;
+import com.helger.commons.collections.CollectionHelper;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.tools.xjc.Options;
@@ -56,7 +56,7 @@ public class PluginFieldsPrivate extends Plugin
   @Override
   public List <String> getCustomizationURIs ()
   {
-    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
+    return CollectionHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
   }
 
   @Override

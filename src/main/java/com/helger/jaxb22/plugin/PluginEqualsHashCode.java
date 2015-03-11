@@ -22,7 +22,7 @@ import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotations.IsSPIImplementation;
 import com.helger.commons.collections.ArrayHelper;
-import com.helger.commons.collections.ContainerHelper;
+import com.helger.commons.collections.CollectionHelper;
 import com.helger.commons.equals.EqualsUtils;
 import com.helger.commons.hash.HashCodeGenerator;
 import com.sun.codemodel.JBlock;
@@ -70,7 +70,7 @@ public class PluginEqualsHashCode extends Plugin
   @Override
   public List <String> getCustomizationURIs ()
   {
-    return ContainerHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
+    return CollectionHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
   }
 
   @Override

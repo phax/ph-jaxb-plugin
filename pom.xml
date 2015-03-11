@@ -22,7 +22,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>1.3.2</version>
+    <version>1.3.3</version>
   </parent>
   <artifactId>ph-jaxb22-plugin</artifactId>
   <version>2.2.11.3-SNAPSHOT</version>
@@ -70,12 +70,12 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-commons</artifactId>
-      <version>5.5.0</version>
+      <version>5.6.0</version>
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-math</artifactId>
-      <version>1.2.0</version>
+      <version>1.2.1</version>
     </dependency>
     <dependency>
       <groupId>${jaxb.package}</groupId>
