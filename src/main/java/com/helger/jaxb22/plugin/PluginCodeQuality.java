@@ -29,6 +29,7 @@ import com.helger.commons.collections.CollectionHelper;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
+import com.sun.codemodel.JMod;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
@@ -74,26 +75,43 @@ public class PluginCodeQuality extends Plugin
     {
       final JDefinedClass jClass = aClassOutline.implClass;
 
-      final Set <String> aFieldNames = new HashSet <String> ();
-      for (final JFieldVar aField : jClass.fields ().values ())
-        aFieldNames.add (aField.name ());
-
-      for (final JMethod jMethod : jClass.methods ())
+      if (false)
       {
-        final List <JVar> aParams = jMethod.params ();
-        if (jMethod.name ().startsWith ("set") && aParams.size () == 1)
+        // Does not work, because the execution order of plugins is undefined.
+        // And if this happens after the equals/hashCode plugin it will create
+        // invalid code!
+        // Change field name - copy the list!
+        for (final JFieldVar aField : CollectionHelper.newList (jClass.fields ().values ()))
+          if ((aField.mods ().getValue () & JMod.STATIC) == 0)
+            if (!aField.name ().startsWith ("m_"))
+              aField.name ("m_" + aField.name ());
+      }
+      else
+        if (false)
         {
-          final JVar aParam = aParams.get (0);
-          if (aFieldNames.contains (aParam.name ()))
-          {
-            // Change name because it conflicts with field "value"
-            aParam.name (aParam.name () + "Param");
+          // This fails, because the Java 8 javadoc will create errors because
+          // of this
+          final Set <String> aFieldNames = new HashSet <String> ();
+          for (final JFieldVar aField : jClass.fields ().values ())
+            aFieldNames.add (aField.name ());
 
-            // TODO update javaDoc - currently not possible see
-            // https://java.net/jira/browse/CODEMODEL-15
+          for (final JMethod jMethod : jClass.methods ())
+          {
+            final List <JVar> aParams = jMethod.params ();
+            if (jMethod.name ().startsWith ("set") && aParams.size () == 1)
+            {
+              final JVar aParam = aParams.get (0);
+              if (aFieldNames.contains (aParam.name ()))
+              {
+                // Change name because it conflicts with field "value"
+                aParam.name (aParam.name () + "Param");
+
+                // TODO update javaDoc - currently not possible see
+                // https://java.net/jira/browse/CODEMODEL-15
+              }
+            }
           }
         }
-      }
     }
 
     // Get all ObjectFactory classes

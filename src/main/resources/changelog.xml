@@ -19,6 +19,12 @@
 -->
 <changelog xmlns="http://www.phloc.com/ns/changelog/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.phloc.com/ns/changelog/1.0 schemas/changelog-1.0.xsd" version="1.0" component="ph-jaxb22-plugin">
+  <release date="2015-03-31" version="2.2.11.4" />
+  <entry date="2015-03-31" category="api" action="add">
+    <change>
+      <text locale="en">Disabled the parameter renaming in the PluginCodeQuality so that JavaDocs can be generated with Java 8</text>
+    </change>
+  </entry>
   <release date="2015-03-11" version="2.2.11.3" />
   <release date="2015-02-06" version="2.2.11.2" />
   <entry date="2015-02-06" category="api" action="add">
