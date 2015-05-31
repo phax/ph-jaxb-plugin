@@ -22,7 +22,7 @@ import org.junit.Test;
 
 import com.sun.tools.xjc.Driver;
 
-public class XJCLoaderTest
+public class XJCLoaderFuncTest
 {
   @Test
   public void testLoadXJC () throws Throwable
