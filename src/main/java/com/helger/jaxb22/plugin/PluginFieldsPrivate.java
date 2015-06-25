@@ -22,8 +22,8 @@ import javax.annotation.Nonnull;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotations.IsSPIImplementation;
-import com.helger.commons.collections.CollectionHelper;
+import com.helger.commons.annotation.IsSPIImplementation;
+import com.helger.commons.collection.CollectionHelper;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.tools.xjc.Options;

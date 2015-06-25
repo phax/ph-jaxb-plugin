@@ -20,11 +20,11 @@ import java.util.List;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotations.IsSPIImplementation;
-import com.helger.commons.collections.ArrayHelper;
-import com.helger.commons.collections.CollectionHelper;
-import com.helger.commons.equals.EqualsUtils;
-import com.helger.commons.hash.HashCodeGenerator;
+import com.helger.commons.annotation.IsSPIImplementation;
+import com.helger.commons.collection.ArrayHelper;
+import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.equals.EqualsHelper;
+import com.helger.commons.hashcode.HashCodeGenerator;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
@@ -43,7 +43,7 @@ import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
 
 /**
- * Add default equals and hashCode methods. For equals the {@link EqualsUtils}
+ * Add default equals and hashCode methods. For equals the {@link EqualsHelper}
  * class is used and for hashCode the {@link HashCodeGenerator} class is used.
  *
  * @author Philip Helger
@@ -64,7 +64,7 @@ public class PluginEqualsHashCode extends Plugin
   {
     return "  -" +
            OPT +
-           "    :  auto implement equals and hashCode using com.helger.commons.equals.EqualsUtils and com.helger.commons.hash.HashCodeGenerator";
+           "    :  auto implement equals and hashCode using com.helger.commons.equals.EqualsHelper and com.helger.commons.hash.HashCodeGenerator";
   }
 
   @Override
@@ -78,7 +78,7 @@ public class PluginEqualsHashCode extends Plugin
   {
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     final JClass jObject = aCodeModel.ref (Object.class);
-    final JClass jEqualsUtils = aCodeModel.ref (EqualsUtils.class);
+    final JClass jEqualsHelper = aCodeModel.ref (EqualsHelper.class);
     final JClass jHashCodeGenerator = aCodeModel.ref (HashCodeGenerator.class);
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
@@ -123,9 +123,9 @@ public class PluginEqualsHashCode extends Plugin
             for (final FieldOutline aField : aFields)
             {
               final String sFieldName = aField.getPropertyInfo ().getName (false);
-              final JExpression aThisExpr = jEqualsUtils.staticInvoke ("equals")
-                                                        .arg (JExpr.ref (sFieldName))
-                                                        .arg (jTyped.ref (sFieldName));
+              final JExpression aThisExpr = jEqualsHelper.staticInvoke ("equals")
+                                                         .arg (JExpr.ref (sFieldName))
+                                                         .arg (jTyped.ref (sFieldName));
               jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
             }
           }

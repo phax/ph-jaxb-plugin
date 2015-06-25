@@ -31,7 +31,7 @@ import javax.validation.constraints.Size;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.collections.CollectionHelper;
+import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.math.MathHelper;
 import com.helger.commons.string.StringParser;
 import com.sun.codemodel.JAnnotationUse;

@@ -21,8 +21,8 @@ import java.util.List;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotations.IsSPIImplementation;
-import com.helger.commons.collections.CollectionHelper;
+import com.helger.commons.annotation.IsSPIImplementation;
+import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.math.graph.IDirectedGraphNode;
 import com.helger.math.graph.simple.SimpleDirectedGraph;

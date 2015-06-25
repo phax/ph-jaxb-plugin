@@ -23,8 +23,8 @@ import javax.annotation.Nonnull;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotations.IsSPIImplementation;
-import com.helger.commons.collections.CollectionHelper;
+import com.helger.commons.annotation.IsSPIImplementation;
+import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.locale.LocaleCache;
 import com.helger.commons.string.StringHelper;
 import com.sun.tools.xjc.BadCommandLineException;
@@ -70,7 +70,7 @@ public class PluginDefaultLocale extends Plugin
       final String sLocale = opt.requireArgument ("-" + OPT, args, i + 1);
       if (StringHelper.hasNoText (sLocale))
         throw new BadCommandLineException ("No locale name provided. Use e.g. 'en_US'");
-      Locale.setDefault (LocaleCache.getLocale (sLocale));
+      Locale.setDefault (LocaleCache.getInstance ().getLocale (sLocale));
       return 2;
     }
     return 0;

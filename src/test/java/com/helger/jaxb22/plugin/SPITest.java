@@ -18,13 +18,13 @@ package com.helger.jaxb22.plugin;
 
 import org.junit.Test;
 
-import com.helger.commons.mock.PHTestUtils;
+import com.helger.commons.mock.CommonsTestHelper;
 
-public class SPITest
+public final class SPITest
 {
   @Test
   public void testBasic () throws Exception
   {
-    PHTestUtils.testIfAllSPIImplementationsAreValid ();
+    CommonsTestHelper.testIfAllSPIImplementationsAreValid ();
   }
 }

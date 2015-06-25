@@ -25,9 +25,9 @@ import javax.annotation.Nullable;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotations.IsSPIImplementation;
-import com.helger.commons.annotations.ReturnsMutableObject;
-import com.helger.commons.collections.CollectionHelper;
+import com.helger.commons.annotation.IsSPIImplementation;
+import com.helger.commons.annotation.ReturnsMutableObject;
+import com.helger.commons.collection.CollectionHelper;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JMethod;
