@@ -88,7 +88,7 @@ public class PluginAnnotate extends Plugin
           if (aReturnType.name ().startsWith ("List<"))
           {
             aMethod.annotate (Nonnull.class);
-            aMethod.annotate (ReturnsMutableObject.class).param ("reason", "JAXB implementation style");
+            aMethod.annotate (ReturnsMutableObject.class).param ("value", "JAXB implementation style");
           }
           else
             if (!aReturnType.isPrimitive ())
