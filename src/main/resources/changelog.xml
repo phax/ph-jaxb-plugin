@@ -18,6 +18,17 @@
 
 -->
 <changelog xmlns="http://www.helger.com/xsd/changelog/1.0" version="1.0" component="ph-jaxb22-plugin">
+  <release date="2015-07-01" version="2.2.11.5" />
+  <entry date="2015-07-01" category="api" action="add">
+    <change>
+      <text locale="en">Extended 'ph-csu' for all enums as well</text>
+    </change>
+  </entry>
+  <entry date="2015-07-01" category="tech" action="update">
+    <change>
+      <text locale="en">Updated to ph-commons 6.0.0</text>
+    </change>
+  </entry>
   <release date="2015-03-31" version="2.2.11.4" />
   <entry date="2015-03-31" category="api" action="add">
     <change>
