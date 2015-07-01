@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.xml.sax.ErrorHandler;
@@ -105,12 +106,14 @@ public class PluginListExtension extends Plugin
           // Find e.g. List<ItemListType> getItemList()
           if (aReturnType.name ().startsWith ("List<"))
           {
+            final String sRelevantTypeName = aMethod.name ().substring (3);
             final JType aListElementType = ((JClass) aReturnType).getTypeParameters ().get (0);
 
+            // boolean hasXXXEntries ()
             {
               final JMethod mHasEntries = jClass.method (JMod.PUBLIC,
                                                          aCodeModel.BOOLEAN,
-                                                         "has" + aMethod.name ().substring (3) + "Entries");
+                                                         "has" + sRelevantTypeName + "Entries");
               mHasEntries.body ()._return (JOp.not (JExpr.invoke (aMethod).invoke ("isEmpty")));
 
               mHasEntries.javadoc ()
@@ -119,10 +122,11 @@ public class PluginListExtension extends Plugin
               mHasEntries.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }
 
+            // boolean hasNoXXXEntries ()
             {
               final JMethod mHasNoEntries = jClass.method (JMod.PUBLIC,
                                                            aCodeModel.BOOLEAN,
-                                                           "hasNo" + aMethod.name ().substring (3) + "Entries");
+                                                           "hasNo" + sRelevantTypeName + "Entries");
               mHasNoEntries.body ()._return (JExpr.invoke (aMethod).invoke ("isEmpty"));
 
               mHasNoEntries.javadoc ()
@@ -131,8 +135,9 @@ public class PluginListExtension extends Plugin
               mHasNoEntries.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }
 
+            // int getXXXCount ()
             {
-              final JMethod mCount = jClass.method (JMod.PUBLIC, aCodeModel.INT, aMethod.name () + "Count");
+              final JMethod mCount = jClass.method (JMod.PUBLIC, aCodeModel.INT, "get" + aMethod.name () + "Count");
               mCount.annotate (Nonnegative.class);
               mCount.body ()._return (JExpr.invoke (aMethod).invoke ("size"));
 
@@ -140,10 +145,11 @@ public class PluginListExtension extends Plugin
               mCount.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }
 
+            // ELEMENTTYPE getXXXAtIndex (int)
             {
               final JMethod mAtIndex = jClass.method (JMod.PUBLIC,
                                                       aListElementType,
-                                                      "get" + aMethod.name ().substring (3) + "AtIndex");
+                                                      "get" + sRelevantTypeName + "AtIndex");
               mAtIndex.annotate (Nullable.class);
               final JVar aParam = mAtIndex.param (JMod.FINAL, aCodeModel.INT, "index");
               aParam.annotate (Nonnegative.class);
@@ -153,6 +159,17 @@ public class PluginListExtension extends Plugin
               mAtIndex.javadoc ().addReturn ().add ("The element at the specified index. May be <code>null</code>");
               mAtIndex.javadoc ().addThrows (ArrayIndexOutOfBoundsException.class).add ("if the index is invalid!");
               mAtIndex.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+            }
+
+            // void addXXX (ELEMENTTYPE)
+            {
+              final JMethod mAdd = jClass.method (JMod.PUBLIC, aCodeModel.VOID, "add" + sRelevantTypeName);
+              final JVar aParam = mAdd.param (JMod.FINAL, aListElementType, "elem");
+              aParam.annotate (Nonnull.class);
+              mAdd.body ().add (JExpr.invoke (aMethod).invoke ("add").arg (aParam));
+
+              mAdd.javadoc ().addParam (aParam).add ("The element to be added. May not be <code>null</code>.");
+              mAdd.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }
           }
         }

@@ -24,7 +24,7 @@ import org.xml.sax.ErrorHandler;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.regex.RegExHelper;
-import com.helger.math.graph.IDirectedGraphNode;
+import com.helger.math.graph.IMutableDirectedGraphNode;
 import com.helger.math.graph.simple.SimpleDirectedGraph;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
@@ -45,8 +45,9 @@ import com.sun.tools.xjc.outline.Outline;
 @IsSPIImplementation
 public class PluginImplements extends Plugin
 {
+  private static final String GRAPH_ATTR_VALUE = "value";
   private static final String OPT = "Xph-implements";
-  private List <String> m_aInterfaces;
+  private List <String> m_aInterfacesToImplement;
 
   @Override
   public String getOptionName ()
@@ -57,7 +58,7 @@ public class PluginImplements extends Plugin
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + " interfaceName[,interfaceName] :  implement 1-n interfaces in a class";
+    return "  -" + OPT + " interfaceName[,interfaceName] :  implement 1-n interfaces in all classes/enums";
   }
 
   @Override
@@ -66,9 +67,9 @@ public class PluginImplements extends Plugin
     if (args[i].equals ("-" + OPT))
     {
       final String sClassNames = opt.requireArgument ("-" + OPT, args, i + 1);
-      m_aInterfaces = RegExHelper.getSplitToList (sClassNames, "[,;]+");
-      if (m_aInterfaces.isEmpty ())
-        throw new BadCommandLineException ("No interface names provided. They must be seprated by commad (,) or semicolon (;)");
+      m_aInterfacesToImplement = RegExHelper.getSplitToList (sClassNames, "[,;]+");
+      if (m_aInterfacesToImplement.isEmpty ())
+        throw new BadCommandLineException ("No interface names provided. They must be seprated by comma (,) or semicolon (;)");
       return 2;
     }
     return 0;
@@ -89,26 +90,26 @@ public class PluginImplements extends Plugin
     final SimpleDirectedGraph aSG = new SimpleDirectedGraph ();
     // Create all nodes
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
-      aSG.createNode (aClassOutline.implClass.fullName ()).setAttribute ("value", aClassOutline.implClass);
+      aSG.createNode (aClassOutline.implClass.fullName ()).setAttribute (GRAPH_ATTR_VALUE, aClassOutline.implClass);
     // Connect them
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
       // Check if there is a super-class node present (not present e.g. for
       // Object.class)
-      final IDirectedGraphNode aParentNode = aSG.getNodeOfID (aClassOutline.implClass._extends ().fullName ());
+      final IMutableDirectedGraphNode aParentNode = aSG.getNodeOfID (aClassOutline.implClass._extends ().fullName ());
       if (aParentNode != null)
         aSG.createRelation (aParentNode, aSG.getNodeOfID (aClassOutline.implClass.fullName ()));
     }
 
-    for (final String sInterface : m_aInterfaces)
+    for (final String sInterface : m_aInterfacesToImplement)
     {
       final String sCleanInterfaceName = sInterface.trim ();
       final JClass aInterface = aCodeModel.ref (sCleanInterfaceName);
 
       // Implement interfaces only in all base classes, because sub-classes have
       // them already!
-      for (final IDirectedGraphNode aNode : aSG.getAllStartNodes ())
-        ((JDefinedClass) aNode.getCastedAttribute ("value"))._implements (aInterface);
+      for (final IMutableDirectedGraphNode aNode : aSG.getAllStartNodes ())
+        ((JDefinedClass) aNode.getCastedAttribute (GRAPH_ATTR_VALUE))._implements (aInterface);
 
       // Enums are automatically serializable
       if (!sCleanInterfaceName.equals (Serializable.class.getName ()))
