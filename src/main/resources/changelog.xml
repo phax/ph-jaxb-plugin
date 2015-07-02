@@ -21,7 +21,7 @@
   <release date="2015-07-01" version="2.2.11.5" />
   <entry date="2015-07-01" category="api" action="add">
     <change>
-      <text locale="en">Extended 'ph-csu' for all enums as well</text>
+      <text locale="en">Extended 'ph-list-extension' with the "add" method</text>
     </change>
   </entry>
   <entry date="2015-07-01" category="tech" action="update">
