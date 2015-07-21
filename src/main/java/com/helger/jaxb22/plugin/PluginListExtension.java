@@ -137,7 +137,7 @@ public class PluginListExtension extends Plugin
 
             // int getXXXCount ()
             {
-              final JMethod mCount = jClass.method (JMod.PUBLIC, aCodeModel.INT, "get" + aMethod.name () + "Count");
+              final JMethod mCount = jClass.method (JMod.PUBLIC, aCodeModel.INT, "get" + sRelevantTypeName + "Count");
               mCount.annotate (Nonnegative.class);
               mCount.body ()._return (JExpr.invoke (aMethod).invoke ("size"));
 
