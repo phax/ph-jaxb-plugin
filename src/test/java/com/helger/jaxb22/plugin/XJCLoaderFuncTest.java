@@ -22,14 +22,15 @@ import org.junit.Test;
 
 import com.sun.tools.xjc.Driver;
 
-public class XJCLoaderFuncTest
+public final class XJCLoaderFuncTest
 {
   @Test
   public void testLoadXJC () throws Throwable
   {
     // Don't use Driver.main because it calls System.exit
     Driver.run (new String [] { new File ("src/test/resources/changelog-1.0.xsd").getAbsolutePath (),
-                               "-d",
-                               new File ("target").getAbsolutePath () }, System.out, System.out);
+                                "-d",
+                                new File ("target").getAbsolutePath () },
+                System.out, System.out);
   }
 }
