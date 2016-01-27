@@ -68,12 +68,12 @@ public abstract class AbstractPluginBeanValidation extends Plugin
 {
   private static final BigInteger UNBOUNDED = BigInteger.valueOf (XSParticle.UNBOUNDED);
   private static final String [] NUMBER_TYPES = new String [] { "BigDecimal",
-                                                               "BigInteger",
-                                                               "String",
-                                                               "byte",
-                                                               "short",
-                                                               "int",
-                                                               "long" };
+                                                                "BigInteger",
+                                                                "String",
+                                                                "byte",
+                                                                "short",
+                                                                "int",
+                                                                "long" };
 
   private boolean m_bJSR349 = false;
 
@@ -260,9 +260,9 @@ public abstract class AbstractPluginBeanValidation extends Plugin
     final XSFacet aXSTotalDigits = aSimpleType.getFacet ("totalDigits");
     final XSFacet aXSFractionDigits = aSimpleType.getFacet ("fractionDigits");
     final Integer aTotalDigits = aXSTotalDigits == null ? null
-                                                       : StringParser.parseIntObj (aXSTotalDigits.getValue ().value);
+                                                        : StringParser.parseIntObj (aXSTotalDigits.getValue ().value);
     final Integer aFractionDigits = aXSFractionDigits == null ? null
-                                                             : StringParser.parseIntObj (aXSFractionDigits.getValue ().value);
+                                                              : StringParser.parseIntObj (aXSFractionDigits.getValue ().value);
     if (!_hasAnnotation (aField, Digits.class) && aTotalDigits != null)
     {
       final JAnnotationUse aAnnotDigits = aField.annotate (Digits.class);
@@ -333,7 +333,8 @@ public abstract class AbstractPluginBeanValidation extends Plugin
     return value != null &&
            !(_isEqual (Long.MAX_VALUE, value) ||
              _isEqual (Integer.MAX_VALUE, value) ||
-             _isEqual (Long.MIN_VALUE, value) || _isEqual (Integer.MIN_VALUE, value));
+             _isEqual (Long.MIN_VALUE, value) ||
+             _isEqual (Integer.MIN_VALUE, value));
   }
 
   private static boolean _hasAnnotation (@Nonnull final JFieldVar aField, @Nonnull final Class <?> aAnnotationClass)
