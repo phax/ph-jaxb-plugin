@@ -59,7 +59,7 @@ public class PluginCodingStyleguideUnaware extends Plugin
   @Override
   public List <String> getCustomizationURIs ()
   {
-    return CollectionHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
+    return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
   }
 
   @Override

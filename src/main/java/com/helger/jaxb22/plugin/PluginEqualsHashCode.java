@@ -70,7 +70,7 @@ public class PluginEqualsHashCode extends Plugin
   @Override
   public List <String> getCustomizationURIs ()
   {
-    return CollectionHelper.newUnmodifiableList (CJAXB22.NSURI_PH);
+    return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
   }
 
   @Override
@@ -105,11 +105,11 @@ public class PluginEqualsHashCode extends Plugin
           if (bIsRoot)
           {
             // if(o==null||!getClass().equals(o.getClass()))return false;
-            jBody._if (param.eq (JExpr._null ()).cor (JOp.not (JExpr.invoke ("getClass")
-                                                                    .invoke ("equals")
-                                                                    .arg (param.invoke ("getClass")))))
-                 ._then ()
-                 ._return (JExpr.FALSE);
+            jBody._if (param.eq (JExpr._null ())
+                            .cor (JOp.not (JExpr.invoke ("getClass")
+                                                .invoke ("equals")
+                                                .arg (param.invoke ("getClass")))))
+                 ._then ()._return (JExpr.FALSE);
           }
           else
           {
