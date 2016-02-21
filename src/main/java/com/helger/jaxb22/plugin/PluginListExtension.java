@@ -47,15 +47,26 @@ import com.sun.tools.xjc.outline.Outline;
 
 /**
  * Extend all bean List&lt;?&gt; getters with additional method to query the
- * content: boolean has...Entries(), boolean hasNo...Entries(), int
- * get...Count() and T get...AtIndex(int)
+ * content:
+ * <ul>
+ * <li>void set...(List)</li>
+ * <li>boolean has...Entries()</li>
+ * <li>boolean hasNo...Entries()</li>
+ * <li>int get...Count()</li>
+ * <li>T get...AtIndex(int)</li>
+ * <li>void add...(T)</li>
+ * </ul>
  *
  * @author Philip Helger
  */
 @IsSPIImplementation
 public class PluginListExtension extends Plugin
 {
-  private static final boolean USE_COMMONS_LIST = true;
+  /**
+   * Does not work because upon reading the object gets filled with a regular
+   * java.util.ArrayList!
+   */
+  private static final boolean USE_COMMONS_LIST = false;
   private static final String OPT = "Xph-list-extension";
 
   @Override
