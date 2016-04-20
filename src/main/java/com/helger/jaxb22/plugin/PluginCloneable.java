@@ -16,8 +16,8 @@
  */
 package com.helger.jaxb22.plugin;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
@@ -25,17 +25,24 @@ import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.CommonsLinkedHashMap;
+import com.helger.commons.collection.ext.ICommonsMap;
+import com.helger.commons.collection.ext.ICommonsOrderedMap;
 import com.helger.commons.lang.CloneHelper;
-import com.helger.commons.lang.ICloneable;
+import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JForEach;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
-import com.sun.codemodel.JTypeVar;
+import com.sun.codemodel.JOp;
+import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
@@ -70,9 +77,26 @@ public class PluginCloneable extends Plugin
     return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
   }
 
-  private static boolean _isImmutable (@Nonnull final String sTypeName)
+  private static boolean _isImmutable (@Nonnull final JType aType)
   {
-    return sTypeName.equals ("String") ||
+    // int, byte, boolean etc?
+    if (aType.isPrimitive ())
+      return true;
+
+    // Is it an enum?
+    if (aType instanceof JDefinedClass)
+    {
+      final JDefinedClass aClass = (JDefinedClass) aType;
+      if (aClass.getClassType () == ClassType.ENUM)
+        return true;
+    }
+
+    // Check by name :)
+    final String sTypeName = aType.name ();
+    return sTypeName.equals ("Object") ||
+           sTypeName.equals ("String") ||
+           sTypeName.equals ("BigInteger") ||
+           sTypeName.equals ("BigDecimal") ||
            sTypeName.equals ("Boolean") ||
            sTypeName.equals ("Byte") ||
            sTypeName.equals ("Character") ||
@@ -83,69 +107,149 @@ public class PluginCloneable extends Plugin
            sTypeName.equals ("Short");
   }
 
+  private static boolean _isJavaCloneable (@Nonnull final JType aType)
+  {
+    // Check by name :)
+    final String sTypeName = aType.name ();
+    return sTypeName.equals ("XMLGregorianCalendar");
+  }
+
+  private static boolean _isImmutableArray (@Nonnull final JType aType)
+  {
+    return aType.isArray () && _isImmutable (aType.elementType ());
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  private static ICommonsMap <JFieldVar, String> _getAllFields (@Nonnull final Outline aOutline,
+                                                                @Nonnull final ClassOutline aClassOutline)
+  {
+    final ICommonsOrderedMap <JFieldVar, String> ret = new CommonsLinkedHashMap<> ();
+
+    // Add all fields of base class
+    final JDefinedClass jClass = aClassOutline.implClass;
+    final JClass jExtends = jClass._extends ();
+    if (jExtends instanceof JDefinedClass)
+    {
+      for (final ClassOutline aCurClassOutline : aOutline.getClasses ())
+        if (aCurClassOutline.implClass == jExtends)
+        {
+          ret.addAll (_getAllFields (aOutline, aCurClassOutline));
+          break;
+        }
+    }
+
+    // Add fields of this class
+    for (final JFieldVar aFieldVar : CollectionHelper.getSortedByKey (jClass.fields ()).values ())
+    {
+      // Get public name
+      final String sFieldName = aClassOutline.target.getProperty (aFieldVar.name ()).getName (true);
+      ret.put (aFieldVar, sFieldName);
+    }
+
+    return ret;
+  }
+
+  @Nonnull
+  private static JExpression _getCloneCode (final JCodeModel aCodeModel,
+                                            final JExpression aGetter,
+                                            final JType aTypeParam)
+  {
+    if (_isImmutable (aTypeParam))
+    {
+      // Immutable value
+      // return aItem
+      return aGetter;
+    }
+
+    if (_isImmutableArray (aTypeParam))
+    {
+      // Array of immutable objects
+      // ArrayHelper.getCopy (aItem);
+      // Method is null-safe
+      return aCodeModel.ref (ArrayHelper.class).staticInvoke ("getCopy").arg (aGetter);
+    }
+
+    if (_isJavaCloneable (aTypeParam))
+    {
+      // Nested Java Cloneable value
+      // aItem == null ? null : (X) aItem.clone ();
+      if (true)
+        return JOp.cond (aGetter.eq (JExpr._null ()),
+                         JExpr._null (),
+                         JExpr.cast (aTypeParam, aGetter.invoke ("clone")));
+      return aCodeModel.ref (CloneHelper.class).staticInvoke ("getClonedValue").arg (aGetter);
+    }
+
+    if (aTypeParam.erasure ().name ().equals ("JAXBElement"))
+    {
+      // Array of immutable objects
+      // CloneHelper.getClonedJAXBElement (aItem);
+      // Method is null-safe
+      return aCodeModel.ref (CloneHelper.class).staticInvoke ("getClonedJAXBElement").arg (aGetter);
+    }
+
+    // Nested Cloneable value
+    // aItem == null ? null : aItem.clone ();
+    return JOp.cond (aGetter.eq (JExpr._null ()), JExpr._null (), aGetter.invoke ("clone"));
+  }
+
   @Override
   public boolean run (@Nonnull final Outline aOutline,
                       @Nonnull final Options aOpts,
                       @Nonnull final ErrorHandler aErrorHandler)
   {
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
-    final JClass jICloneable = aCodeModel.ref (ICloneable.class);
-    final JClass jCollectionHelper = aCodeModel.ref (CollectionHelper.class);
-    final JClass jCloneHelper = aCodeModel.ref (CloneHelper.class);
+    final JClass jObject = aCodeModel.ref (Object.class);
+    final JClass jCloneable = aCodeModel.ref (Cloneable.class);
 
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
       final JDefinedClass jClass = aClassOutline.implClass;
-      jClass._implements (jICloneable);
+      final boolean bIsRoot = jClass._extends () == null || jClass._extends ().equals (jObject);
 
-      // getClone
-      final JMethod mGetClone = jClass.method (JMod.PUBLIC, jClass, "getClone");
+      if (bIsRoot)
+      {
+        // Implement Cloneable
+        jClass._implements (jCloneable);
+      }
+
+      // clone
+      // Do not use "getClone" as this is the name of a JAXB generated method
+      // for the XSD Element "Clone" :(
+      final JMethod mGetClone = jClass.method (JMod.PUBLIC, jClass, "clone");
       mGetClone.annotate (Nonnull.class);
       mGetClone.annotate (ReturnsMutableCopy.class);
+      mGetClone.annotate (Override.class);
 
       final JVar jRet = mGetClone.body ().decl (jClass, "ret", JExpr._new (jClass));
-      final Collection <JFieldVar> aFields = CollectionHelper.getSortedByKey (jClass.fields ()).values ();
-      for (final JFieldVar aField : aFields)
+      for (final Map.Entry <JFieldVar, String> aEntry : _getAllFields (aOutline, aClassOutline).entrySet ())
       {
-        final String sFieldName = aField.name ();
+        final JFieldVar aField = aEntry.getKey ();
+        // Must use the getter in case this is a derived class. In this case we
+        // cannot access the private member of the base class
+        final String sGetter = CJAXB22.getGetterName (aField.type (), aEntry.getValue ());
+        final String sSetter = CJAXB22.getSetterName (aEntry.getValue ());
 
-        final String sGetter = CJAXB22.getGetterName (sFieldName);
-        final String sSetter = CJAXB22.getSetterName (sFieldName);
-
-        if (aField.type ().name ().equals ("List"))
+        if (aField.type ().erasure ().name ().equals ("List"))
         {
           // List
-          final JTypeVar aTypeParam = ((JClass) aField.type ()).typeParams ()[0];
-          if (_isImmutable (aTypeParam.name ()))
-          {
-            // Immutable value
-            // ret.setX (CollectionHelper.newList (getX ()))
-            mGetClone.body ()
-                     .add (jRet.invoke (sSetter)
-                               .arg (jCollectionHelper.staticInvoke ("newList").arg (JExpr._this ().invoke (sGetter))));
-          }
-          else
-          {
-            // Nested cloneable value
-            // ret.setX (CloneHelper.getClonedList (getX ().getClone ()));
-            mGetClone.body ().add (jRet.invoke (sSetter).arg (jCloneHelper.staticInvoke ("getClonedList")
-                                                                          .arg (JExpr._this ().invoke (sGetter))));
-          }
+          final JClass aTypeParam = ((JClass) aField.type ()).getTypeParameters ().get (0);
+
+          // Ensure list is created :)
+          final JVar aTargetList = mGetClone.body ().decl (aField.type (),
+                                                           "_" + aEntry.getValue (),
+                                                           jRet.invoke (sGetter));
+
+          // for (X aItem : getX())
+          final JForEach jForEach = mGetClone.body ().forEach (aTypeParam, "aItem", JExpr.invoke (sGetter));
+          jForEach.body ()
+                  .add (aTargetList.invoke ("add").arg (_getCloneCode (aCodeModel, jForEach.var (), aTypeParam)));
         }
         else
         {
-          if (aField.type ().isPrimitive () || _isImmutable (aField.type ().name ()))
-          {
-            // Immutable value
-            // ret.setX (getX ())
-            mGetClone.body ().add (jRet.invoke (sSetter).arg (JExpr._this ().invoke (sGetter)));
-          }
-          else
-          {
-            // Nested cloneable value
-            // ret.setX (getX ().getClone ());
-            mGetClone.body ().add (jRet.invoke (sSetter).arg (JExpr._this ().invoke (sGetter).invoke ("getClone")));
-          }
+          mGetClone.body ().add (jRet.invoke (sSetter)
+                                     .arg (_getCloneCode (aCodeModel, JExpr.invoke (sGetter), aField.type ())));
         }
       }
       mGetClone.body ()._return (jRet);

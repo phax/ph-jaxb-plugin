@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 
 import com.helger.commons.annotation.Nonempty;
+import com.sun.codemodel.JType;
 
 @Immutable
 public final class CJAXB22
@@ -35,11 +36,14 @@ public final class CJAXB22
 
   @Nonnull
   @Nonempty
-  public static String getGetterName (@Nonnull final String sFieldName)
+  public static String getGetterName (@Nonnull final JType aType, @Nonnull final String sFieldName)
   {
     String sName = sFieldName;
     if (Character.isLowerCase (sName.charAt (0)))
       sName = sName.substring (0, 1).toUpperCase (Locale.US) + sName.substring (1);
+
+    if (aType.name ().equals ("boolean") || aType.name ().equals ("Boolean"))
+      return "is" + sName;
     return "get" + sName;
   }
 

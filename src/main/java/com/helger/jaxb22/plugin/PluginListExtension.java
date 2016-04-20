@@ -111,11 +111,12 @@ public class PluginListExtension extends Plugin
             aField.type (aNewType);
           }
 
+          // Important for correct casing
+          final String sFieldName = aClassOutline.target.getProperty (aField.name ()).getName (true);
+
           // Create Setter
           {
-            final JMethod aSetter = jClass.method (JMod.PUBLIC,
-                                                   aCodeModel.VOID,
-                                                   CJAXB22.getSetterName (aField.name ()));
+            final JMethod aSetter = jClass.method (JMod.PUBLIC, aCodeModel.VOID, CJAXB22.getSetterName (sFieldName));
             final JVar aParam = aSetter.param (JMod.FINAL, USE_COMMONS_LIST ? aNewType : aField.type (), "aList");
             aParam.annotate (Nullable.class);
             aSetter.body ().assign (aField, aParam);
@@ -126,7 +127,8 @@ public class PluginListExtension extends Plugin
           // Create a new getter
           if (USE_COMMONS_LIST)
           {
-            final JMethod aOldGetter = jClass.getMethod (CJAXB22.getGetterName (aField.name ()), new JType [0]);
+            final JMethod aOldGetter = jClass.getMethod (CJAXB22.getGetterName (aField.type (), sFieldName),
+                                                         new JType [0]);
             jClass.methods ().remove (aOldGetter);
             final JMethod aNewGetter = jClass.method (JMod.PUBLIC, aNewType, aOldGetter.name ());
             aNewGetter.annotate (Nonnull.class);
