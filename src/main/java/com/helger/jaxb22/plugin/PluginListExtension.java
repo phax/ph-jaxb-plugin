@@ -17,7 +17,6 @@
 package com.helger.jaxb22.plugin;
 
 import java.util.List;
-import java.util.Locale;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -113,11 +112,10 @@ public class PluginListExtension extends Plugin
           }
 
           // Create Setter
-          String sName = aField.name ();
-          if (Character.isLowerCase (sName.charAt (0)))
-            sName = sName.substring (0, 1).toUpperCase (Locale.US) + sName.substring (1);
           {
-            final JMethod aSetter = jClass.method (JMod.PUBLIC, aCodeModel.VOID, "set" + sName);
+            final JMethod aSetter = jClass.method (JMod.PUBLIC,
+                                                   aCodeModel.VOID,
+                                                   CJAXB22.getSetterName (aField.name ()));
             final JVar aParam = aSetter.param (JMod.FINAL, USE_COMMONS_LIST ? aNewType : aField.type (), "aList");
             aParam.annotate (Nullable.class);
             aSetter.body ().assign (aField, aParam);
@@ -128,9 +126,9 @@ public class PluginListExtension extends Plugin
           // Create a new getter
           if (USE_COMMONS_LIST)
           {
-            final JMethod aOldGetter = jClass.getMethod ("get" + sName, new JType [0]);
+            final JMethod aOldGetter = jClass.getMethod (CJAXB22.getGetterName (aField.name ()), new JType [0]);
             jClass.methods ().remove (aOldGetter);
-            final JMethod aNewGetter = jClass.method (JMod.PUBLIC, aNewType, "get" + sName);
+            final JMethod aNewGetter = jClass.method (JMod.PUBLIC, aNewType, aOldGetter.name ());
             aNewGetter.annotate (Nonnull.class);
             aNewGetter.annotate (ReturnsMutableObject.class).param ("value", "JAXB style");
             final JVar aJRet = aNewGetter.body ().decl (aNewType, "ret", JExpr.cast (aNewType, aField));

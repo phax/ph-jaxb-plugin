@@ -1,6 +1,7 @@
 com.helger.jaxb22.plugin.PluginAnnotate
 com.helger.jaxb22.plugin.PluginBeanValidation10
 com.helger.jaxb22.plugin.PluginBeanValidation11
+com.helger.jaxb22.plugin.PluginCloneable
 com.helger.jaxb22.plugin.PluginCodeQuality
 com.helger.jaxb22.plugin.PluginCodingStyleguideUnaware
 com.helger.jaxb22.plugin.PluginDefaultLocale

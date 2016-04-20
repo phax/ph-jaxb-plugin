@@ -16,7 +16,12 @@
  */
 package com.helger.jaxb22.plugin;
 
+import java.util.Locale;
+
+import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
+
+import com.helger.commons.annotation.Nonempty;
 
 @Immutable
 public final class CJAXB22
@@ -27,4 +32,24 @@ public final class CJAXB22
 
   private CJAXB22 ()
   {}
+
+  @Nonnull
+  @Nonempty
+  public static String getGetterName (@Nonnull final String sFieldName)
+  {
+    String sName = sFieldName;
+    if (Character.isLowerCase (sName.charAt (0)))
+      sName = sName.substring (0, 1).toUpperCase (Locale.US) + sName.substring (1);
+    return "get" + sName;
+  }
+
+  @Nonnull
+  @Nonempty
+  public static String getSetterName (@Nonnull final String sFieldName)
+  {
+    String sName = sFieldName;
+    if (Character.isLowerCase (sName.charAt (0)))
+      sName = sName.substring (0, 1).toUpperCase (Locale.US) + sName.substring (1);
+    return "set" + sName;
+  }
 }
