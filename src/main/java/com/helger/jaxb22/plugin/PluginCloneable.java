@@ -46,6 +46,7 @@ import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
+import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
@@ -92,11 +93,13 @@ public class PluginCloneable extends Plugin
     }
 
     // Check by name :)
+    // TODO Element should also be cloned
     final String sTypeName = aType.name ();
     return sTypeName.equals ("Object") ||
            sTypeName.equals ("String") ||
            sTypeName.equals ("BigInteger") ||
            sTypeName.equals ("BigDecimal") ||
+           sTypeName.equals ("Element") ||
            sTypeName.equals ("Boolean") ||
            sTypeName.equals ("Byte") ||
            sTypeName.equals ("Character") ||
@@ -143,7 +146,16 @@ public class PluginCloneable extends Plugin
     for (final JFieldVar aFieldVar : CollectionHelper.getSortedByKey (jClass.fields ()).values ())
     {
       // Get public name
-      final String sFieldName = aClassOutline.target.getProperty (aFieldVar.name ()).getName (true);
+      final CPropertyInfo aPI = aClassOutline.target.getProperty (aFieldVar.name ());
+      if (aPI == null)
+      {
+        throw new IllegalStateException ("'" +
+                                         aFieldVar.name () +
+                                         "' not found in " +
+                                         CollectionHelper.newListMapped (aClassOutline.target.getProperties (),
+                                                                         pi -> pi.getName (false)));
+      }
+      final String sFieldName = aPI.getName (true);
       ret.put (aFieldVar, sFieldName);
     }
 
