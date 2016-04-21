@@ -102,6 +102,7 @@ public class PluginCloneable extends Plugin
            sTypeName.equals ("BigInteger") ||
            sTypeName.equals ("BigDecimal") ||
            sTypeName.equals ("Element") ||
+           sTypeName.equals ("Duration") ||
            sTypeName.equals ("Boolean") ||
            sTypeName.equals ("Byte") ||
            sTypeName.equals ("Character") ||
@@ -114,7 +115,9 @@ public class PluginCloneable extends Plugin
 
   private static boolean _isJavaCloneable (@Nonnull final JType aType)
   {
-    return aType instanceof JClass && ((JClass) aType)._package ().name ().equals ("javax.xml.datatype");
+    // Check by name :)
+    final String sTypeName = aType.name ();
+    return sTypeName.equals ("XMLGregorianCalendar");
   }
 
   private static boolean _isImmutableArray (@Nonnull final JType aType)
