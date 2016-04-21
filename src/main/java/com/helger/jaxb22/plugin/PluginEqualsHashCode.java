@@ -165,7 +165,8 @@ public class PluginEqualsHashCode extends Plugin
       }
 
       // General information
-      jClass.javadoc ().add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>");
+      jClass.javadoc ()
+            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
     return true;
   }

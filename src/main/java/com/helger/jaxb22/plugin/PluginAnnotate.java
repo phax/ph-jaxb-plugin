@@ -155,7 +155,7 @@ public class PluginAnnotate extends Plugin
     for (final JDefinedClass jClass : aEffectedClasses)
     {
       // General information
-      jClass.javadoc ().add ("<p>This class was annotated by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>");
+      jClass.javadoc ().add ("<p>This class was annotated by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
 
     return true;
