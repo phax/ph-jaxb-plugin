@@ -20,7 +20,7 @@ Add the following to your pom.xml to use this artifact:
 
 #JAXB Plugins
 
-  * `ph-annotate` - Create `@Nonnull`/`@Nullable` annotations in all bean generated objects as well as in the `ObjectFactory` classes
+  * `ph-annotate` - Create `@javax.annotation.Nonnull`/`@javax.annotation.Nullable` annotations in all bean generated objects as well as in the `ObjectFactory` classes
   * `ph-bean-validation10` - inject Bean validation 1.0 annotations (JSR 303)
   * `ph-bean-validation11` - inject Bean validation 1.1 annotations (JSR 349)
   * `ph-cloneable` (since 2.2.11.7) - implement clone() of Cloneable interface and cloneTo(target). This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons).

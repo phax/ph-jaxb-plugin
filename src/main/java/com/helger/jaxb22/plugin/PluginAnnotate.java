@@ -61,7 +61,9 @@ public class PluginAnnotate extends Plugin
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + " :  add Nullable/Nonnull annotations to getters and setters";
+    return "  -" +
+           OPT +
+           " :  add @javax.annotation.Nullable/@javax.annotation.Nonnull annotations to getters and setters";
   }
 
   @Override
@@ -89,7 +91,7 @@ public class PluginAnnotate extends Plugin
         {
           final JType aReturnType = aMethod.type ();
           // Find e.g. List<ItemListType> getItemList()
-          if (aReturnType.name ().startsWith ("List<"))
+          if (aReturnType.erasure ().name ().equals ("List"))
           {
             aMethod.annotate (Nonnull.class);
             aMethod.annotate (ReturnsMutableObject.class).param ("value", "JAXB implementation style");
@@ -131,7 +133,7 @@ public class PluginAnnotate extends Plugin
       {
         final List <JVar> aParams = aMethod.params ();
         if (aMethod.name ().startsWith ("create") &&
-            aMethod.type ().name ().startsWith ("JAXBElement<") &&
+            aMethod.type ().erasure ().name ().equals ("JAXBElement") &&
             aParams.size () == 1)
         {
           // Modify all JAXBElement<T> createT (Object o) methods
