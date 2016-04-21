@@ -24,9 +24,9 @@ Add something **like** the following to your pom.xml to use this artifact:
           </execution>
         </executions>
         <configuration>
-          ...
+          ...regular plugin configuration...
           <args>
-            <arg>-no-header</arg>
+            ...other direct arguments like -no-header...
             <arg>-Xph-default-locale</arg>
             <arg>en_US</arg>
             <arg>-Xph-annotate</arg>
