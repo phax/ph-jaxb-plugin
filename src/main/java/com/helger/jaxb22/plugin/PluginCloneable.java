@@ -16,6 +16,7 @@
  */
 package com.helger.jaxb22.plugin;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -124,23 +125,11 @@ public class PluginCloneable extends Plugin
 
   @Nonnull
   @ReturnsMutableCopy
-  private static ICommonsMap <JFieldVar, String> _getAllFields (@Nonnull final Outline aOutline,
-                                                                @Nonnull final ClassOutline aClassOutline)
+  private static ICommonsMap <JFieldVar, String> _getAllFields (@Nonnull final ClassOutline aClassOutline)
   {
     final ICommonsOrderedMap <JFieldVar, String> ret = new CommonsLinkedHashMap<> ();
 
-    // Add all fields of base class
     final JDefinedClass jClass = aClassOutline.implClass;
-    final JClass jExtends = jClass._extends ();
-    if (jExtends instanceof JDefinedClass)
-    {
-      for (final ClassOutline aCurClassOutline : aOutline.getClasses ())
-        if (aCurClassOutline.implClass == jExtends)
-        {
-          ret.addAll (_getAllFields (aOutline, aCurClassOutline));
-          break;
-        }
-    }
 
     // Add fields of this class
     for (final JFieldVar aFieldVar : CollectionHelper.getSortedByKey (jClass.fields ()).values ())
@@ -230,6 +219,7 @@ public class PluginCloneable extends Plugin
     final JClass jObject = aCodeModel.ref (Object.class);
     final JClass jCloneable = aCodeModel.ref (Cloneable.class);
     final JClass jCollectionHelper = aCodeModel.ref (CollectionHelper.class);
+    final JClass jArrayList = aCodeModel.ref (ArrayList.class);
 
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
@@ -249,55 +239,80 @@ public class PluginCloneable extends Plugin
         jClass._implements (jCloneable);
       }
 
+      final ICommonsMap <JFieldVar, String> aAllFields = _getAllFields (aClassOutline);
+
+      // cloneTo
+      JMethod mCloneTo;
+      {
+        mCloneTo = jClass.method (JMod.PUBLIC, aCodeModel.VOID, "cloneTo");
+        // No @Override because parameter types are different in the class
+        // hierarchy
+        mCloneTo.javadoc ()
+                .add ("This method clones all values from <code>this</code> to the passed object. All data in the parameter object is overwritten!");
+
+        final JVar jRet = mCloneTo.param (jClass, "ret");
+        jRet.annotate (Nonnull.class);
+        mCloneTo.javadoc ().addParam (jRet).add ("The target object to clone to. May not be <code>null</code>.");
+
+        for (final Map.Entry <JFieldVar, String> aEntry : aAllFields.entrySet ())
+        {
+          final JFieldVar aField = aEntry.getKey ();
+
+          if (aField.type ().erasure ().name ().equals ("List"))
+          {
+            // List
+            final JClass aTypeParam = ((JClass) aField.type ()).getTypeParameters ().get (0);
+
+            // Ensure list is created :)
+            final JVar aTargetList = mCloneTo.body ().decl (aField.type (),
+                                                            "ret" + aEntry.getValue (),
+                                                            JExpr._new (jArrayList.narrow (aTypeParam)));
+
+            // for (X aItem : getX())
+            final String sGetter = CJAXB22.getGetterName (aField.type (), aEntry.getValue ());
+            final JForEach jForEach = mCloneTo.body ().forEach (aTypeParam, "aItem", JExpr.invoke (sGetter));
+            // aTargetList.add (_cloneOf_ (aItem))
+            jForEach.body ()
+                    .add (aTargetList.invoke ("add").arg (_getCloneCode (aCodeModel, jForEach.var (), aTypeParam)));
+            mCloneTo.body ().assign (jRet.ref (aField), aTargetList);
+          }
+          else
+            if (aField.type ().erasure ().name ().equals ("Map"))
+            {
+              // Map (for xs:anyAttribute/> - Map<QName,String>)
+              // has no setter - need to assign directly!
+              mCloneTo.body ().assign (jRet.ref (aField), jCollectionHelper.staticInvoke ("newMap").arg (aField));
+            }
+            else
+            {
+              mCloneTo.body ().assign (jRet.ref (aField), _getCloneCode (aCodeModel, aField, aField.type ()));
+            }
+        }
+
+        mCloneTo.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+      }
+
       // clone
       // Do not use "getClone" as this is the name of a JAXB generated method
       // for the XSD Element "Clone" :(
-      final JMethod mGetClone = jClass.method (JMod.PUBLIC, jClass, "clone");
-      mGetClone.annotate (Nonnull.class);
-      mGetClone.annotate (ReturnsMutableCopy.class);
-      mGetClone.annotate (Override.class);
-
-      final JVar jRet = mGetClone.body ().decl (jClass, "ret", JExpr._new (jClass));
-      for (final Map.Entry <JFieldVar, String> aEntry : _getAllFields (aOutline, aClassOutline).entrySet ())
       {
-        final JFieldVar aField = aEntry.getKey ();
-        // Must use the getter in case this is a derived class. In this case we
-        // cannot access the private member of the base class
-        final String sGetter = CJAXB22.getGetterName (aField.type (), aEntry.getValue ());
-        final String sSetter = CJAXB22.getSetterName (aEntry.getValue ());
+        final JMethod mClone = jClass.method (JMod.PUBLIC, jClass, "clone");
+        mClone.annotate (Nonnull.class);
+        mClone.annotate (ReturnsMutableCopy.class);
+        mClone.annotate (Override.class);
 
-        if (aField.type ().erasure ().name ().equals ("List"))
-        {
-          // List
-          final JClass aTypeParam = ((JClass) aField.type ()).getTypeParameters ().get (0);
+        mClone.javadoc ().addReturn ().add ("The cloned object. Never <code>null</code>.");
 
-          // Ensure list is created :)
-          final JVar aTargetList = mGetClone.body ().decl (aField.type (),
-                                                           "ret" + aEntry.getValue (),
-                                                           jRet.invoke (sGetter));
+        final JVar jRet = mClone.body ().decl (jClass, "ret", JExpr._new (jClass));
+        if (!bIsRoot)
+          mClone.body ().add (JExpr._super ().invoke (mCloneTo).arg (jRet));
+        mClone.body ().invoke (mCloneTo).arg (jRet);
+        mClone.body ()._return (jRet);
 
-          // for (X aItem : getX())
-          final JForEach jForEach = mGetClone.body ().forEach (aTypeParam, "aItem", JExpr.invoke (sGetter));
-          jForEach.body ()
-                  .add (aTargetList.invoke ("add").arg (_getCloneCode (aCodeModel, jForEach.var (), aTypeParam)));
-        }
-        else
-          if (aField.type ().erasure ().name ().equals ("Map"))
-          {
-            // Map (for xs:anyAttribute/> - Map<QName,String>)
-            // has no setter - need to assign directly!
-            mGetClone.body ().assign (jRet.ref (aField),
-                                      jCollectionHelper.staticInvoke ("newMap").arg (JExpr.invoke (sGetter)));
-          }
-          else
-          {
-            mGetClone.body ().add (jRet.invoke (sSetter)
-                                       .arg (_getCloneCode (aCodeModel, JExpr.invoke (sGetter), aField.type ())));
-          }
+        mClone.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
       }
-      mGetClone.body ()._return (jRet);
 
-      mGetClone.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+      jClass.javadoc ().add ("<p>This class contains methods of " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>");
     }
     return true;
   }
