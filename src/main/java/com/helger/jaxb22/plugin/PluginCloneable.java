@@ -55,6 +55,7 @@ import com.sun.tools.xjc.outline.Outline;
  * Add <code>getClone()</code> method.
  *
  * @author Philip Helger
+ * @since 2.2.11.7
  */
 @IsSPIImplementation
 public class PluginCloneable extends Plugin
@@ -113,9 +114,7 @@ public class PluginCloneable extends Plugin
 
   private static boolean _isJavaCloneable (@Nonnull final JType aType)
   {
-    // Check by name :)
-    final String sTypeName = aType.name ();
-    return sTypeName.equals ("XMLGregorianCalendar");
+    return aType instanceof JClass && ((JClass) aType)._package ().name ().equals ("javax.xml.datatype");
   }
 
   private static boolean _isImmutableArray (@Nonnull final JType aType)
