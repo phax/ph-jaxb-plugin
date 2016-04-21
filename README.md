@@ -9,13 +9,56 @@ Versions >= 2.2.11.5 are compatible with ph-commons >= 6.0.
 Versions >= 2.2.11.7 required JDK 8.
 
 #Maven usage
-Add the following to your pom.xml to use this artifact:
-```
-<dependency>
-  <groupId>com.helger</groupId>
-  <artifactId>ph-jaxb22-plugin</artifactId>
-  <version>2.2.11.6</version>
-</dependency>
+Add something **like** the following to your pom.xml to use this artifact:
+
+```xml
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+        <version>0.13.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          ...
+          <args>
+            <arg>-no-header</arg>
+            <arg>-Xph-default-locale</arg>
+            <arg>en_US</arg>
+            <arg>-Xph-annotate</arg>
+            <arg>-Xph-fields-private</arg>
+            <arg>-Xph-code-quality</arg>
+            <arg>-Xph-implements</arg>
+            <arg>java.io.Serializable</arg>
+            <arg>-Xph-equalshashcode</arg>
+            <arg>-Xph-tostring</arg>
+            <arg>-Xph-list-extension</arg>
+            <arg>-Xph-bean-validation11</arg>
+            <arg>-Xph-csu</arg>
+          </args>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.2.11</version>
+          </dependency>
+          <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-xjc</artifactId>
+            <version>2.2.11</version>
+          </dependency>
+          <dependency>
+            <groupId>com.helger</groupId>
+            <artifactId>ph-jaxb22-plugin</artifactId>
+            <version>2.2.11.6</version>
+          </dependency>
+        </dependencies>
+      </plugin>
 ```
 
 #JAXB Plugins
