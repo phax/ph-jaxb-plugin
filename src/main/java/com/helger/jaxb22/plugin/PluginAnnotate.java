@@ -28,6 +28,8 @@ import org.xml.sax.ErrorHandler;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.CommonsHashSet;
+import com.helger.commons.collection.ext.ICommonsSet;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JMethod;
@@ -74,6 +76,8 @@ public class PluginAnnotate extends Plugin
                       @Nonnull final ErrorHandler aErrorHandler)
   {
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
+    final ICommonsSet <JDefinedClass> aEffectedClasses = new CommonsHashSet<> ();
+
     // For all classes
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
@@ -89,17 +93,24 @@ public class PluginAnnotate extends Plugin
           {
             aMethod.annotate (Nonnull.class);
             aMethod.annotate (ReturnsMutableObject.class).param ("value", "JAXB implementation style");
+            aEffectedClasses.add (jClass);
           }
           else
             if (!aReturnType.isPrimitive ())
+            {
               aMethod.annotate (Nullable.class);
+              aEffectedClasses.add (jClass);
+            }
         }
         else
           if (aMethod.type () == aCodeModel.VOID && aMethod.name ().startsWith ("set") && aParams.size () == 1)
           {
             final JVar aParam = aParams.get (0);
             if (!aParam.type ().isPrimitive ())
+            {
               aParam.annotate (Nullable.class);
+              aEffectedClasses.add (jClass);
+            }
           }
       }
     }
@@ -130,14 +141,22 @@ public class PluginAnnotate extends Plugin
 
           // Modify method
           aMethod.annotate (Nonnull.class);
+          aEffectedClasses.add (aObjFactory);
         }
         else
           if (aMethod.name ().startsWith ("create") && aParams.isEmpty ())
           {
             // Modify all Object createObject() methods
             aMethod.annotate (Nonnull.class);
+            aEffectedClasses.add (aObjFactory);
           }
       }
+
+    for (final JDefinedClass jClass : aEffectedClasses)
+    {
+      // General information
+      jClass.javadoc ().add ("<p>This class was annotated by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>");
+    }
 
     return true;
   }

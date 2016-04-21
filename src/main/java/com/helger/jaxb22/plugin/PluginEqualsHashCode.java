@@ -109,7 +109,8 @@ public class PluginEqualsHashCode extends Plugin
                             .cor (JOp.not (JExpr.invoke ("getClass")
                                                 .invoke ("equals")
                                                 .arg (param.invoke ("getClass")))))
-                 ._then ()._return (JExpr.FALSE);
+                 ._then ()
+                 ._return (JExpr.FALSE);
           }
           else
           {
@@ -162,6 +163,9 @@ public class PluginEqualsHashCode extends Plugin
 
         mHashCode.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
       }
+
+      // General information
+      jClass.javadoc ().add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>");
     }
     return true;
   }

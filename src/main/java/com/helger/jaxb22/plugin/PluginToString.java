@@ -87,23 +87,28 @@ public class PluginToString extends Plugin
       }
 
       // toString
-      final JMethod mToString = jClass.method (JMod.PUBLIC, aCodeModel.ref (String.class), "toString");
-      mToString.annotate (Override.class);
-
-      JInvocation aInvocation;
-      if (bIsRoot)
-        aInvocation = JExpr._new (jToStringGenerator).arg (JExpr._this ());
-      else
-        aInvocation = jToStringGenerator.staticInvoke ("getDerived").arg (JExpr._super ().invoke (mToString));
-
-      for (final FieldOutline aField : aFields)
       {
-        final String sFieldName = aField.getPropertyInfo ().getName (false);
-        aInvocation = aInvocation.invoke ("append").arg (JExpr.lit (sFieldName)).arg (JExpr.ref (sFieldName));
-      }
-      mToString.body ()._return (aInvocation.invoke ("toString"));
+        final JMethod mToString = jClass.method (JMod.PUBLIC, aCodeModel.ref (String.class), "toString");
+        mToString.annotate (Override.class);
 
-      mToString.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+        JInvocation aInvocation;
+        if (bIsRoot)
+          aInvocation = JExpr._new (jToStringGenerator).arg (JExpr._this ());
+        else
+          aInvocation = jToStringGenerator.staticInvoke ("getDerived").arg (JExpr._super ().invoke (mToString));
+
+        for (final FieldOutline aField : aFields)
+        {
+          final String sFieldName = aField.getPropertyInfo ().getName (false);
+          aInvocation = aInvocation.invoke ("append").arg (JExpr.lit (sFieldName)).arg (JExpr.ref (sFieldName));
+        }
+        mToString.body ()._return (aInvocation.invoke ("toString"));
+
+        mToString.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+      }
+
+      // General information
+      jClass.javadoc ().add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>");
     }
     return true;
   }

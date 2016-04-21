@@ -28,7 +28,9 @@ import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.ext.CommonsArrayList;
+import com.helger.commons.collection.ext.CommonsHashSet;
 import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.ext.ICommonsSet;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
@@ -90,6 +92,7 @@ public class PluginListExtension extends Plugin
   public boolean run (final Outline aOutline, final Options aOpts, final ErrorHandler aErrorHandler)
   {
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
+    final ICommonsSet <JDefinedClass> aEffectedClasses = new CommonsHashSet<> ();
 
     // For all classes
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
@@ -100,7 +103,7 @@ public class PluginListExtension extends Plugin
       for (final JFieldVar aField : jClass.fields ().values ())
       {
         final JType aOldType = aField.type ();
-        if (aOldType.name ().startsWith ("List<"))
+        if (aOldType.erasure ().name ().equals ("List"))
         {
           final JType aNewType = aCodeModel.ref (ICommonsList.class).narrow (((JClass) aOldType).getTypeParameters ());
           if (false)
@@ -144,6 +147,8 @@ public class PluginListExtension extends Plugin
             aNewGetter.javadoc ().addReturn ().add ("The mutable list and never <code>null</code>");
             aNewGetter.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
           }
+
+          aEffectedClasses.add (jClass);
         }
       }
 
@@ -152,7 +157,7 @@ public class PluginListExtension extends Plugin
         {
           final JType aReturnType = aMethod.type ();
           // Find e.g. List<ItemListType> getItemList()
-          if (aReturnType.name ().startsWith (USE_COMMONS_LIST ? "ICommonsList<" : "List<"))
+          if (aReturnType.erasure ().name ().equals (USE_COMMONS_LIST ? "ICommonsList" : "List"))
           {
             final String sRelevantTypeName = aMethod.name ().substring (3);
             final JType aListElementType = ((JClass) aReturnType).getTypeParameters ().get (0);
@@ -225,9 +230,18 @@ public class PluginListExtension extends Plugin
               mAdd.javadoc ().addParam (aParam).add ("The element to be added. May not be <code>null</code>.");
               mAdd.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }
+
+            aEffectedClasses.add (jClass);
           }
         }
     }
+
+    for (final JDefinedClass jClass : aEffectedClasses)
+    {
+      // General information
+      jClass.javadoc ().add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>");
+    }
+
     return true;
   }
 }
