@@ -250,6 +250,10 @@ public class PluginCloneable extends Plugin
         jRet.annotate (Nonnull.class);
         mCloneTo.javadoc ().addParam (jRet).add ("The target object to clone to. May not be <code>null</code>.");
 
+        // Call from super class as well
+        if (!bIsRoot)
+          mCloneTo.body ().add (JExpr._super ().invoke (mCloneTo).arg (jRet));
+
         for (final Map.Entry <JFieldVar, String> aEntry : aAllFields.entrySet ())
         {
           final JFieldVar aField = aEntry.getKey ();
@@ -302,8 +306,6 @@ public class PluginCloneable extends Plugin
         mClone.javadoc ().addReturn ().add ("The cloned object. Never <code>null</code>.");
 
         final JVar jRet = mClone.body ().decl (jClass, "ret", JExpr._new (jClass));
-        if (!bIsRoot)
-          mClone.body ().add (JExpr._super ().invoke (mCloneTo).arg (jRet));
         mClone.body ().invoke (mCloneTo).arg (jRet);
         mClone.body ()._return (jRet);
 
