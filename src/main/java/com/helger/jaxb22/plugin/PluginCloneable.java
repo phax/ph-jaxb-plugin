@@ -225,12 +225,6 @@ public class PluginCloneable extends Plugin
     {
       final JDefinedClass jClass = aClassOutline.implClass;
 
-      if (jClass.isAbstract ())
-      {
-        // Cannot clone abstract classes
-        continue;
-      }
-
       final boolean bIsRoot = jClass._extends () == null || jClass._extends ().equals (jObject);
 
       if (bIsRoot)
@@ -292,10 +286,12 @@ public class PluginCloneable extends Plugin
         mCloneTo.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
       }
 
-      // clone
-      // Do not use "getClone" as this is the name of a JAXB generated method
-      // for the XSD Element "Clone" :(
+      // Cannot instantiate abstract classes
+      if (!jClass.isAbstract ())
       {
+        // clone
+        // Do not use "getClone" as this is the name of a JAXB generated method
+        // for the XSD Element "Clone" :(
         final JMethod mClone = jClass.method (JMod.PUBLIC, jClass, "clone");
         mClone.annotate (Nonnull.class);
         mClone.annotate (ReturnsMutableCopy.class);
@@ -312,7 +308,8 @@ public class PluginCloneable extends Plugin
         mClone.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
       }
 
-      jClass.javadoc ().add ("<p>This class contains methods of " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>");
+      // General information
+      jClass.javadoc ().add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>");
     }
     return true;
   }
