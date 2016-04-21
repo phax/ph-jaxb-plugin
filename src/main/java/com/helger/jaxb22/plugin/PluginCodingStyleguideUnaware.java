@@ -53,7 +53,7 @@ public class PluginCodingStyleguideUnaware extends Plugin
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + "       :  add CodingStyleguideUnaware annotations to all classes";
+    return "  -" + OPT + "       :  add @CodingStyleguideUnaware annotations to all classes";
   }
 
   @Override

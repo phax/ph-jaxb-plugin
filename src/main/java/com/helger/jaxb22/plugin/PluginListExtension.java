@@ -79,7 +79,7 @@ public class PluginListExtension extends Plugin
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + " :  add additional methods for list types";
+    return "  -" + OPT + " :  add additional methods for List types";
   }
 
   @Override

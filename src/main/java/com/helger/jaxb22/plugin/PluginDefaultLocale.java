@@ -53,7 +53,7 @@ public class PluginDefaultLocale extends Plugin
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + " locale   :  set default locale to the specified parameter. Use e.g. 'en_US'";
+    return "  -" + OPT + " locale   :  set Java default locale to the specified parameter. Use e.g. 'en_US'";
   }
 
   @Override

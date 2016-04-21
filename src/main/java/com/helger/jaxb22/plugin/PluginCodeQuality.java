@@ -139,7 +139,7 @@ public class PluginCodeQuality extends Plugin
       {
         final List <JVar> aParams = aMethod.params ();
         if (aMethod.name ().startsWith ("create") &&
-            aMethod.type ().name ().startsWith ("JAXBElement<") &&
+            aMethod.type ().erasure ().name ().equals ("JAXBElement") &&
             aParams.size () == 1)
         {
           // Modify all JAXBElement<T> createT (Object o) methods

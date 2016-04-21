@@ -64,7 +64,7 @@ public class PluginEqualsHashCode extends Plugin
   {
     return "  -" +
            OPT +
-           "    :  auto implement equals and hashCode using com.helger.commons.equals.EqualsHelper and com.helger.commons.hash.HashCodeGenerator";
+           "    :  auto implement equals and hashCode using com.helger.commons.equals.EqualsHelper and com.helger.commons.hashcode.HashCodeGenerator";
   }
 
   @Override

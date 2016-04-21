@@ -71,7 +71,7 @@ public class PluginCloneable extends Plugin
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + "    :  auto implement getClone() of ICloneable interface";
+    return "  -" + OPT + "    :  implement clone() of Cloneable interface and cloneTo(target)";
   }
 
   @Override
