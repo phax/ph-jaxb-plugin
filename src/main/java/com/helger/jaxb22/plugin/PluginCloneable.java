@@ -146,16 +146,31 @@ public class PluginCloneable extends Plugin
     for (final JFieldVar aFieldVar : CollectionHelper.getSortedByKey (jClass.fields ()).values ())
     {
       // Get public name
-      final CPropertyInfo aPI = aClassOutline.target.getProperty (aFieldVar.name ());
+      final String sFieldVarName = aFieldVar.name ();
+      final CPropertyInfo aPI = aClassOutline.target.getProperty (sFieldVarName);
+      String sFieldName;
       if (aPI == null)
       {
-        throw new IllegalStateException ("'" +
-                                         aFieldVar.name () +
-                                         "' not found in " +
-                                         CollectionHelper.newListMapped (aClassOutline.target.getProperties (),
-                                                                         pi -> pi.getName (false)));
+        if ("otherAttributes".equals (sFieldVarName))
+        {
+          // Created by <xs:anyAttribute/>
+          sFieldName = sFieldVarName;
+        }
+        else
+        {
+          throw new IllegalStateException ("'" +
+                                           aFieldVar.name () +
+                                           "' not found in " +
+                                           CollectionHelper.newListMapped (aClassOutline.target.getProperties (),
+                                                                           pi -> pi.getName (false)) +
+                                           " of " +
+                                           jClass.fullName ());
+        }
       }
-      final String sFieldName = aPI.getName (true);
+      else
+      {
+        sFieldName = aPI.getName (true);
+      }
       ret.put (aFieldVar, sFieldName);
     }
 
@@ -214,10 +229,18 @@ public class PluginCloneable extends Plugin
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     final JClass jObject = aCodeModel.ref (Object.class);
     final JClass jCloneable = aCodeModel.ref (Cloneable.class);
+    final JClass jCollectionHelper = aCodeModel.ref (CollectionHelper.class);
 
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
       final JDefinedClass jClass = aClassOutline.implClass;
+
+      if (jClass.isAbstract ())
+      {
+        // Cannot clone abstract classes
+        continue;
+      }
+
       final boolean bIsRoot = jClass._extends () == null || jClass._extends ().equals (jObject);
 
       if (bIsRoot)
@@ -250,7 +273,7 @@ public class PluginCloneable extends Plugin
 
           // Ensure list is created :)
           final JVar aTargetList = mGetClone.body ().decl (aField.type (),
-                                                           "_" + aEntry.getValue (),
+                                                           "ret" + aEntry.getValue (),
                                                            jRet.invoke (sGetter));
 
           // for (X aItem : getX())
@@ -259,10 +282,18 @@ public class PluginCloneable extends Plugin
                   .add (aTargetList.invoke ("add").arg (_getCloneCode (aCodeModel, jForEach.var (), aTypeParam)));
         }
         else
-        {
-          mGetClone.body ().add (jRet.invoke (sSetter)
-                                     .arg (_getCloneCode (aCodeModel, JExpr.invoke (sGetter), aField.type ())));
-        }
+          if (aField.type ().erasure ().name ().equals ("Map"))
+          {
+            // Map (for xs:anyAttribute/> - Map<QName,String>)
+            // has no setter - need to assign directly!
+            mGetClone.body ().assign (jRet.ref (aField),
+                                      jCollectionHelper.staticInvoke ("newMap").arg (JExpr.invoke (sGetter)));
+          }
+          else
+          {
+            mGetClone.body ().add (jRet.invoke (sSetter)
+                                       .arg (_getCloneCode (aCodeModel, JExpr.invoke (sGetter), aField.type ())));
+          }
       }
       mGetClone.body ()._return (jRet);
 
