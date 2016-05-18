@@ -103,6 +103,12 @@ public class PluginCloneable extends Plugin
            sTypeName.equals ("BigDecimal") ||
            sTypeName.equals ("Element") ||
            sTypeName.equals ("Duration") ||
+           sTypeName.equals ("W3CEndpointReference") ||
+           sTypeName.equals ("LocalDate") ||
+           sTypeName.equals ("LocalDateTime") ||
+           sTypeName.equals ("LocalTime") ||
+           sTypeName.equals ("ZonedDateTime") ||
+           sTypeName.equals ("OffsetDateTime") ||
            sTypeName.equals ("Boolean") ||
            sTypeName.equals ("Byte") ||
            sTypeName.equals ("Character") ||
@@ -129,7 +135,7 @@ public class PluginCloneable extends Plugin
   @ReturnsMutableCopy
   private static ICommonsMap <JFieldVar, String> _getAllFields (@Nonnull final ClassOutline aClassOutline)
   {
-    final ICommonsOrderedMap <JFieldVar, String> ret = new CommonsLinkedHashMap<> ();
+    final ICommonsOrderedMap <JFieldVar, String> ret = new CommonsLinkedHashMap <> ();
 
     final JDefinedClass jClass = aClassOutline.implClass;
 
