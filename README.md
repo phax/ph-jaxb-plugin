@@ -8,6 +8,9 @@ Versions <= 2.2.11.4 are compatible with ph-commons < 6.0.
 Versions >= 2.2.11.5 are compatible with ph-commons >= 6.0.
 Versions >= 2.2.11.7 required JDK 8.
 
+#News and noteworthy
+  * Version 2.2.11.7 - the `ph-csu` settings is now also applied on nested generated classes
+
 #Maven usage
 Add something **like** the following to your pom.xml to use this artifact:
 
