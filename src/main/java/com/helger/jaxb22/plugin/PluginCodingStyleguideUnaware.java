@@ -26,6 +26,7 @@ import org.xml.sax.ErrorHandler;
 import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.collection.CollectionHelper;
+import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JPackage;
@@ -62,6 +63,17 @@ public class PluginCodingStyleguideUnaware extends Plugin
     return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
   }
 
+  private static void _apply (@Nonnull final JDefinedClass aDefinedClass)
+  {
+    // Add annotation
+    aDefinedClass.annotate (CodingStyleguideUnaware.class);
+
+    // Check for inner classes
+    for (final JClass aInnerClass : aDefinedClass.listClasses ())
+      if (aInnerClass instanceof JDefinedClass)
+        _apply ((JDefinedClass) aInnerClass);
+  }
+
   @Override
   public boolean run (@Nonnull final Outline aOutline,
                       @Nonnull final Options aOpts,
@@ -81,8 +93,8 @@ public class PluginCodingStyleguideUnaware extends Plugin
       {
         final JDefinedClass aDefinedClass = itClasses.next ();
 
-        // Add annotation
-        aDefinedClass.annotate (CodingStyleguideUnaware.class);
+        // Add annotation recursively
+        _apply (aDefinedClass);
       }
     }
 
