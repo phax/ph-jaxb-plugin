@@ -19,6 +19,8 @@ package com.helger.jaxb22.plugin;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -66,6 +68,7 @@ import com.sun.xml.xsom.impl.parser.DelayedRef;
  */
 public abstract class AbstractPluginBeanValidation extends Plugin
 {
+  private static final Logger s_aLogger = com.sun.xml.bind.Util.getClassLogger ();
   private static final BigInteger UNBOUNDED = BigInteger.valueOf (XSParticle.UNBOUNDED);
   private static final String [] NUMBER_TYPES = new String [] { "BigDecimal",
                                                                 "BigInteger",
@@ -112,15 +115,15 @@ public abstract class AbstractPluginBeanValidation extends Plugin
 
                 }
                 else
-                  System.err.println ("Unsupported property: " + aPropertyInfo);
+                  s_aLogger.info ("Unsupported property: " + aPropertyInfo);
         }
       }
 
       return true;
     }
-    catch (final Exception e)
+    catch (final Exception ex)
     {
-      e.printStackTrace ();
+      s_aLogger.log (Level.SEVERE, "Internal error creating bean validation", ex);
       return false;
     }
   }
@@ -169,7 +172,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
         _processElement (aField, (ElementDecl) xsElementDecl);
       }
       else
-        System.out.println ("Unsupported particle term " + aTerm);
+        s_aLogger.info ("Unsupported particle term " + aTerm);
   }
 
   private void _processElement (@Nonnull final JFieldVar aField, final ElementDecl aElement)
