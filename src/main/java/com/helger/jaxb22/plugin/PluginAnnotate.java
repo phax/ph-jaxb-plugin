@@ -16,9 +16,7 @@
  */
 package com.helger.jaxb22.plugin;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -118,7 +116,7 @@ public class PluginAnnotate extends Plugin
     }
 
     // Get all ObjectFactory classes
-    final Set <JDefinedClass> aObjFactories = new HashSet <JDefinedClass> ();
+    final ICommonsSet <JDefinedClass> aObjFactories = new CommonsHashSet<> ();
     for (final CElementInfo ei : aOutline.getModel ().getAllElements ())
     {
       final JDefinedClass aClass = aOutline.getPackageContext (ei._package ())

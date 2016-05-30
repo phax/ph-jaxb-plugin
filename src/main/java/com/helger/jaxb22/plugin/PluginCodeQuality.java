@@ -16,9 +16,7 @@
  */
 package com.helger.jaxb22.plugin;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -26,6 +24,8 @@ import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.CommonsHashSet;
+import com.helger.commons.collection.ext.ICommonsSet;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
@@ -91,7 +91,7 @@ public class PluginCodeQuality extends Plugin
         {
           // This fails, because the Java 8 javadoc will create errors because
           // of this
-          final Set <String> aFieldNames = new HashSet <String> ();
+          final ICommonsSet <String> aFieldNames = new CommonsHashSet<> ();
           for (final JFieldVar aField : jClass.fields ().values ())
             aFieldNames.add (aField.name ());
 
@@ -115,7 +115,7 @@ public class PluginCodeQuality extends Plugin
     }
 
     // Get all ObjectFactory classes
-    final Set <JDefinedClass> aObjFactories = new HashSet <JDefinedClass> ();
+    final ICommonsSet <JDefinedClass> aObjFactories = new CommonsHashSet<> ();
     for (final CElementInfo ei : aOutline.getModel ().getAllElements ())
     {
       final JDefinedClass aClass = aOutline.getPackageContext (ei._package ())
