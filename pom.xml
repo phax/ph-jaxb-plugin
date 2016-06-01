@@ -61,7 +61,7 @@
   </developers>
   
   <properties>
-    <!-- com.sun.xml.bind -->
+    <!-- com.sun.xml.bind was the old one-->
     <jaxb.package>org.glassfish.jaxb</jaxb.package>
     <jaxb.version>2.2.11</jaxb.version>
   </properties>

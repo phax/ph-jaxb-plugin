@@ -46,12 +46,12 @@ Add something **like** the following to your pom.xml to use this artifact:
         </configuration>
         <dependencies>
           <dependency>
-            <groupId>com.sun.xml.bind</groupId>
+            <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-impl</artifactId>
             <version>2.2.11</version>
           </dependency>
           <dependency>
-            <groupId>com.sun.xml.bind</groupId>
+            <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-xjc</artifactId>
             <version>2.2.11</version>
           </dependency>
