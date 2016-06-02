@@ -26,11 +26,14 @@ import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.ext.CommonsHashSet;
 import com.helger.commons.collection.ext.ICommonsSet;
+import com.sun.codemodel.JAssignment;
+import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JVar;
+import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.model.CElementInfo;
@@ -48,6 +51,9 @@ public class PluginCodeQuality extends Plugin
 {
   private static final String OPT = "Xph-code-quality";
 
+  private boolean m_bJDK7 = false;
+  private boolean m_bJDK8 = false;
+
   @Override
   public String getOptionName ()
   {
@@ -57,7 +63,23 @@ public class PluginCodeQuality extends Plugin
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + "    :  fix some issues that cause warnings in the generated code";
+    return "  -" + OPT + "  [jdk7|jdk8]? :  fix some issues that cause warnings in the generated code";
+  }
+
+  @Override
+  public int parseArgument (final Options opt, final String [] args, final int i) throws BadCommandLineException
+  {
+    if (args[i].equals ("-" + OPT))
+    {
+      if (i + 1 >= args.length)
+        return 1;
+
+      final String sArg = args[i + 1];
+      m_bJDK7 = "jdk7".equalsIgnoreCase (sArg);
+      m_bJDK8 = "jdk8".equalsIgnoreCase (sArg);
+      return m_bJDK7 || m_bJDK8 ? 2 : 1;
+    }
+    return 0;
   }
 
   @Override
@@ -91,7 +113,7 @@ public class PluginCodeQuality extends Plugin
         {
           // This fails, because the Java 8 javadoc will create errors because
           // of this
-          final ICommonsSet <String> aFieldNames = new CommonsHashSet<> ();
+          final ICommonsSet <String> aFieldNames = new CommonsHashSet <> ();
           for (final JFieldVar aField : jClass.fields ().values ())
             aFieldNames.add (aField.name ());
 
@@ -112,10 +134,33 @@ public class PluginCodeQuality extends Plugin
             }
           }
         }
+
+      if (false)
+        if (m_bJDK7 || m_bJDK8)
+        {
+          for (final JMethod jMethod : jClass.methods ())
+            if (jMethod.name ().startsWith ("get") &&
+                jMethod.params ().isEmpty () &&
+                jMethod.type ().erasure ().name ().equals ("List"))
+            {
+              List <Object> aContents = jMethod.body ().getContents ();
+              Object aFirst = aContents.get (0);
+              if (aFirst instanceof JConditional)
+              {
+                aContents = ((JConditional) aFirst)._then ().getContents ();
+                aFirst = aContents.get (0);
+                if (aFirst instanceof JAssignment)
+                {
+                  final JAssignment aAss = (JAssignment) aFirst;
+                  // No way to change assignment :(
+                }
+              }
+            }
+        }
     }
 
     // Get all ObjectFactory classes
-    final ICommonsSet <JDefinedClass> aObjFactories = new CommonsHashSet<> ();
+    final ICommonsSet <JDefinedClass> aObjFactories = new CommonsHashSet <> ();
     for (final CElementInfo ei : aOutline.getModel ().getAllElements ())
     {
       final JDefinedClass aClass = aOutline.getPackageContext (ei._package ())

@@ -92,7 +92,7 @@ public class PluginListExtension extends Plugin
   public boolean run (final Outline aOutline, final Options aOpts, final ErrorHandler aErrorHandler)
   {
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
-    final ICommonsSet <JDefinedClass> aEffectedClasses = new CommonsHashSet<> ();
+    final ICommonsSet <JDefinedClass> aEffectedClasses = new CommonsHashSet <> ();
 
     // For all classes
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
