@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
 
 import org.xml.sax.ErrorHandler;
 
+import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.string.ToStringGenerator;
@@ -61,6 +62,7 @@ public class PluginToString extends Plugin
   }
 
   @Override
+  @CodingStyleguideUnaware
   public List <String> getCustomizationURIs ()
   {
     return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);

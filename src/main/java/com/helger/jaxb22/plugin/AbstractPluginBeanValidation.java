@@ -33,6 +33,7 @@ import javax.validation.constraints.Size;
 
 import org.xml.sax.ErrorHandler;
 
+import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.math.MathHelper;
 import com.helger.commons.string.StringParser;
@@ -86,6 +87,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
   }
 
   @Override
+  @CodingStyleguideUnaware
   public List <String> getCustomizationURIs ()
   {
     return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);

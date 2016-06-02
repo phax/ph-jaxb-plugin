@@ -21,8 +21,10 @@ import java.util.List;
 
 import org.xml.sax.ErrorHandler;
 
+import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.ext.ICommonsList;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.math.graph.IMutableDirectedGraphNode;
 import com.helger.math.graph.simple.SimpleDirectedGraph;
@@ -47,7 +49,7 @@ public class PluginImplements extends Plugin
 {
   private static final String GRAPH_ATTR_VALUE = "value";
   private static final String OPT = "Xph-implements";
-  private List <String> m_aInterfacesToImplement;
+  private ICommonsList <String> m_aInterfacesToImplement;
 
   @Override
   public String getOptionName ()
@@ -76,6 +78,7 @@ public class PluginImplements extends Plugin
   }
 
   @Override
+  @CodingStyleguideUnaware
   public List <String> getCustomizationURIs ()
   {
     return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);

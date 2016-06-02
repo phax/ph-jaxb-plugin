@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.xml.sax.ErrorHandler;
 
+import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.collection.CollectionHelper;
@@ -68,6 +69,7 @@ public class PluginEqualsHashCode extends Plugin
   }
 
   @Override
+  @CodingStyleguideUnaware
   public List <String> getCustomizationURIs ()
   {
     return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
@@ -109,8 +111,7 @@ public class PluginEqualsHashCode extends Plugin
                             .cor (JOp.not (JExpr.invoke ("getClass")
                                                 .invoke ("equals")
                                                 .arg (param.invoke ("getClass")))))
-                 ._then ()
-                 ._return (JExpr.FALSE);
+                 ._then ()._return (JExpr.FALSE);
           }
           else
           {

@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 
 import org.xml.sax.ErrorHandler;
 
+import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.collection.CollectionHelper;
@@ -65,6 +66,7 @@ public class PluginAnnotate extends Plugin
   }
 
   @Override
+  @CodingStyleguideUnaware
   public List <String> getCustomizationURIs ()
   {
     return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
@@ -76,7 +78,7 @@ public class PluginAnnotate extends Plugin
                       @Nonnull final ErrorHandler aErrorHandler)
   {
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
-    final ICommonsSet <JDefinedClass> aEffectedClasses = new CommonsHashSet<> ();
+    final ICommonsSet <JDefinedClass> aEffectedClasses = new CommonsHashSet <> ();
 
     // For all classes
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
@@ -116,7 +118,7 @@ public class PluginAnnotate extends Plugin
     }
 
     // Get all ObjectFactory classes
-    final ICommonsSet <JDefinedClass> aObjFactories = new CommonsHashSet<> ();
+    final ICommonsSet <JDefinedClass> aObjFactories = new CommonsHashSet <> ();
     for (final CElementInfo ei : aOutline.getModel ().getAllElements ())
     {
       final JDefinedClass aClass = aOutline.getPackageContext (ei._package ())
