@@ -84,8 +84,10 @@
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
-        <artifactId>ph-math</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <artifactId>ph-math-parent-pom</artifactId>
+        <version>3.0.0</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -97,7 +99,7 @@
     </dependency>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>ph-math</artifactId>
+      <artifactId>ph-graph</artifactId>
     </dependency>
     <dependency>
       <groupId>${jaxb.package}</groupId>
