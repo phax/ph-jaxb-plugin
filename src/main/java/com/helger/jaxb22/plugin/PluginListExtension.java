@@ -203,12 +203,13 @@ public class PluginListExtension extends Plugin
               mCount.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }
 
-            // ELEMENTTYPE getXXXAtIndex (int)
+            // ELEMENTTYPE getXXXAtIndex (int) throws IndexOutOfBoundsException
             {
               final JMethod mAtIndex = jClass.method (JMod.PUBLIC,
                                                       aListElementType,
                                                       "get" + sRelevantTypeName + "AtIndex");
               mAtIndex.annotate (Nullable.class);
+              mAtIndex._throws (IndexOutOfBoundsException.class);
               final JVar aParam = mAtIndex.param (JMod.FINAL, aCodeModel.INT, "index");
               aParam.annotate (Nonnegative.class);
               if (USE_COMMONS_LIST)
@@ -218,7 +219,7 @@ public class PluginListExtension extends Plugin
 
               mAtIndex.javadoc ().addParam (aParam).add ("The index to retrieve");
               mAtIndex.javadoc ().addReturn ().add ("The element at the specified index. May be <code>null</code>");
-              mAtIndex.javadoc ().addThrows (ArrayIndexOutOfBoundsException.class).add ("if the index is invalid!");
+              mAtIndex.javadoc ().addThrows (IndexOutOfBoundsException.class).add ("if the index is invalid!");
               mAtIndex.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }
 
