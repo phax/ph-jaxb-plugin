@@ -137,7 +137,7 @@ public class PluginCloneable extends Plugin
   @ReturnsMutableCopy
   private static ICommonsMap <JFieldVar, String> _getAllFields (@Nonnull final ClassOutline aClassOutline)
   {
-    final ICommonsOrderedMap <JFieldVar, String> ret = new CommonsLinkedHashMap <> ();
+    final ICommonsOrderedMap <JFieldVar, String> ret = new CommonsLinkedHashMap<> ();
 
     final JDefinedClass jClass = aClassOutline.implClass;
 
@@ -301,7 +301,22 @@ public class PluginCloneable extends Plugin
       }
 
       // Cannot instantiate abstract classes
-      if (!jClass.isAbstract ())
+      if (jClass.isAbstract ())
+      {
+        // Create an abstract clone method
+        // clone
+        // Do not use "getClone" as this is the name of a JAXB generated method
+        // for the XSD Element "Clone" :(
+        final JMethod mClone = jClass.method (JMod.PUBLIC | JMod.ABSTRACT, jClass, "clone");
+        mClone.annotate (Nonnull.class);
+        mClone.annotate (ReturnsMutableCopy.class);
+        mClone.annotate (Override.class);
+
+        mClone.javadoc ().addReturn ().add ("The cloned object. Never <code>null</code>.");
+
+        mClone.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+      }
+      else
       {
         // clone
         // Do not use "getClone" as this is the name of a JAXB generated method
