@@ -4,12 +4,18 @@ JAXB 2.2 plugin that adds some commonly needed functionality.
 The version 2.2.7 is linked against JAXB 2.2.7.
 The current version 2.2.11.6 is linked against JAXB 2.2.11.
 
-Versions <= 2.2.11.4 are compatible with ph-commons < 6.0.
-Versions >= 2.2.11.5 are compatible with ph-commons >= 6.0.
-Versions >= 2.2.11.7 required JDK 8.
 
 #News and noteworthy
-  * Version 2.2.11.7 - the `ph-csu` settings is now also applied on nested generated classes
+  * v2.2.11.8
+    * Added -Xph-tostring requires ph-commons >= 8.6.2 
+    * Added -Xph-tostring-legacy 
+  * v2.2.11.7 
+    * JDK8 is required
+    * the `ph-csu` settings is now also applied on nested generated classes
+  * v2.2.11
+    * linked against JAXB 2.2.11
+  * v2.2.7
+    * linked against JAXB 2.2.7
 
 #Maven usage
 Add something **like** the following to your pom.xml to use this artifact:
@@ -58,7 +64,7 @@ Add something **like** the following to your pom.xml to use this artifact:
           <dependency>
             <groupId>com.helger</groupId>
             <artifactId>ph-jaxb22-plugin</artifactId>
-            <version>2.2.11.6</version>
+            <version>2.2.11.7</version>
           </dependency>
         </dependencies>
       </plugin>

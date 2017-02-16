@@ -40,7 +40,8 @@ import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
 
 /**
- * Add default toString method using the {@link ToStringGenerator} class.
+ * Add default toString method using the {@link ToStringGenerator} class (using
+ * getToString method).
  *
  * @author Philip Helger
  */
@@ -49,16 +50,32 @@ public class PluginToString extends Plugin
 {
   private static final String OPT = "Xph-tostring";
 
+  private final boolean m_bLegacy;
+  private final String m_sOpt;
+
+  public PluginToString ()
+  {
+    this (false, OPT);
+  }
+
+  protected PluginToString (final boolean bLegacy, final String sOpt)
+  {
+    m_bLegacy = bLegacy;
+    m_sOpt = sOpt;
+  }
+
   @Override
   public String getOptionName ()
   {
-    return OPT;
+    return m_sOpt;
   }
 
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + "    :  auto implement toString using com.helger.commons.string.ToStringGenerator";
+    return "  -" +
+           m_sOpt +
+           "    :  auto implement toString using com.helger.commons.string.ToStringGenerator (ph-commons >= 8.6.2)";
   }
 
   @Override
@@ -104,14 +121,14 @@ public class PluginToString extends Plugin
           final String sFieldName = aField.getPropertyInfo ().getName (false);
           aInvocation = aInvocation.invoke ("append").arg (JExpr.lit (sFieldName)).arg (JExpr.ref (sFieldName));
         }
-        mToString.body ()._return (aInvocation.invoke ("toString"));
+        mToString.body ()._return (aInvocation.invoke (m_bLegacy ? "toString" : "getToString"));
 
-        mToString.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+        mToString.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + m_sOpt);
       }
 
       // General information
       jClass.javadoc ()
-            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
+            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + m_sOpt + "</p>\n");
     }
     return true;
   }
