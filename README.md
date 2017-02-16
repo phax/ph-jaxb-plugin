@@ -6,15 +6,24 @@ The current version 2.2.11.6 is linked against JAXB 2.2.11.
 
 
 #News and noteworthy
-  * v2.2.11.8
+  * v2.2.11.9
     * Added -Xph-tostring requires ph-commons >= 8.6.2 
-    * Added -Xph-tostring-legacy 
-  * v2.2.11.7 
+    * Added -Xph-tostring-legacy
+  * v2.2.11.8 - 2016-07-27
+    * Fixed bug in cloning of abstract class
+  * v2.2.11.7 - 2016-06-10
     * JDK8 is required
+    * Added generic cloning 
     * the `ph-csu` settings is now also applied on nested generated classes
-  * v2.2.11
+  * v2.2.11.6 - 2015-07-21
+  * v2.2.11.5 - 2015-07-01
+  * v2.2.11.4 - 2015-03-31
+  * v2.2.11.3 - 2015-03-11
+  * v2.2.11.2 - 2015-02-06
+  * v2.2.11.1 - 2015-02-06
+  * v2.2.11 - 2014-12-02
     * linked against JAXB 2.2.11
-  * v2.2.7
+  * v2.2.7 - 2014-08-24
     * linked against JAXB 2.2.7
 
 #Maven usage
@@ -64,7 +73,7 @@ Add something **like** the following to your pom.xml to use this artifact:
           <dependency>
             <groupId>com.helger</groupId>
             <artifactId>ph-jaxb22-plugin</artifactId>
-            <version>2.2.11.7</version>
+            <version>2.2.11.8</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -89,7 +98,8 @@ Add something **like** the following to your pom.xml to use this artifact:
     * `int get...Count()` - returns the number of contained entries
     * `T get...AtIndex(int)` - get the element at the specified index
     * `void add...(T)` - add a new entry to the list
-  * `ph-tostring` - auto implement `toString` using `com.helger.commons.string.ToStringGenerator`. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons). 
+  * `ph-tostring` - auto implement `toString` using `com.helger.commons.string.ToStringGenerator.getToString()`. This requires the created code to depend on [ph-commons >= 8.6.2](https://github.com/phax/ph-commons). 
+  * `ph-tostring-legacy` (since 2.2.11.9) - auto implement `toString` using `com.helger.commons.string.ToStringGenerator.toString()`. This requires the created code to depend on [ph-commons <= 8.6.1](https://github.com/phax/ph-commons). 
 
 ---
 
