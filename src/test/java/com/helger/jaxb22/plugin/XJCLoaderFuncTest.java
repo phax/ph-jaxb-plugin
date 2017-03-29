@@ -30,7 +30,7 @@ public final class XJCLoaderFuncTest
   @Test
   public void testLoadXJC () throws Throwable
   {
-    try (final PrintStream aPS = new PrintStream (FileHelper.getOutputStream ("target/jaxb22-test.txt"),
+    try (final PrintStream aPS = new PrintStream (FileHelper.getOutputStream (new File ("target/jaxb22-test.txt")),
                                                   true,
                                                   StandardCharsets.UTF_8.name ()))
     {

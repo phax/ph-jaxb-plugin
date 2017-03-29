@@ -1,11 +1,11 @@
-#ph-jaxb22-plugin
+# ph-jaxb22-plugin
 
 JAXB 2.2 plugin that adds some commonly needed functionality.
 The version 2.2.7 is linked against JAXB 2.2.7.
 The current version 2.2.11.6 is linked against JAXB 2.2.11.
 
 
-#News and noteworthy
+# News and noteworthy
   * v2.2.11.9 - 2017-02-16
     * Added -Xph-tostring requires ph-commons >= 8.6.2 
     * Added -Xph-tostring-legacy
@@ -32,7 +32,7 @@ The current version 2.2.11.6 is linked against JAXB 2.2.11.
   * v2.2.7 - 2014-08-24
     * linked against JAXB 2.2.7
 
-#Maven usage
+# Maven usage
 Add something **like** the following to your pom.xml to use this artifact:
 
 ```xml
@@ -85,7 +85,7 @@ Add something **like** the following to your pom.xml to use this artifact:
       </plugin>
 ```
 
-#JAXB Plugins
+# JAXB Plugins
 
   * `ph-annotate` - Create `@javax.annotation.Nonnull`/`@javax.annotation.Nullable` annotations in all bean generated objects as well as in the `ObjectFactory` classes
   * `ph-bean-validation10` - inject Bean validation 1.0 annotations (JSR 303)
