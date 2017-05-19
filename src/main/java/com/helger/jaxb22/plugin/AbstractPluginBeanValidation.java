@@ -142,7 +142,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
 
     // workaround for choices
     final boolean bRequired = aElement.isRequired ();
-    if (MathHelper.isLowerThanZero (aMinOccurs) || (aMinOccurs.compareTo (BigInteger.ONE) >= 0 && bRequired))
+    if (MathHelper.isLT0 (aMinOccurs) || (MathHelper.isGE1 (aMinOccurs) && bRequired))
     {
       if (!_hasAnnotation (aField, NotNull.class))
       {
@@ -156,7 +156,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
         aField.annotate (Size.class).param ("min", aMinOccurs.intValue ()).param ("max", aMaxOccurs.intValue ());
       }
     }
-    if (UNBOUNDED.equals (aMaxOccurs) && MathHelper.isGreaterThanZero (aMinOccurs))
+    if (UNBOUNDED.equals (aMaxOccurs) && MathHelper.isGT0 (aMinOccurs))
     {
       if (!_hasAnnotation (aField, Size.class))
       {
@@ -213,9 +213,8 @@ public abstract class AbstractPluginBeanValidation extends Plugin
 
     /**
      * <annox:annotate annox:class="javax.validation.constraints.Pattern"
-     * message=
-     * "Name can only contain capital letters, numbers and the symbols '-', '_', '/', ' '"
-     * regexp="^[A-Z0-9_\s//-]*" />
+     * message= "Name can only contain capital letters, numbers and the symbols
+     * '-', '_', '/', ' '" regexp="^[A-Z0-9_\s//-]*" />
      */
     if (aSimpleType.getFacet ("pattern") != null)
     {
