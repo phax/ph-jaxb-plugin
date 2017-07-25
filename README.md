@@ -6,6 +6,8 @@ The current version 2.2.11.6 is linked against JAXB 2.2.11.
 
 
 # News and noteworthy
+  * v2.2.11.10 - work in progress
+    * Updated to ph-commons 9.0.0
   * v2.2.11.9 - 2017-02-16
     * Added -Xph-tostring requires ph-commons >= 8.6.2 
     * Added -Xph-tostring-legacy
@@ -67,19 +69,9 @@ Add something **like** the following to your pom.xml to use this artifact:
         </configuration>
         <dependencies>
           <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>2.2.11</version>
-          </dependency>
-          <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-xjc</artifactId>
-            <version>2.2.11</version>
-          </dependency>
-          <dependency>
             <groupId>com.helger</groupId>
             <artifactId>ph-jaxb22-plugin</artifactId>
-            <version>2.2.11.8</version>
+            <version>2.2.11.9</version>
           </dependency>
         </dependencies>
       </plugin>

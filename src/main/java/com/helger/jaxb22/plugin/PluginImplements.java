@@ -24,7 +24,7 @@ import org.xml.sax.ErrorHandler;
 import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.collection.ext.ICommonsList;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.graph.IMutableDirectedGraphNode;
 import com.helger.graph.simple.SimpleDirectedGraph;
@@ -93,7 +93,8 @@ public class PluginImplements extends Plugin
     final SimpleDirectedGraph aSG = new SimpleDirectedGraph ();
     // Create all nodes
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
-      aSG.createNode (aClassOutline.implClass.fullName ()).setAttribute (GRAPH_ATTR_VALUE, aClassOutline.implClass);
+      aSG.createNode (aClassOutline.implClass.fullName ()).attrs ().setAttribute (GRAPH_ATTR_VALUE,
+                                                                                  aClassOutline.implClass);
     // Connect them
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
@@ -112,7 +113,7 @@ public class PluginImplements extends Plugin
       // Implement interfaces only in all base classes, because sub-classes have
       // them already!
       for (final IMutableDirectedGraphNode aNode : aSG.getAllStartNodes ())
-        ((JDefinedClass) aNode.getCastedAttribute (GRAPH_ATTR_VALUE))._implements (aInterface);
+        ((JDefinedClass) aNode.attrs ().getCastedValue (GRAPH_ATTR_VALUE))._implements (aInterface);
 
       // Enums are automatically serializable
       if (!sCleanInterfaceName.equals (Serializable.class.getName ()))
