@@ -93,7 +93,7 @@ public class PluginImplements extends Plugin
     final SimpleDirectedGraph aSG = new SimpleDirectedGraph ();
     // Create all nodes
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
-      aSG.createNode (aClassOutline.implClass.fullName ()).attrs ().setAttribute (GRAPH_ATTR_VALUE,
+      aSG.createNode (aClassOutline.implClass.fullName ()).attrs ().putIn (GRAPH_ATTR_VALUE,
                                                                                   aClassOutline.implClass);
     // Connect them
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
