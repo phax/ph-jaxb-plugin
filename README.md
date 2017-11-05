@@ -6,7 +6,7 @@ The current version 2.2.11.6 is linked against JAXB 2.2.11.
 
 
 # News and noteworthy
-  * v2.2.11.10 - work in progress
+  * v2.2.11.10 - 2017-11-05
     * Updated to ph-commons 9.0.0
   * v2.2.11.9 - 2017-02-16
     * Added -Xph-tostring requires ph-commons >= 8.6.2 
@@ -41,7 +41,7 @@ Add something **like** the following to your pom.xml to use this artifact:
       <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin</artifactId>
-        <version>0.13.1</version>
+        <version>0.13.2</version>
         <executions>
           <execution>
             <goals>
@@ -71,7 +71,7 @@ Add something **like** the following to your pom.xml to use this artifact:
           <dependency>
             <groupId>com.helger</groupId>
             <artifactId>ph-jaxb22-plugin</artifactId>
-            <version>2.2.11.9</version>
+            <version>2.2.11.10</version>
           </dependency>
         </dependencies>
       </plugin>
