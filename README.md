@@ -6,33 +6,36 @@ The current version 2.2.11.6 is linked against JAXB 2.2.11.
 
 
 # News and noteworthy
-  * v2.2.11.10 - 2017-11-05
-    * Updated to ph-commons 9.0.0
-  * v2.2.11.9 - 2017-02-16
-    * Added -Xph-tostring requires ph-commons >= 8.6.2 
-    * Added -Xph-tostring-legacy
-  * v2.2.11.8 - 2016-07-27
-    * Fixed bug in cloning of abstract class
-  * v2.2.11.7 - 2016-06-10
-    * JDK8 is required
-    * Added generic cloning 
-    * the `ph-csu` settings is now also applied on nested generated classes
-  * v2.2.11.6 - 2015-07-21
-    * Fixed error in 'getXXXCount' method name
-  * v2.2.11.5 - 2015-07-01
-    * Extended 'ph-list-extension' with the "add" method
-    * Updated to ph-commons 6.0.0
-  * v2.2.11.4 - 2015-03-31
-    * Disabled the parameter renaming in the PluginCodeQuality so that JavaDocs can be generated with Java 8
-  * v2.2.11.3 - 2015-03-11
-  * v2.2.11.2 - 2015-02-06
-   * Extended 'ph-csu' for all enums as well
-  * v2.2.11.1 - 2015-02-06
-    * Added new option 'ph-csu' to add the CodingStyleguideUnaware annotation to all classes
-  * v2.2.11 - 2014-12-02
-    * linked against JAXB 2.2.11
-  * v2.2.7 - 2014-08-24
-    * linked against JAXB 2.2.7
+
+* v2.2.11.11 - 2018-03-13
+  * Fixed a problem in `cloneTo` with `null` `List` values 
+* v2.2.11.10 - 2017-11-05
+  * Updated to ph-commons 9.0.0
+* v2.2.11.9 - 2017-02-16
+  * Added -Xph-tostring requires ph-commons >= 8.6.2 
+  * Added -Xph-tostring-legacy
+* v2.2.11.8 - 2016-07-27
+  * Fixed bug in cloning of abstract class
+* v2.2.11.7 - 2016-06-10
+  * JDK8 is required
+  * Added generic cloning 
+  * the `ph-csu` settings is now also applied on nested generated classes
+* v2.2.11.6 - 2015-07-21
+  * Fixed error in 'getXXXCount' method name
+* v2.2.11.5 - 2015-07-01
+  * Extended 'ph-list-extension' with the "add" method
+  * Updated to ph-commons 6.0.0
+* v2.2.11.4 - 2015-03-31
+  * Disabled the parameter renaming in the PluginCodeQuality so that JavaDocs can be generated with Java 8
+* v2.2.11.3 - 2015-03-11
+* v2.2.11.2 - 2015-02-06
+ * Extended 'ph-csu' for all enums as well
+* v2.2.11.1 - 2015-02-06
+  * Added new option 'ph-csu' to add the CodingStyleguideUnaware annotation to all classes
+* v2.2.11 - 2014-12-02
+  * linked against JAXB 2.2.11
+* v2.2.7 - 2014-08-24
+  * linked against JAXB 2.2.7
 
 # Maven usage
 Add something **like** the following to your pom.xml to use this artifact:
@@ -41,7 +44,7 @@ Add something **like** the following to your pom.xml to use this artifact:
       <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin</artifactId>
-        <version>0.13.2</version>
+        <version>0.13.3</version>
         <executions>
           <execution>
             <goals>
@@ -71,7 +74,7 @@ Add something **like** the following to your pom.xml to use this artifact:
           <dependency>
             <groupId>com.helger</groupId>
             <artifactId>ph-jaxb22-plugin</artifactId>
-            <version>2.2.11.10</version>
+            <version>2.2.11.11</version>
           </dependency>
         </dependencies>
       </plugin>

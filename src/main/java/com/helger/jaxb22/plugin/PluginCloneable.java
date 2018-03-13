@@ -29,13 +29,16 @@ import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.CommonsLinkedHashMap;
 import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.lang.CloneHelper;
 import com.sun.codemodel.ClassType;
+import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
+import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
@@ -137,7 +140,7 @@ public class PluginCloneable extends Plugin
   @ReturnsMutableCopy
   private static ICommonsMap <JFieldVar, String> _getAllFields (@Nonnull final ClassOutline aClassOutline)
   {
-    final ICommonsOrderedMap <JFieldVar, String> ret = new CommonsLinkedHashMap<> ();
+    final ICommonsOrderedMap <JFieldVar, String> ret = new CommonsLinkedHashMap <> ();
 
     final JDefinedClass jClass = aClassOutline.implClass;
 
@@ -160,8 +163,8 @@ public class PluginCloneable extends Plugin
           throw new IllegalStateException ("'" +
                                            aFieldVar.name () +
                                            "' not found in " +
-                                           CollectionHelper.newListMapped (aClassOutline.target.getProperties (),
-                                                                           pi -> pi.getName (false)) +
+                                           new CommonsArrayList <> (aClassOutline.target.getProperties (),
+                                                                    pi -> pi.getName (false)) +
                                            " of " +
                                            jClass.fullName ());
         }
@@ -271,25 +274,37 @@ public class PluginCloneable extends Plugin
             // List
             final JClass aTypeParam = ((JClass) aField.type ()).getTypeParameters ().get (0);
 
-            // Ensure list is created :)
-            final JVar aTargetList = mCloneTo.body ().decl (aField.type (),
-                                                            "ret" + aEntry.getValue (),
-                                                            JExpr._new (jArrayList.narrow (aTypeParam)));
+            // if (x == null)
+            // ret.x = null;
+            final JConditional aIf = mCloneTo.body ()._if (aField.eq (JExpr._null ()));
+            aIf._then ().assign (jRet.ref (aField), JExpr._null ());
 
-            // for (X aItem : getX())
-            final String sGetter = CJAXB22.getGetterName (aField.type (), aEntry.getValue ());
-            final JForEach jForEach = mCloneTo.body ().forEach (aTypeParam, "aItem", JExpr.invoke (sGetter));
-            // aTargetList.add (_cloneOf_ (aItem))
-            jForEach.body ()
-                    .add (aTargetList.invoke ("add").arg (_getCloneCode (aCodeModel, jForEach.var (), aTypeParam)));
-            mCloneTo.body ().assign (jRet.ref (aField), aTargetList);
+            // else
+            {
+              final JBlock aJElse = aIf._else ();
+
+              // Ensure list is created :)
+              final JVar aTargetList = aJElse.decl (aField.type (),
+                                                    "ret" + aEntry.getValue (),
+                                                    JExpr._new (jArrayList.narrow (aTypeParam)));
+
+              // for (X aItem : getX())
+              final String sGetter = CJAXB22.getGetterName (aField.type (), aEntry.getValue ());
+              final JForEach jForEach = aJElse.forEach (aTypeParam, "aItem", JExpr.invoke (sGetter));
+              // aTargetList.add (_cloneOf_ (aItem))
+              jForEach.body ()
+                      .add (aTargetList.invoke ("add").arg (_getCloneCode (aCodeModel, jForEach.var (), aTypeParam)));
+              aJElse.assign (jRet.ref (aField), aTargetList);
+            }
           }
           else
             if (aField.type ().erasure ().name ().equals ("Map"))
             {
               // Map (for xs:anyAttribute/> - Map<QName,String>)
               // has no setter - need to assign directly!
-              mCloneTo.body ().assign (jRet.ref (aField), jCollectionHelper.staticInvoke ("newMap").arg (aField));
+              final JConditional aIf = mCloneTo.body ()._if (aField.eq (JExpr._null ()));
+              aIf._then ().assign (jRet.ref (aField), JExpr._null ());
+              aIf._else ().assign (jRet.ref (aField), jCollectionHelper.staticInvoke ("newMap").arg (aField));
             }
             else
             {
