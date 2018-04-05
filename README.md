@@ -1,9 +1,10 @@
 # ph-jaxb22-plugin
 
 JAXB 2.2 plugin that adds some commonly needed functionality.
+The current version 2.2.11.* is linked against JAXB 2.2.11.
 The version 2.2.7 is linked against JAXB 2.2.7.
-The current version 2.2.11.6 is linked against JAXB 2.2.11.
 
+This project is licensed under the Apache 2 license.
 
 # News and noteworthy
 
@@ -12,8 +13,8 @@ The current version 2.2.11.6 is linked against JAXB 2.2.11.
 * v2.2.11.10 - 2017-11-05
   * Updated to ph-commons 9.0.0
 * v2.2.11.9 - 2017-02-16
-  * Added -Xph-tostring requires ph-commons >= 8.6.2 
-  * Added -Xph-tostring-legacy
+  * Added option `-Xph-tostring` requires ph-commons >= 8.6.2 
+  * Added option `-Xph-tostring-legacy`
 * v2.2.11.8 - 2016-07-27
   * Fixed bug in cloning of abstract class
 * v2.2.11.7 - 2016-06-10
@@ -29,7 +30,7 @@ The current version 2.2.11.6 is linked against JAXB 2.2.11.
   * Disabled the parameter renaming in the PluginCodeQuality so that JavaDocs can be generated with Java 8
 * v2.2.11.3 - 2015-03-11
 * v2.2.11.2 - 2015-02-06
- * Extended 'ph-csu' for all enums as well
+  * Extended `ph-csu` for all enums as well
 * v2.2.11.1 - 2015-02-06
   * Added new option `ph-csu` to add the CodingStyleguideUnaware annotation to all classes
 * v2.2.11 - 2014-12-02
@@ -85,13 +86,13 @@ Add something **like** the following to your pom.xml to use this artifact:
 * `ph-annotate` - Create `@javax.annotation.Nonnull`/`@javax.annotation.Nullable` annotations in all bean generated objects as well as in the `ObjectFactory` classes
 * `ph-bean-validation10` - inject Bean validation 1.0 annotations (JSR 303)
 * `ph-bean-validation11` - inject Bean validation 1.1 annotations (JSR 349)
-* `ph-cloneable` (since 2.2.11.7) - implement clone() of Cloneable interface and cloneTo(target). This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons).
+* `ph-cloneable` (since 2.2.11.7) - implement `clone()` of `Cloneable` interface and `cloneTo(target)`. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons).
 * `ph-code-quality` - fix some issues that cause warnings in the generated code.
     * All `ObjectFactory` `QName` members are made public.
     * Adding JavaDocs to all `ObjectFactory` `JAXBElement<...> create...` methods
 * `ph-csu` - add `@CodingStyleguideUnaware` annotations to all classes. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons).
 * `ph-default-locale` `locale` - set Java default locale to the specified parameter. Use e.g. `en_US`
-* `ph-equalshashcode` - auto implement equals and hashCode using `com.helger.commons.equals.EqualsHelper` and `com.helger.commons.hashcode.HashCodeGenerator`. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons). 
+* `ph-equalshashcode` - auto implement `equals` and `hashCode` using `com.helger.commons.equals.EqualsHelper` and `com.helger.commons.hashcode.HashCodeGenerator`. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons). 
 * `ph-fields-private` - mark all fields as private
 * `ph-implements` `fullyQualifiedInterfaceName[,otherInterfaceName]` - implement 1-n interfaces in all classes/enums (e.g. `java.io.Serializable`)
 * `ph-list-extension` - add additional methods for `List` types:
