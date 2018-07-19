@@ -69,7 +69,7 @@ import com.sun.xml.xsom.impl.parser.DelayedRef;
  */
 public abstract class AbstractPluginBeanValidation extends Plugin
 {
-  private static final Logger s_aLogger = com.sun.xml.bind.Util.getClassLogger ();
+  private static final Logger LOGGER = com.sun.xml.bind.Util.getClassLogger ();
   private static final BigInteger UNBOUNDED = BigInteger.valueOf (XSParticle.UNBOUNDED);
   private static final String [] NUMBER_TYPES = new String [] { "BigDecimal",
                                                                 "BigInteger",
@@ -117,7 +117,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
 
                 }
                 else
-                  s_aLogger.info ("Unsupported property: " + aPropertyInfo);
+                  LOGGER.info ("Unsupported property: " + aPropertyInfo);
         }
       }
 
@@ -125,7 +125,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
     }
     catch (final Exception ex)
     {
-      s_aLogger.log (Level.SEVERE, "Internal error creating bean validation", ex);
+      LOGGER.log (Level.SEVERE, "Internal error creating bean validation", ex);
       return false;
     }
   }
@@ -174,7 +174,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
         _processElement (aField, (ElementDecl) xsElementDecl);
       }
       else
-        s_aLogger.info ("Unsupported particle term " + aTerm);
+        LOGGER.info ("Unsupported particle term " + aTerm);
   }
 
   private void _processElement (@Nonnull final JFieldVar aField, final ElementDecl aElement)
