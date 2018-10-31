@@ -6,6 +6,7 @@ com.helger.jaxb22.plugin.PluginCodeQuality
 com.helger.jaxb22.plugin.PluginCodingStyleguideUnaware
 com.helger.jaxb22.plugin.PluginDefaultLocale
 com.helger.jaxb22.plugin.PluginEqualsHashCode
+com.helger.jaxb22.plugin.PluginExplicitlyCloneable
 com.helger.jaxb22.plugin.PluginFieldsPrivate
 com.helger.jaxb22.plugin.PluginImplements
 com.helger.jaxb22.plugin.PluginListExtension
