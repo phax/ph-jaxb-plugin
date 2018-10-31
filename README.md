@@ -8,6 +8,8 @@ This project is licensed under the Apache 2 license.
 
 # News and noteworthy
 
+* v2.2.11.13 - 2018-10-31
+    * Added `QName` as an immutable type for cloning
 * v2.2.11.12 - 2018-10-31
     * Added option `-Xph-cloneable2` to implement `Cloneable` based on the `com.helger.commons.lang.IExplicitlyCloneable` interface. That means that created code requires at least ph-commons 9.1.8.
 * v2.2.11.11 - 2018-03-13
@@ -78,7 +80,7 @@ Add something **like** the following to your pom.xml to use this artifact:
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-jaxb22-plugin</artifactId>
-      <version>2.2.11.12</version>
+      <version>2.2.11.13</version>
     </dependency>
   </dependencies>
 </plugin>
