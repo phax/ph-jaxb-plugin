@@ -27,6 +27,7 @@ import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.ICommonsMap;
+import com.helger.commons.lang.IExplicitlyCloneable;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
@@ -43,15 +44,16 @@ import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
 /**
- * Add <code>getClone()</code> method.
+ * Add <code>getClone()</code> method based on {@link IExplicitlyCloneable}
+ * interface.
  *
  * @author Philip Helger
- * @since 2.2.11.7
+ * @since 2.2.11.12
  */
 @IsSPIImplementation
-public class PluginCloneable extends AbstractPluginCloneable
+public class PluginExplicitlyCloneable extends AbstractPluginCloneable
 {
-  private static final String OPT = "Xph-cloneable";
+  private static final String OPT = "Xph-cloneable2";
 
   @Override
   public String getOptionName ()
@@ -62,7 +64,9 @@ public class PluginCloneable extends AbstractPluginCloneable
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + "    :  implement clone() of Cloneable interface and cloneTo(target)";
+    return "  -" +
+           OPT +
+           "    :  implement clone() of IExplicitlyCloneable interface and cloneTo(target) - req. ph-commons >= 9.1.8";
   }
 
   @Override
@@ -72,7 +76,7 @@ public class PluginCloneable extends AbstractPluginCloneable
   {
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     final JClass jObject = aCodeModel.ref (Object.class);
-    final JClass jCloneable = aCodeModel.ref (Cloneable.class);
+    final JClass jExplicitlyCloneable = aCodeModel.ref (IExplicitlyCloneable.class);
     final JClass jCollectionHelper = aCodeModel.ref (CollectionHelper.class);
     final JClass jArrayList = aCodeModel.ref (ArrayList.class);
 
@@ -85,7 +89,7 @@ public class PluginCloneable extends AbstractPluginCloneable
       if (bIsRoot)
       {
         // Implement Cloneable
-        jClass._implements (jCloneable);
+        jClass._implements (jExplicitlyCloneable);
       }
 
       final ICommonsMap <JFieldVar, String> aAllFields = _getAllFields (aClassOutline);

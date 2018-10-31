@@ -8,8 +8,10 @@ This project is licensed under the Apache 2 license.
 
 # News and noteworthy
 
+* v2.2.11.12 - work in progress
+    * Added option `-Xph-cloneable2` to implement `Cloneable` based on the `com.helger.commons.lang.IExplicitlyCloneable` interface. That means that created code requires at least ph-commons 9.1.8.
 * v2.2.11.11 - 2018-03-13
-  * Fixed a problem in `cloneTo` with `null` `List` values 
+    * Fixed a problem in `cloneTo` with `null` `List` values 
 * v2.2.11.10 - 2017-11-05
   * Updated to ph-commons 9.0.0
 * v2.2.11.9 - 2017-02-16
