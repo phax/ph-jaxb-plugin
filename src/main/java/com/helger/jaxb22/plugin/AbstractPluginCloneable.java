@@ -73,26 +73,27 @@ public abstract class AbstractPluginCloneable extends Plugin
     // Check by name :)
     // TODO Element should also be cloned
     final String sTypeName = aType.name ();
-    return sTypeName.equals ("Object") ||
-           sTypeName.equals ("String") ||
+    return sTypeName.equals ("BigDecimal") ||
            sTypeName.equals ("BigInteger") ||
-           sTypeName.equals ("BigDecimal") ||
-           sTypeName.equals ("Element") ||
-           sTypeName.equals ("Duration") ||
-           sTypeName.equals ("W3CEndpointReference") ||
-           sTypeName.equals ("LocalDate") ||
-           sTypeName.equals ("LocalDateTime") ||
-           sTypeName.equals ("LocalTime") ||
-           sTypeName.equals ("ZonedDateTime") ||
-           sTypeName.equals ("OffsetDateTime") ||
            sTypeName.equals ("Boolean") ||
            sTypeName.equals ("Byte") ||
            sTypeName.equals ("Character") ||
            sTypeName.equals ("Double") ||
+           sTypeName.equals ("Duration") ||
+           sTypeName.equals ("Element") ||
            sTypeName.equals ("Float") ||
            sTypeName.equals ("Integer") ||
+           sTypeName.equals ("LocalDate") ||
+           sTypeName.equals ("LocalDateTime") ||
+           sTypeName.equals ("LocalTime") ||
            sTypeName.equals ("Long") ||
-           sTypeName.equals ("Short");
+           sTypeName.equals ("Object") ||
+           sTypeName.equals ("OffsetDateTime") ||
+           sTypeName.equals ("QName") ||
+           sTypeName.equals ("Short") ||
+           sTypeName.equals ("String") ||
+           sTypeName.equals ("W3CEndpointReference") ||
+           sTypeName.equals ("ZonedDateTime");
   }
 
   protected static boolean _isJavaCloneable (@Nonnull final JType aType)
