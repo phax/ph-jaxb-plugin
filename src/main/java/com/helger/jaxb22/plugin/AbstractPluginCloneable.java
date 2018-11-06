@@ -89,6 +89,7 @@ public abstract class AbstractPluginCloneable extends Plugin
            sTypeName.equals ("Long") ||
            sTypeName.equals ("Object") ||
            sTypeName.equals ("OffsetDateTime") ||
+           sTypeName.equals ("Period") ||
            sTypeName.equals ("QName") ||
            sTypeName.equals ("Short") ||
            sTypeName.equals ("String") ||
