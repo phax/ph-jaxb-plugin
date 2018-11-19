@@ -29,6 +29,7 @@ import com.helger.commons.collection.impl.CommonsLinkedHashMap;
 import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.lang.CloneHelper;
+import com.helger.jaxb.JAXBHelper;
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
@@ -186,9 +187,9 @@ public abstract class AbstractPluginCloneable extends Plugin
     if (aTypeParam.erasure ().name ().equals ("JAXBElement"))
     {
       // Array of immutable objects
-      // CloneHelper.getClonedJAXBElement (aItem);
+      // JAXBHelper.getClonedJAXBElement (aItem);
       // Method is null-safe
-      return aCodeModel.ref (CloneHelper.class).staticInvoke ("getClonedJAXBElement").arg (aGetter);
+      return aCodeModel.ref (JAXBHelper.class).staticInvoke ("getClonedJAXBElement").arg (aGetter);
     }
 
     // Nested Cloneable value

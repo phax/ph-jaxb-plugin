@@ -8,6 +8,8 @@ This project is licensed under the Apache 2 license.
 
 # News and noteworthy
 
+* v2.2.11.14 - work in progress
+    * Updated to ph-commons 9.2.0 
 * v2.2.11.13 - 2018-10-31
     * Added `QName` as an immutable type for cloning
 * v2.2.11.12 - 2018-10-31
