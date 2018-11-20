@@ -10,6 +10,7 @@ This project is licensed under the Apache 2 license.
 
 * v2.2.11.14 - work in progress
     * Updated to ph-commons 9.2.0 
+    * Created code requires at least ph-commons 9.2.0
 * v2.2.11.13 - 2018-10-31
     * Added `QName` as an immutable type for cloning
 * v2.2.11.12 - 2018-10-31
@@ -76,6 +77,7 @@ Add something **like** the following to your pom.xml to use this artifact:
       <arg>-Xph-list-extension</arg>
       <arg>-Xph-bean-validation11</arg>
       <arg>-Xph-csu</arg>
+      <arg>-Xph-cloneable2</arg>
     </args>
   </configuration>
   <dependencies>

@@ -16,14 +16,11 @@
  */
 package com.helger.jaxb22.plugin;
 
-import java.util.List;
-
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.collection.ArrayHelper;
-import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.equals.EqualsHelper;
 import com.helger.commons.hashcode.HashCodeGenerator;
 import com.sun.codemodel.JBlock;
@@ -32,13 +29,13 @@ import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
+import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JOp;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
@@ -50,7 +47,7 @@ import com.sun.tools.xjc.outline.Outline;
  * @author Philip Helger
  */
 @IsSPIImplementation
-public class PluginEqualsHashCode extends Plugin
+public class PluginEqualsHashCode extends AbstractPlugin
 {
   private static final String OPT = "Xph-equalshashcode";
 
@@ -69,13 +66,6 @@ public class PluginEqualsHashCode extends Plugin
   }
 
   @Override
-  @CodingStyleguideUnaware
-  public List <String> getCustomizationURIs ()
-  {
-    return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
-  }
-
-  @Override
   public boolean run (final Outline aOutline, final Options aOpts, final ErrorHandler aErrorHandler)
   {
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
@@ -85,6 +75,7 @@ public class PluginEqualsHashCode extends Plugin
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
       final FieldOutline [] aFields = aClassOutline.getDeclaredFields ();
+      final ICommonsOrderedMap <JFieldVar, String> aFieldVars = _getAllFields (aClassOutline);
       final JDefinedClass jClass = aClassOutline.implClass;
       final boolean bIsRoot = jClass._extends () == null || jClass._extends ().equals (jObject);
 
@@ -111,7 +102,8 @@ public class PluginEqualsHashCode extends Plugin
                             .cor (JOp.not (JExpr.invoke ("getClass")
                                                 .invoke ("equals")
                                                 .arg (param.invoke ("getClass")))))
-                 ._then ()._return (JExpr.FALSE);
+                 ._then ()
+                 ._return (JExpr.FALSE);
           }
           else
           {
@@ -122,13 +114,29 @@ public class PluginEqualsHashCode extends Plugin
           {
             // final type rhs = (type)o;
             final JVar jTyped = jBody.decl (JMod.FINAL, jClass, "rhs", JExpr.cast (jClass, param));
-            for (final FieldOutline aField : aFields)
+            for (final JFieldVar aField : aFieldVars.keySet ())
             {
-              final String sFieldName = aField.getPropertyInfo ().getName (false);
-              final JExpression aThisExpr = jEqualsHelper.staticInvoke ("equals")
-                                                         .arg (JExpr.ref (sFieldName))
-                                                         .arg (jTyped.ref (sFieldName));
-              jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
+              final String sFieldName = aField.name ();
+              if (aField.type ().erasure ().name ().equals ("List"))
+              {
+                /*
+                 * Ensure that "EqualsHelper.equals" is invoked on all child
+                 * elements. This is an issue with "List<JAXBElement<?>>" in
+                 * Java9 onwards, because JAXBElement does not implement equals.
+                 * Note: use "equalsCollection" to allow for null values as well
+                 */
+                final JExpression aThisExpr = jEqualsHelper.staticInvoke ("equalsCollection")
+                                                           .arg (JExpr.ref (sFieldName))
+                                                           .arg (jTyped.ref (sFieldName));
+                jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
+              }
+              else
+              {
+                final JExpression aThisExpr = jEqualsHelper.staticInvoke ("equals")
+                                                           .arg (JExpr.ref (sFieldName))
+                                                           .arg (jTyped.ref (sFieldName));
+                jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
+              }
             }
           }
           jBody._return (JExpr.TRUE);

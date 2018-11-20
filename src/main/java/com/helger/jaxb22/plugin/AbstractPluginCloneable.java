@@ -16,18 +16,9 @@
  */
 package com.helger.jaxb22.plugin;
 
-import java.util.List;
-
 import javax.annotation.Nonnull;
 
-import com.helger.commons.annotation.CodingStyleguideUnaware;
-import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.ArrayHelper;
-import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.CommonsLinkedHashMap;
-import com.helger.commons.collection.impl.ICommonsMap;
-import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.lang.CloneHelper;
 import com.helger.jaxb.JAXBHelper;
 import com.sun.codemodel.ClassType;
@@ -35,12 +26,8 @@ import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
-import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JOp;
 import com.sun.codemodel.JType;
-import com.sun.tools.xjc.Plugin;
-import com.sun.tools.xjc.model.CPropertyInfo;
-import com.sun.tools.xjc.outline.ClassOutline;
 
 /**
  * Abstract cloneable support.
@@ -48,15 +35,8 @@ import com.sun.tools.xjc.outline.ClassOutline;
  * @author Philip Helger
  * @since 2.2.11.12
  */
-public abstract class AbstractPluginCloneable extends Plugin
+public abstract class AbstractPluginCloneable extends AbstractPlugin
 {
-  @Override
-  @CodingStyleguideUnaware
-  public List <String> getCustomizationURIs ()
-  {
-    return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
-  }
-
   protected static boolean _isImmutable (@Nonnull final JType aType)
   {
     // int, byte, boolean etc?
@@ -108,49 +88,6 @@ public abstract class AbstractPluginCloneable extends Plugin
   protected static boolean _isImmutableArray (@Nonnull final JType aType)
   {
     return aType.isArray () && _isImmutable (aType.elementType ());
-  }
-
-  @Nonnull
-  @ReturnsMutableCopy
-  protected static ICommonsMap <JFieldVar, String> _getAllFields (@Nonnull final ClassOutline aClassOutline)
-  {
-    final ICommonsOrderedMap <JFieldVar, String> ret = new CommonsLinkedHashMap <> ();
-
-    final JDefinedClass jClass = aClassOutline.implClass;
-
-    // Add fields of this class
-    for (final JFieldVar aFieldVar : CollectionHelper.getSortedByKey (jClass.fields ()).values ())
-    {
-      // Get public name
-      final String sFieldVarName = aFieldVar.name ();
-      final CPropertyInfo aPI = aClassOutline.target.getProperty (sFieldVarName);
-      String sFieldName;
-      if (aPI == null)
-      {
-        if ("otherAttributes".equals (sFieldVarName))
-        {
-          // Created by <xs:anyAttribute/>
-          sFieldName = sFieldVarName;
-        }
-        else
-        {
-          throw new IllegalStateException ("'" +
-                                           aFieldVar.name () +
-                                           "' not found in " +
-                                           new CommonsArrayList <> (aClassOutline.target.getProperties (),
-                                                                    pi -> pi.getName (false)) +
-                                           " of " +
-                                           jClass.fullName ());
-        }
-      }
-      else
-      {
-        sFieldName = aPI.getName (true);
-      }
-      ret.put (aFieldVar, sFieldName);
-    }
-
-    return ret;
   }
 
   @Nonnull
