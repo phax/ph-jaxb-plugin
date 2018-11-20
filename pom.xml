@@ -77,8 +77,15 @@
       <dependencies>
         <!-- Only present up to v2.3.0 -->
         <dependency>
-          <groupId>org.glassfish.jaxb</groupId>
+          <groupId>${jaxb.package}</groupId>
           <artifactId>jaxb-core</artifactId>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.xsom</groupId>
+          <artifactId>xsom</artifactId>
+          <version>20140925</version>                                  
+          <scope>provided</scope>
         </dependency>
       </dependencies>
     </profile>
@@ -96,6 +103,14 @@
           <groupId>javax.activation</groupId>
           <artifactId>activation</artifactId>
           <version>1.1.1</version>
+          <scope>provided</scope>
+        </dependency>
+        <!-- For 2.3.0 change to org.glassfish.jaxb:xsom:2.3.0 -->
+        <dependency>
+          <groupId>${jaxb.package}</groupId>
+          <artifactId>xsom</artifactId>
+          <version>${jaxb.version}</version>                                  
+          <scope>provided</scope>
         </dependency>
       </dependencies>
     </profile>
@@ -158,13 +173,6 @@
     <dependency>
       <groupId>com.sun.istack</groupId>
       <artifactId>istack-commons-runtime</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <!-- For 2.3.0 change to org.glassfish.jaxb:xsom:2.3.0 -->
-    <dependency>
-      <groupId>com.sun.xsom</groupId>
-      <artifactId>xsom</artifactId>
-      <version>20140925</version>                                  
       <scope>provided</scope>
     </dependency>
     <dependency>
