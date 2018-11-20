@@ -63,8 +63,43 @@
   <properties>
     <!-- com.sun.xml.bind was the old one-->
     <jaxb.package>org.glassfish.jaxb</jaxb.package>
-    <jaxb.version>2.2.11</jaxb.version>
   </properties>
+
+  <profiles>
+    <profile>
+      <id>jdk8</id>
+      <activation>
+        <jdk>1.8</jdk>
+      </activation>
+      <properties>
+        <jaxb.version>2.2.11</jaxb.version>
+      </properties>
+      <dependencies>
+        <!-- Only present up to v2.3.0 -->
+        <dependency>
+          <groupId>org.glassfish.jaxb</groupId>
+          <artifactId>jaxb-core</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>jdk9up</id>
+      <activation>
+        <!-- use "12)" to support versions like "11.0.1" -->
+        <jdk>[9,12)</jdk>
+      </activation>
+      <properties>
+        <jaxb.version>2.3.1</jaxb.version>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>javax.activation</groupId>
+          <artifactId>activation</artifactId>
+          <version>1.1.1</version>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
   
   <dependencyManagement>
     <dependencies>
@@ -97,11 +132,6 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-jaxb</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${jaxb.package}</groupId>
-      <artifactId>jaxb-core</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>${jaxb.package}</groupId>
