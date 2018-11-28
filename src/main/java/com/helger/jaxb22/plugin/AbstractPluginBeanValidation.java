@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.Valid;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
@@ -79,7 +80,9 @@ public abstract class AbstractPluginBeanValidation extends Plugin
                                                                 "int",
                                                                 "long" };
 
-  private boolean m_bJSR349 = false;
+  // JSR 303 = Bean Validaiton 1.0
+  // JSR 349 = Bean Validaiton 1.1
+  private final boolean m_bJSR349;
 
   protected AbstractPluginBeanValidation (final boolean bValidation10)
   {
@@ -114,7 +117,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
               else
                 if (aPropertyInfo instanceof CReferencePropertyInfo)
                 {
-
+                  // Ignore
                 }
                 else
                   LOGGER.info ("Unsupported property: " + aPropertyInfo);
@@ -162,6 +165,13 @@ public abstract class AbstractPluginBeanValidation extends Plugin
       {
         aField.annotate (Size.class).param ("min", aMinOccurs.intValue ());
       }
+    }
+
+    // For all complex types
+    if (aField.type ().erasure ().name ().equals ("List") || aField.type ().isArray ())
+    {
+      // Complex type requires @Valid for nested validation
+      aField.annotate (Valid.class);
     }
 
     final XSTerm aTerm = aParticle.getTerm ();
