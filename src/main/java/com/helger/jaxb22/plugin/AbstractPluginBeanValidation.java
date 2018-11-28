@@ -168,7 +168,12 @@ public abstract class AbstractPluginBeanValidation extends Plugin
     }
 
     // For all complex types
-    if (aField.type ().erasure ().name ().equals ("List") || aField.type ().isArray ())
+    final String sFullName = aField.type ().erasure ().fullName ();
+    if (aField.type ().isArray () ||
+        sFullName.equals ("java.util.Collection") ||
+        sFullName.equals ("java.util.Set") ||
+        sFullName.equals ("java.util.List") ||
+        sFullName.equals ("java.util.Map"))
     {
       // Complex type requires @Valid for nested validation
       aField.annotate (Valid.class);
