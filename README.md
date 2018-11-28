@@ -8,6 +8,8 @@ This project is licensed under the Apache 2 license.
 
 # News and noteworthy
 
+* v2.3.1.2 - work in progress
+    * Added creation of bean validaton `@Valid` annotation
 * v2.3.1.1 - 2018-11-22
     * Added support for JAXB 2.3.1 when using Java 9 or higher - still works with JAXB 2.2.11 for Java 8
     * Updated to ph-commons 9.2.0 
