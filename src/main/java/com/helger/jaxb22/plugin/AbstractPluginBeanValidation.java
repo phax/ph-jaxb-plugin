@@ -80,8 +80,8 @@ public abstract class AbstractPluginBeanValidation extends Plugin
                                                                 "int",
                                                                 "long" };
 
-  // JSR 303 = Bean Validaiton 1.0
-  // JSR 349 = Bean Validaiton 1.1
+  // JSR 303 = Bean Validation 1.0
+  // JSR 349 = Bean Validation 1.1
   private final boolean m_bJSR349;
 
   protected AbstractPluginBeanValidation (final boolean bValidation10)
@@ -148,9 +148,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
     if (MathHelper.isLT0 (aMinOccurs) || (MathHelper.isGE1 (aMinOccurs) && bRequired))
     {
       if (!_hasAnnotation (aField, NotNull.class))
-      {
         aField.annotate (NotNull.class);
-      }
     }
     if (aMaxOccurs.compareTo (BigInteger.ONE) > 0)
     {
@@ -167,16 +165,19 @@ public abstract class AbstractPluginBeanValidation extends Plugin
       }
     }
 
-    // For all complex types
+    // For all collection types
+    // For all types of generated classes
     final String sFullName = aField.type ().erasure ().fullName ();
     if (aField.type ().isArray () ||
         sFullName.equals ("java.util.Collection") ||
         sFullName.equals ("java.util.Set") ||
         sFullName.equals ("java.util.List") ||
-        sFullName.equals ("java.util.Map"))
+        sFullName.equals ("java.util.Map") ||
+        aClassOutline.implClass.owner ()._getClass (aField.type ().fullName ()) != null)
     {
       // Complex type requires @Valid for nested validation
-      aField.annotate (Valid.class);
+      if (!_hasAnnotation (aField, Valid.class))
+        aField.annotate (Valid.class);
     }
 
     final XSTerm aTerm = aParticle.getTerm ();
@@ -216,14 +217,19 @@ public abstract class AbstractPluginBeanValidation extends Plugin
       final Integer aMaxLength = fMaxLength == null ? null : StringParser.parseIntObj (fMaxLength.getValue ().value);
       final XSFacet fMinLength = aSimpleType.getFacet ("minLength");
       final Integer aMinLength = fMinLength == null ? null : StringParser.parseIntObj (fMinLength.getValue ().value);
-      if (aMaxLength != null && aMinLength != null)
-        aField.annotate (Size.class).param ("max", aMaxLength.intValue ()).param ("min", aMinLength.intValue ());
-      else
-        if (aMinLength != null)
-          aField.annotate (Size.class).param ("min", aMinLength.intValue ());
+      if (aMinLength != null)
+      {
+        if (aMaxLength != null)
+          aField.annotate (Size.class).param ("min", aMinLength.intValue ()).param ("max", aMaxLength.intValue ());
         else
-          if (aMaxLength != null)
-            aField.annotate (Size.class).param ("max", aMaxLength.intValue ());
+          aField.annotate (Size.class).param ("min", aMinLength.intValue ());
+      }
+      else
+      {
+        if (aMaxLength != null)
+          aField.annotate (Size.class).param ("max", aMaxLength.intValue ());
+        // else neither nor
+      }
     }
 
     /**
@@ -231,35 +237,36 @@ public abstract class AbstractPluginBeanValidation extends Plugin
      * message= "Name can only contain capital letters, numbers and the symbols
      * '-', '_', '/', ' '" regexp="^[A-Z0-9_\s//-]*" />
      */
-    if (aSimpleType.getFacet ("pattern") != null)
+    final XSFacet aFacetPattern = aSimpleType.getFacet ("pattern");
+    if (aFacetPattern != null)
     {
-      final String sPattern = aSimpleType.getFacet ("pattern").getValue ().value;
+      final String sPattern = aFacetPattern.getValue ().value;
       // cxf-codegen fix
       if (!"\\c+".equals (sPattern))
       {
+        // Note: flags like "multiline" or "case insensitive" are not supported
+        // in XSD. See e.g. https://www.regular-expressions.info/xml.html
         if (!_hasAnnotation (aField, Pattern.class))
-        {
           aField.annotate (Pattern.class).param ("regexp", sPattern);
-        }
       }
     }
 
     if (_isNumericType (aField))
     {
       final XSFacet aMaxInclusive = aSimpleType.getFacet ("maxInclusive");
-      if (aMaxInclusive != null && _isValidValue (aMaxInclusive) && !_hasAnnotation (aField, DecimalMax.class))
+      if (aMaxInclusive != null && _isValidMinMaxValue (aMaxInclusive) && !_hasAnnotation (aField, DecimalMax.class))
       {
         aField.annotate (DecimalMax.class).param ("value", aMaxInclusive.getValue ().value);
       }
 
       final XSFacet aMinInclusive = aSimpleType.getFacet ("minInclusive");
-      if (aMinInclusive != null && _isValidValue (aMinInclusive) && !_hasAnnotation (aField, DecimalMin.class))
+      if (aMinInclusive != null && _isValidMinMaxValue (aMinInclusive) && !_hasAnnotation (aField, DecimalMin.class))
       {
         aField.annotate (DecimalMin.class).param ("value", aMinInclusive.getValue ().value);
       }
 
       final XSFacet aMaxExclusive = aSimpleType.getFacet ("maxExclusive");
-      if (aMaxExclusive != null && _isValidValue (aMaxExclusive) && !_hasAnnotation (aField, DecimalMax.class))
+      if (aMaxExclusive != null && _isValidMinMaxValue (aMaxExclusive) && !_hasAnnotation (aField, DecimalMax.class))
       {
         final JAnnotationUse aAnnotation = aField.annotate (DecimalMax.class);
         aAnnotation.param ("value", aMaxExclusive.getValue ().value);
@@ -267,7 +274,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
           aAnnotation.param ("inclusive", false);
       }
       final XSFacet aMinExclusive = aSimpleType.getFacet ("minExclusive");
-      if (aMinExclusive != null && _isValidValue (aMinExclusive) && !_hasAnnotation (aField, DecimalMin.class))
+      if (aMinExclusive != null && _isValidMinMaxValue (aMinExclusive) && !_hasAnnotation (aField, DecimalMin.class))
       {
         final JAnnotationUse aAnnotation = aField.annotate (DecimalMin.class);
         aAnnotation.param ("value", aMinExclusive.getValue ().value);
@@ -339,21 +346,21 @@ public abstract class AbstractPluginBeanValidation extends Plugin
     _processType (type, aFieldVar);
   }
 
-  private static boolean _isEqual (final long nVal, @Nullable final String sValue)
+  private static boolean _isEqualStr (final long nVal, @Nullable final String sValue)
   {
     return Long.toString (nVal).equals (sValue);
   }
 
-  private static boolean _isValidValue (@Nonnull final XSFacet aFacet)
+  private static boolean _isValidMinMaxValue (@Nonnull final XSFacet aFacet)
   {
-    final String value = aFacet.getValue ().value;
+    final String sValue = aFacet.getValue ().value;
     // cxf-codegen puts max and min as value when there is not anything defined
     // in wsdl.
-    return value != null &&
-           !(_isEqual (Long.MAX_VALUE, value) ||
-             _isEqual (Integer.MAX_VALUE, value) ||
-             _isEqual (Long.MIN_VALUE, value) ||
-             _isEqual (Integer.MIN_VALUE, value));
+    return sValue != null &&
+           !_isEqualStr (Long.MAX_VALUE, sValue) &&
+           !_isEqualStr (Integer.MAX_VALUE, sValue) &&
+           !_isEqualStr (Long.MIN_VALUE, sValue) &&
+           !_isEqualStr (Integer.MIN_VALUE, sValue);
   }
 
   private static boolean _hasAnnotation (@Nonnull final JFieldVar aField, @Nonnull final Class <?> aAnnotationClass)
