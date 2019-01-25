@@ -1,14 +1,14 @@
 # ph-jaxb22-plugin
 
 JAXB 2.2 plugin that adds some commonly needed functionality.
-The current version 2.2.11.* is linked against JAXB 2.2.11.
+The current version 2.3.1.* is linked against JAXB 2.2.11 and 2.3.x depending on the JDK version.
 The version 2.2.7 is linked against JAXB 2.2.7.
 
 This project is licensed under the Apache 2 license.
 
 # News and noteworthy
 
-* v2.3.1.3 - work in progress
+* v2.3.1.3 - 2019-01-25
     * Integrated `ph-ubl-value` from ph-ubl as as `ph-value-extender` into this project. 
 * v2.3.1.2 - 2018-12-01
     * Added creation of bean validaton `@Valid` annotation. Cascading bean validation now works properly.
@@ -89,7 +89,7 @@ Add something **like** the following to your pom.xml to use this artifact:
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-jaxb22-plugin</artifactId>
-      <version>2.3.1.2</version>
+      <version>2.3.1.3</version>
     </dependency>
   </dependencies>
 </plugin>
