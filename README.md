@@ -8,6 +8,8 @@ This project is licensed under the Apache 2 license.
 
 # News and noteworthy
 
+* v2.3.1.3 - work in progress
+    * Integrated `ph-ubl-value` from ph-ubl as as `ph-value-extender` into this project. 
 * v2.3.1.2 - 2018-12-01
     * Added creation of bean validaton `@Valid` annotation. Cascading bean validation now works properly.
 * v2.3.1.1 - 2018-11-22
@@ -117,6 +119,7 @@ Add something **like** the following to your pom.xml to use this artifact:
     * `void add...(T)` - add a new entry to the list
 * `ph-tostring` - auto implement `toString` using `com.helger.commons.string.ToStringGenerator.getToString()`. This requires the created code to depend on [ph-commons >= 8.6.2](https://github.com/phax/ph-commons). 
 * `ph-tostring-legacy` (since 2.2.11.9) - auto implement `toString` using `com.helger.commons.string.ToStringGenerator.toString()`. This requires the created code to depend on [ph-commons <= 8.6.1](https://github.com/phax/ph-commons). 
+* `ph-value-extender` (since 2.3.1.3) - create additional constructors with the 'value' as argument as well as getter and setter for the value
 
 ---
 

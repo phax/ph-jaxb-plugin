@@ -198,12 +198,14 @@ public class PluginCodeQuality extends Plugin
           // Modify method
           aMethod.javadoc ().addReturn ().add ("The created JAXBElement and never <code>null</code>.");
 
-          if (aParam.type ().name ().equals (sByteArrayTypeName))
-          {
-            // Try to remove the contained cast
-            // TODO Unfortunately this does not work with the current code model
-            // See https://java.net/jira/browse/CODEMODEL-13
-          }
+          if (false)
+            if (aParam.type ().name ().equals (sByteArrayTypeName))
+            {
+              // Try to remove the contained cast
+              // TODO Unfortunately this does not work with the current code
+              // model
+              // See https://java.net/jira/browse/CODEMODEL-13
+            }
         }
         else
           if (aMethod.name ().startsWith ("create") && aParams.isEmpty ())
