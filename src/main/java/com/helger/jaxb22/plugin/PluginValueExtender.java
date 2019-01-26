@@ -126,7 +126,9 @@ public class PluginValueExtender extends Plugin
           aParam.annotate (Nullable.class);
         aValueCtor.body ().invoke ("super").arg (aParam);
         aValueCtor.javadoc ()
-                  .add ("Constructor for value of type " + aValueType.name () + " calling super class constructor.");
+                  .add ("Constructor for value of type " +
+                        aValueType.erasure ().name () +
+                        " calling super class constructor.");
         aValueCtor.javadoc ()
                   .addParam (aParam)
                   .add ("The value to be set." + (aValueType.isPrimitive () ? "" : " May be <code>null</code>."));
@@ -265,7 +267,7 @@ public class PluginValueExtender extends Plugin
         if (!aValueType.isPrimitive ())
           aParam.annotate (Nullable.class);
         aValueCtor.body ().invoke ("setValue").arg (aParam);
-        aValueCtor.javadoc ().add ("Constructor for value of type " + aValueType.name ());
+        aValueCtor.javadoc ().add ("Constructor for value of type " + aValueType.erasure ().name ());
         aValueCtor.javadoc ()
                   .addParam (aParam)
                   .add ("The value to be set." + (aValueType.isPrimitive () ? "" : " May be <code>null</code>."));
