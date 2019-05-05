@@ -8,6 +8,8 @@ This project is licensed under the Apache 2 license.
 
 # News and noteworthy
 
+* v2.3.1.5 - 2019-05-05
+    * Added Java 12 support 
 * v2.3.1.4 - 2019-01-26
     * Fixed JavaDoc error in created code when constructor parameter is a List 
 * v2.3.1.3 - 2019-01-25
@@ -91,7 +93,7 @@ Add something **like** the following to your pom.xml to use this artifact:
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-jaxb22-plugin</artifactId>
-      <version>2.3.1.4</version>
+      <version>2.3.1.5</version>
     </dependency>
   </dependencies>
 </plugin>
