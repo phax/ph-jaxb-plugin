@@ -1,8 +1,7 @@
 # ph-jaxb22-plugin
 
 JAXB 2.2 plugin that adds some commonly needed functionality.
-The current version 2.3.1.* is linked against JAXB 2.2.11 and 2.3.x depending on the JDK version.
-The version 2.2.7 is linked against JAXB 2.2.7.
+The current version 2.3.2.* is linked against JAXB 2.2.11 (for Java 8) and 2.3.2 (for Java 9+).
 
 This project is licensed under the Apache 2 license.
 
