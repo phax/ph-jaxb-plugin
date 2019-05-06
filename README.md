@@ -8,6 +8,8 @@ This project is licensed under the Apache 2 license.
 
 # News and noteworthy
 
+* v2.3.2.1 - work in progress
+    * Version number reflects latest JAXB version in use
 * v2.3.1.5 - 2019-05-05
     * Added Java 12 support 
 * v2.3.1.4 - 2019-01-26
@@ -15,7 +17,7 @@ This project is licensed under the Apache 2 license.
 * v2.3.1.3 - 2019-01-25
     * Integrated `ph-ubl-value` from ph-ubl as as `ph-value-extender` into this project. 
 * v2.3.1.2 - 2018-12-01
-    * Added creation of bean validaton `@Valid` annotation. Cascading bean validation now works properly.
+    * Added creation of bean validation `@Valid` annotation. Cascading bean validation now works properly.
 * v2.3.1.1 - 2018-11-22
     * Added support for JAXB 2.3.1 when using Java 9 or higher - still works with JAXB 2.2.11 for Java 8
     * Updated to ph-commons 9.2.0 
