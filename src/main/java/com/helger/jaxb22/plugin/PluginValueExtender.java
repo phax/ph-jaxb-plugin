@@ -207,28 +207,31 @@ public class PluginValueExtender extends Plugin
       final JDefinedClass jClass = aClassOutline.implClass;
 
       // Take only "external", meaning non-generated super classes
-      if (jClass._extends () != null && !(jClass._extends () instanceof JDefinedClass))
+      final JClass aExtends = jClass._extends ();
+      if (aExtends != null && !(aExtends instanceof JDefinedClass))
       {
-        final String sSuperClassName = jClass._extends ().fullName ();
+        final String sSuperClassName = aExtends.fullName ();
+
         // Ignore all system super classes
-        if (!sSuperClassName.startsWith ("java."))
+        if (sSuperClassName.startsWith ("java."))
+          continue;
+
+        final Class <?> aSuperClass = GenericReflection.getClassFromNameSafe (sSuperClassName);
+        if (aSuperClass != null)
         {
-          final Class <?> aSuperClass = GenericReflection.getClassFromNameSafe (sSuperClassName);
-          if (aSuperClass != null)
-          {
-            // Check if that class has a "value" field (name of the variable
-            // created by JAXB to indicate the content of an XML element)
-            for (final Field aField : aSuperClass.getFields ())
-              if (aField.getName ().equals ("value"))
-              {
-                // Map from super class name to codemodel value field type
-                aAllSuperClassNames.put (sSuperClassName, aOutline.getCodeModel ()._ref (aField.getType ()));
-                break;
-              }
-          }
-          else
-            LOGGER.warn ("Failed to load " + sSuperClassName);
+          // Check if that class has a "value" field (name of the variable
+          // created by JAXB to indicate the content of an XML element)
+          for (final Field aField : aSuperClass.getFields ())
+            if (aField.getName ().equals ("value"))
+            {
+              // Map from super class name to codemodel value field type
+              aAllSuperClassNames.put (sSuperClassName, aOutline.getCodeModel ()._ref (aField.getType ()));
+              break;
+            }
         }
+        else
+          if (!aAllSuperClassNames.containsKey (sSuperClassName))
+            LOGGER.warn ("Failed to load " + sSuperClassName);
       }
     }
 
