@@ -7,6 +7,8 @@ This project is licensed under the Apache 2 license.
 
 # News and noteworthy
 
+* v2.3.2.2 - 2019-05-07
+    * Using unbounded version instead of limiting to Java 12.x
 * v2.3.2.1 - 2019-05-06
     * Version number reflects latest JAXB version in use
     * Updated to ph-commons 9.3.3 with Java 12 support
@@ -95,7 +97,7 @@ Add something **like** the following to your pom.xml to use this artifact:
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-jaxb22-plugin</artifactId>
-      <version>2.3.2.1</version>
+      <version>2.3.2.2</version>
     </dependency>
   </dependencies>
 </plugin>
