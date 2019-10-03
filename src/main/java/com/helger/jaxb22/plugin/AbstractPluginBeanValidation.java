@@ -17,7 +17,9 @@
 package com.helger.jaxb22.plugin;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,7 +41,10 @@ import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.math.MathHelper;
 import com.helger.commons.string.StringParser;
 import com.sun.codemodel.JAnnotationUse;
+import com.sun.codemodel.JCodeModel;
+import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JPackage;
 import com.sun.codemodel.JType;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
@@ -53,13 +58,13 @@ import com.sun.tools.xjc.outline.Outline;
 import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XSElementDecl;
 import com.sun.xml.xsom.XSFacet;
+import com.sun.xml.xsom.XSModelGroup;
 import com.sun.xml.xsom.XSParticle;
 import com.sun.xml.xsom.XSSimpleType;
 import com.sun.xml.xsom.XSTerm;
 import com.sun.xml.xsom.XSType;
 import com.sun.xml.xsom.impl.AttributeUseImpl;
 import com.sun.xml.xsom.impl.ElementDecl;
-import com.sun.xml.xsom.impl.ParticleImpl;
 import com.sun.xml.xsom.impl.RestrictionSimpleTypeImpl;
 import com.sun.xml.xsom.impl.parser.DelayedRef;
 
@@ -107,13 +112,13 @@ public abstract class AbstractPluginBeanValidation extends Plugin
         for (final CPropertyInfo aPropertyInfo : aPropertyInfos)
         {
           if (aPropertyInfo instanceof CElementPropertyInfo)
-            _processElement ((CElementPropertyInfo) aPropertyInfo, aClassOutline);
+            _processElementProperty ((CElementPropertyInfo) aPropertyInfo, aClassOutline);
           else
             if (aPropertyInfo instanceof CAttributePropertyInfo)
-              _processAttribute ((CAttributePropertyInfo) aPropertyInfo, aClassOutline);
+              _processAttributeProperty ((CAttributePropertyInfo) aPropertyInfo, aClassOutline);
             else
               if (aPropertyInfo instanceof CValuePropertyInfo)
-                _processValue ((CValuePropertyInfo) aPropertyInfo, aClassOutline);
+                _processValueProperty ((CValuePropertyInfo) aPropertyInfo, aClassOutline);
               else
                 if (aPropertyInfo instanceof CReferencePropertyInfo)
                 {
@@ -136,9 +141,12 @@ public abstract class AbstractPluginBeanValidation extends Plugin
   /*
    * XS:Element
    */
-  private void _processElement (@Nonnull final CElementPropertyInfo aElement, @Nonnull final ClassOutline aClassOutline)
+  private void _processElementProperty (@Nonnull final CElementPropertyInfo aElement,
+                                        @Nonnull final ClassOutline aClassOutline)
   {
-    final ParticleImpl aParticle = (ParticleImpl) aElement.getSchemaComponent ();
+    // It's a ParticleImpl
+    final XSParticle aParticle = (XSParticle) aElement.getSchemaComponent ();
+    final JCodeModel aCM = aClassOutline.implClass.owner ();
     final BigInteger aMinOccurs = aParticle.getMinOccurs ();
     final BigInteger aMaxOccurs = aParticle.getMaxOccurs ();
     final JFieldVar aField = aClassOutline.implClass.fields ().get (aElement.getName (false));
@@ -167,17 +175,33 @@ public abstract class AbstractPluginBeanValidation extends Plugin
 
     // For all collection types
     // For all types of generated classes
-    final String sFullName = aField.type ().erasure ().fullName ();
+    final String sErasureFullName = aField.type ().erasure ().fullName ();
     if (aField.type ().isArray () ||
-        sFullName.equals ("java.util.Collection") ||
-        sFullName.equals ("java.util.Set") ||
-        sFullName.equals ("java.util.List") ||
-        sFullName.equals ("java.util.Map") ||
-        aClassOutline.implClass.owner ()._getClass (aField.type ().fullName ()) != null)
+        sErasureFullName.equals ("java.util.Collection") ||
+        sErasureFullName.equals ("java.util.Set") ||
+        sErasureFullName.equals ("java.util.List") ||
+        sErasureFullName.equals ("java.util.Map") ||
+        aField.type () instanceof JDefinedClass)
     {
       // Complex type requires @Valid for nested validation
       if (!_hasAnnotation (aField, Valid.class))
         aField.annotate (Valid.class);
+    }
+
+    if (false)
+    {
+      // Enumerate all existing classes
+      final Iterator <JPackage> itp = aCM.packages ();
+      while (itp.hasNext ())
+      {
+        final JPackage p = itp.next ();
+        final Iterator <JDefinedClass> cit = p.classes ();
+        while (cit.hasNext ())
+        {
+          final JDefinedClass c = cit.next ();
+          LOGGER.info ("  " + c.fullName ());
+        }
+      }
     }
 
     final XSTerm aTerm = aParticle.getTerm ();
@@ -190,7 +214,16 @@ public abstract class AbstractPluginBeanValidation extends Plugin
         _processElement (aField, (ElementDecl) xsElementDecl);
       }
       else
-        LOGGER.info ("Unsupported particle term " + aTerm);
+        if (aTerm instanceof XSModelGroup)
+        {
+          if (false)
+          {
+            final XSParticle [] c = ((XSModelGroup) aTerm).getChildren ();
+            LOGGER.info ("XSModelGroup children are: '" + Arrays.toString (c) + "'");
+          }
+        }
+        else
+          LOGGER.info ("Unsupported particle term '" + aTerm + "'");
   }
 
   private void _processElement (@Nonnull final JFieldVar aField, final ElementDecl aElement)
@@ -305,7 +338,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
   /*
    * attribute from parent declaration
    */
-  private void _processValue (@Nonnull final CValuePropertyInfo aProperty, final ClassOutline aClassOutline)
+  private void _processValueProperty (@Nonnull final CValuePropertyInfo aProperty, final ClassOutline aClassOutline)
   {
     final String sPropertyName = aProperty.getName (false);
 
@@ -331,7 +364,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
   /*
    * XS:Attribute
    */
-  private void _processAttribute (final CAttributePropertyInfo aPropertyInfo, final ClassOutline aClassOutline)
+  private void _processAttributeProperty (final CAttributePropertyInfo aPropertyInfo, final ClassOutline aClassOutline)
   {
     final String sPropertyName = aPropertyInfo.getName (false);
 

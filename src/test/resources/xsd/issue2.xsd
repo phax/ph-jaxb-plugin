@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:complexType name="TestType">
+    <xs:annotation>
+      <xs:documentation>Test type</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="id" type="xs:long" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="stringlist">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="stringitem" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

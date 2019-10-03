@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.jaxb22.plugin;
+package com.helger.jaxb22.plugin.supplementary.issues;
 
 import java.io.File;
 import java.io.PrintStream;
@@ -28,7 +28,7 @@ import com.helger.commons.io.file.FileHelper;
 import com.helger.commons.io.file.FileOperationManager;
 import com.sun.tools.xjc.Driver;
 
-public final class XJCLoaderFuncTest
+public final class Issue2FuncTest
 {
   private static void _run (@Nonnull final File aXSDFile,
                             @Nonnull final File aDestDir,
@@ -40,15 +40,20 @@ public final class XJCLoaderFuncTest
     {
       // Don't use Driver.main because it calls System.exit
       FileOperationManager.INSTANCE.createDirRecursiveIfNotExisting (aDestDir);
-      Driver.run (new String [] { aXSDFile.getAbsolutePath (), "-d", aDestDir.getAbsolutePath () }, aPS, aPS);
+      Driver.run (new String [] { aXSDFile.getAbsolutePath (),
+                                  "-d",
+                                  aDestDir.getAbsolutePath (),
+                                  "-Xph-bean-validation11" },
+                  aPS,
+                  aPS);
     }
   }
 
   @Test
-  public void testLoadXJC () throws Throwable
+  public void testIssue2 () throws Throwable
   {
-    _run (new File ("src/test/resources/xsd/changelog-1.0.xsd"),
-          new File ("target/basic"),
-          new File ("target/basic-result.txt"));
+    _run (new File ("src/test/resources/xsd/issue2.xsd"),
+          new File ("target/issue2"),
+          new File ("target/issue2-result.txt"));
   }
 }
