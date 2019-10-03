@@ -7,6 +7,8 @@ This project is licensed under the Apache 2 license.
 
 # News and noteworthy
 
+* v2.3.2.3 - 2019-10-04
+    * Fixed a missing `@Valid` annotation for anonymous nested types ([issue #2](https://github.com/phax/ph-jaxb22-plugin/issues/2)) 
 * v2.3.2.2 - 2019-05-07
     * Using unbounded version instead of limiting to Java 12.x
 * v2.3.2.1 - 2019-05-06
@@ -97,7 +99,7 @@ Add something **like** the following to your pom.xml to use this artifact:
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-jaxb22-plugin</artifactId>
-      <version>2.3.2.2</version>
+      <version>2.3.2.3</version>
     </dependency>
   </dependencies>
 </plugin>
