@@ -16,11 +16,14 @@
  */
 package com.helger.jaxb22.plugin;
 
+import com.helger.commons.annotation.IsSPIImplementation;
+
 /**
  * big thanks to original author: cocorossello
  *
  * @author Philip Helger
  */
+@IsSPIImplementation
 public class PluginBeanValidation10 extends AbstractPluginBeanValidation
 {
   private static final String OPT = "Xph-bean-validation10";
