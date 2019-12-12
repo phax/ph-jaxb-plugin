@@ -59,6 +59,7 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
            sTypeName.equals ("Boolean") ||
            sTypeName.equals ("Byte") ||
            sTypeName.equals ("Character") ||
+           sTypeName.equals ("DataHandler") ||
            sTypeName.equals ("Double") ||
            sTypeName.equals ("Duration") ||
            sTypeName.equals ("Element") ||
