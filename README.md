@@ -5,8 +5,81 @@ The current version 2.3.2.* is linked against JAXB 2.2.11 (for Java 8) and 2.3.2
 
 This project is licensed under the Apache 2 license.
 
+# Maven usage
+
+Add something **like** the following to your pom.xml to use this artifact:
+
+```xml
+<plugin>
+  <groupId>org.jvnet.jaxb2.maven2</groupId>
+  <artifactId>maven-jaxb2-plugin</artifactId>
+  <version>0.14.0</version>
+  <executions>
+    <execution>
+      <goals>
+        <goal>generate</goal>
+      </goals>
+    </execution>
+  </executions>
+  <configuration>
+    ...regular plugin configuration...
+    <args>
+      ...other direct arguments like -no-header...
+      <arg>-Xph-default-locale</arg>
+      <arg>en_US</arg>
+      <arg>-Xph-annotate</arg>
+      <arg>-Xph-fields-private</arg>
+      <arg>-Xph-code-quality</arg>
+      <arg>-Xph-implements</arg>
+      <arg>java.io.Serializable</arg>
+      <arg>-Xph-equalshashcode</arg>
+      <arg>-Xph-tostring</arg>
+      <arg>-Xph-list-extension</arg>
+      <arg>-Xph-bean-validation11</arg>
+      <arg>-Xph-csu</arg>
+      <arg>-Xph-cloneable2</arg>
+    </args>
+  </configuration>
+  <dependencies>
+    <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>ph-jaxb22-plugin</artifactId>
+      <version>2.3.2.5</version>
+    </dependency>
+  </dependencies>
+</plugin>
+```
+
+# JAXB Plugins
+
+* `ph-annotate` - Create `@javax.annotation.Nonnull`/`@javax.annotation.Nullable` annotations in all bean generated objects as well as in the `ObjectFactory` classes
+* `ph-bean-validation10` - inject Bean validation 1.0 annotations (JSR 303)
+* `ph-bean-validation11` - inject Bean validation 1.1 annotations (JSR 349)
+* `ph-cloneable` (since 2.2.11.7) - implement `clone()` of `Cloneable` interface and `cloneTo(target)`. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons).
+* `ph-cloneable2` (since 2.2.11.12) - implement `clone()` of `Cloneable` using `com.helger.commons.lang.IExplicitlyCloneable` interface and `cloneTo(target)`. This requires the created code to depend on [ph-commons &ge; 9.1.8](https://github.com/phax/ph-commons).
+* `ph-code-quality` - fix some issues that cause warnings in the generated code.
+    * All `ObjectFactory` `QName` members are made public.
+    * Adding JavaDocs to all `ObjectFactory` `JAXBElement<...> create...` methods
+* `ph-csu` - add `@CodingStyleguideUnaware` annotations to all classes. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons).
+* `ph-default-locale` `locale` - set Java default locale to the specified parameter. Use e.g. `en_US`
+* `ph-equalshashcode` - auto implement `equals` and `hashCode` using `com.helger.commons.equals.EqualsHelper` and `com.helger.commons.hashcode.HashCodeGenerator`. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons). 
+* `ph-fields-private` - mark all fields as private
+* `ph-implements` `fullyQualifiedInterfaceName[,otherInterfaceName]` - implement 1-n interfaces in all classes/enums (e.g. `java.io.Serializable`)
+* `ph-list-extension` - add additional methods for `List` types:
+    * `void set...(List)` - set a new `List`
+    * `boolean has...Entries()` - returns `true` if at least one entry is present
+    * `boolean hasNo...Entries()` - returns `true` if no entry is present
+    * `int get...Count()` - returns the number of contained entries
+    * `T get...AtIndex(int)` - get the element at the specified index
+    * `void add...(T)` - add a new entry to the list
+* `ph-tostring` - auto implement `toString` using `com.helger.commons.string.ToStringGenerator.getToString()`. This requires the created code to depend on [ph-commons >= 8.6.2](https://github.com/phax/ph-commons). 
+* `ph-tostring-legacy` (since 2.2.11.9) - auto implement `toString` using `com.helger.commons.string.ToStringGenerator.toString()`. This requires the created code to depend on [ph-commons <= 8.6.1](https://github.com/phax/ph-commons). 
+* `ph-value-extender` (since 2.3.1.3) - create additional constructors with the 'value' as argument as well as getter and setter for the value
+
 # News and noteworthy
 
+* v2.3.2.5 - 2020-04-24
+    * Ignoring static fields if the global binding `fixedAttributeAsConstantProperty="true"` is used
 * v2.3.2.4 - 2019-12-12
     * Added class `DataHandler` as being "not clonable"
 * v2.3.2.3 - 2019-10-04
@@ -61,77 +134,6 @@ This project is licensed under the Apache 2 license.
     * linked against JAXB 2.2.11
 * v2.2.7 - 2014-08-24
     * linked against JAXB 2.2.7
-
-# Maven usage
-
-Add something **like** the following to your pom.xml to use this artifact:
-
-```xml
-<plugin>
-  <groupId>org.jvnet.jaxb2.maven2</groupId>
-  <artifactId>maven-jaxb2-plugin</artifactId>
-  <version>0.14.0</version>
-  <executions>
-    <execution>
-      <goals>
-        <goal>generate</goal>
-      </goals>
-    </execution>
-  </executions>
-  <configuration>
-    ...regular plugin configuration...
-    <args>
-      ...other direct arguments like -no-header...
-      <arg>-Xph-default-locale</arg>
-      <arg>en_US</arg>
-      <arg>-Xph-annotate</arg>
-      <arg>-Xph-fields-private</arg>
-      <arg>-Xph-code-quality</arg>
-      <arg>-Xph-implements</arg>
-      <arg>java.io.Serializable</arg>
-      <arg>-Xph-equalshashcode</arg>
-      <arg>-Xph-tostring</arg>
-      <arg>-Xph-list-extension</arg>
-      <arg>-Xph-bean-validation11</arg>
-      <arg>-Xph-csu</arg>
-      <arg>-Xph-cloneable2</arg>
-    </args>
-  </configuration>
-  <dependencies>
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-jaxb22-plugin</artifactId>
-      <version>2.3.2.4</version>
-    </dependency>
-  </dependencies>
-</plugin>
-```
-
-# JAXB Plugins
-
-* `ph-annotate` - Create `@javax.annotation.Nonnull`/`@javax.annotation.Nullable` annotations in all bean generated objects as well as in the `ObjectFactory` classes
-* `ph-bean-validation10` - inject Bean validation 1.0 annotations (JSR 303)
-* `ph-bean-validation11` - inject Bean validation 1.1 annotations (JSR 349)
-* `ph-cloneable` (since 2.2.11.7) - implement `clone()` of `Cloneable` interface and `cloneTo(target)`. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons).
-* `ph-cloneable2` (since 2.2.11.12) - implement `clone()` of `Cloneable` using `com.helger.commons.lang.IExplicitlyCloneable` interface and `cloneTo(target)`. This requires the created code to depend on [ph-commons &ge; 9.1.8](https://github.com/phax/ph-commons).
-* `ph-code-quality` - fix some issues that cause warnings in the generated code.
-    * All `ObjectFactory` `QName` members are made public.
-    * Adding JavaDocs to all `ObjectFactory` `JAXBElement<...> create...` methods
-* `ph-csu` - add `@CodingStyleguideUnaware` annotations to all classes. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons).
-* `ph-default-locale` `locale` - set Java default locale to the specified parameter. Use e.g. `en_US`
-* `ph-equalshashcode` - auto implement `equals` and `hashCode` using `com.helger.commons.equals.EqualsHelper` and `com.helger.commons.hashcode.HashCodeGenerator`. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons). 
-* `ph-fields-private` - mark all fields as private
-* `ph-implements` `fullyQualifiedInterfaceName[,otherInterfaceName]` - implement 1-n interfaces in all classes/enums (e.g. `java.io.Serializable`)
-* `ph-list-extension` - add additional methods for `List` types:
-    * `void set...(List)` - set a new `List`
-    * `boolean has...Entries()` - returns `true` if at least one entry is present
-    * `boolean hasNo...Entries()` - returns `true` if no entry is present
-    * `int get...Count()` - returns the number of contained entries
-    * `T get...AtIndex(int)` - get the element at the specified index
-    * `void add...(T)` - add a new entry to the list
-* `ph-tostring` - auto implement `toString` using `com.helger.commons.string.ToStringGenerator.getToString()`. This requires the created code to depend on [ph-commons >= 8.6.2](https://github.com/phax/ph-commons). 
-* `ph-tostring-legacy` (since 2.2.11.9) - auto implement `toString` using `com.helger.commons.string.ToStringGenerator.toString()`. This requires the created code to depend on [ph-commons <= 8.6.1](https://github.com/phax/ph-commons). 
-* `ph-value-extender` (since 2.3.1.3) - create additional constructors with the 'value' as argument as well as getter and setter for the value
 
 ---
 
