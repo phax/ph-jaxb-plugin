@@ -17,6 +17,7 @@
 package com.helger.jaxb22.plugin;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
@@ -28,6 +29,7 @@ import com.helger.commons.collection.impl.CommonsLinkedHashMap;
 import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JMod;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
@@ -40,6 +42,8 @@ import com.sun.tools.xjc.outline.ClassOutline;
  */
 public abstract class AbstractPlugin extends Plugin
 {
+  private static final Logger LOGGER = com.sun.xml.bind.Util.getClassLogger ();
+
   @Override
   @CodingStyleguideUnaware
   public final List <String> getCustomizationURIs ()
@@ -49,7 +53,7 @@ public abstract class AbstractPlugin extends Plugin
 
   @Nonnull
   @ReturnsMutableCopy
-  protected static ICommonsOrderedMap <JFieldVar, String> _getAllFields (@Nonnull final ClassOutline aClassOutline)
+  protected static ICommonsOrderedMap <JFieldVar, String> getAllInstanceFields (@Nonnull final ClassOutline aClassOutline)
   {
     final ICommonsOrderedMap <JFieldVar, String> ret = new CommonsLinkedHashMap <> ();
 
@@ -60,6 +64,14 @@ public abstract class AbstractPlugin extends Plugin
     {
       // Get public name
       final String sFieldVarName = aFieldVar.name ();
+
+      // Ignore static fields
+      if ((aFieldVar.mods ().getValue () & JMod.STATIC) == JMod.STATIC)
+      {
+        LOGGER.fine ("Ignoring static field '" + sFieldVarName + "'");
+        continue;
+      }
+
       final CPropertyInfo aPI = aClassOutline.target.getProperty (sFieldVarName);
       String sFieldName;
       if (aPI == null)

@@ -92,7 +92,7 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
         jClass._implements (jExplicitlyCloneable);
       }
 
-      final ICommonsMap <JFieldVar, String> aAllFields = _getAllFields (aClassOutline);
+      final ICommonsMap <JFieldVar, String> aAllFields = getAllInstanceFields (aClassOutline);
 
       // cloneTo
       JMethod mCloneTo;

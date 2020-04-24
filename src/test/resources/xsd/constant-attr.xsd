@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xsd:complexType name="DateLiteral">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:date">
+        <!-- creates a constant -->
+        <xsd:attribute ref="datatype" fixed="http://www.w3.org/2001/XMLSchema#date"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:attribute name="datatype" type="xsd:anyURI"/>
+</xsd:schema>

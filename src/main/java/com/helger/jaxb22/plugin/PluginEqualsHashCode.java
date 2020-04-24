@@ -75,7 +75,7 @@ public class PluginEqualsHashCode extends AbstractPlugin
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
       final FieldOutline [] aFields = aClassOutline.getDeclaredFields ();
-      final ICommonsOrderedMap <JFieldVar, String> aFieldVars = _getAllFields (aClassOutline);
+      final ICommonsOrderedMap <JFieldVar, String> aFieldVars = getAllInstanceFields (aClassOutline);
       final JDefinedClass jClass = aClassOutline.implClass;
       final boolean bIsRoot = jClass._extends () == null || jClass._extends ().equals (jObject);
 
