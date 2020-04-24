@@ -162,10 +162,24 @@ public class PluginEqualsHashCode extends AbstractPlugin
             aInvocation = JExpr._new (jHashCodeGenerator).arg (JExpr._this ());
           else
             aInvocation = jHashCodeGenerator.staticInvoke ("getDerived").arg (JExpr._super ().invoke (mHashCode));
-          for (final FieldOutline aField : aFields)
+
+          if (true)
           {
-            final String sFieldName = aField.getPropertyInfo ().getName (false);
-            aInvocation = aInvocation.invoke ("append").arg (JExpr.ref (sFieldName));
+            // Instance fields only
+            for (final JFieldVar aField : aFieldVars.keySet ())
+            {
+              final String sFieldName = aField.name ();
+              aInvocation = aInvocation.invoke ("append").arg (JExpr.ref (sFieldName));
+            }
+          }
+          else
+          {
+            // Does not handle static fields
+            for (final FieldOutline aField : aFields)
+            {
+              final String sFieldName = aField.getPropertyInfo ().getName (false);
+              aInvocation = aInvocation.invoke ("append").arg (JExpr.ref (sFieldName));
+            }
           }
           mHashCode.body ()._return (aInvocation.invoke ("getHashCode"));
         }

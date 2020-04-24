@@ -16,25 +16,22 @@
  */
 package com.helger.jaxb22.plugin;
 
-import java.util.List;
-
 import javax.annotation.Nonnull;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.collection.CollectionHelper;
+import com.helger.commons.collection.impl.ICommonsOrderedMap;
 import com.helger.commons.string.ToStringGenerator;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
@@ -46,7 +43,7 @@ import com.sun.tools.xjc.outline.Outline;
  * @author Philip Helger
  */
 @IsSPIImplementation
-public class PluginToString extends Plugin
+public class PluginToString extends AbstractPlugin
 {
   private static final String OPT = "Xph-tostring";
 
@@ -79,13 +76,6 @@ public class PluginToString extends Plugin
   }
 
   @Override
-  @CodingStyleguideUnaware
-  public List <String> getCustomizationURIs ()
-  {
-    return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
-  }
-
-  @Override
   public boolean run (@Nonnull final Outline aOutline,
                       @Nonnull final Options aOpts,
                       @Nonnull final ErrorHandler aErrorHandler)
@@ -105,6 +95,8 @@ public class PluginToString extends Plugin
         continue;
       }
 
+      final ICommonsOrderedMap <JFieldVar, String> aFieldVars = getAllInstanceFields (aClassOutline);
+
       // toString
       {
         final JMethod mToString = jClass.method (JMod.PUBLIC, aCodeModel.ref (String.class), "toString");
@@ -116,10 +108,23 @@ public class PluginToString extends Plugin
         else
           aInvocation = jToStringGenerator.staticInvoke ("getDerived").arg (JExpr._super ().invoke (mToString));
 
-        for (final FieldOutline aField : aFields)
+        if (true)
         {
-          final String sFieldName = aField.getPropertyInfo ().getName (false);
-          aInvocation = aInvocation.invoke ("append").arg (JExpr.lit (sFieldName)).arg (JExpr.ref (sFieldName));
+          // Instance fields only
+          for (final JFieldVar aField : aFieldVars.keySet ())
+          {
+            final String sFieldName = aField.name ();
+            aInvocation = aInvocation.invoke ("append").arg (JExpr.lit (sFieldName)).arg (JExpr.ref (sFieldName));
+          }
+        }
+        else
+        {
+          // Does not handle static fields
+          for (final FieldOutline aField : aFields)
+          {
+            final String sFieldName = aField.getPropertyInfo ().getName (false);
+            aInvocation = aInvocation.invoke ("append").arg (JExpr.lit (sFieldName)).arg (JExpr.ref (sFieldName));
+          }
         }
         mToString.body ()._return (aInvocation.invoke (m_bLegacy ? "toString" : "getToString"));
 
