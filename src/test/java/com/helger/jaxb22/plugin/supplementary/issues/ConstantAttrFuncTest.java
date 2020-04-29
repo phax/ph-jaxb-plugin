@@ -16,6 +16,8 @@
  */
 package com.helger.jaxb22.plugin.supplementary.issues;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -30,10 +32,10 @@ import com.sun.tools.xjc.Driver;
 
 public final class ConstantAttrFuncTest
 {
-  private static void _run (@Nonnull final File aXSDFile,
-                            @Nonnull final File aBindingFile,
-                            @Nonnull final File aDestDir,
-                            @Nonnull final File aLogFile) throws Exception
+  private static int _run (@Nonnull final File aXSDFile,
+                           @Nonnull final File aBindingFile,
+                           @Nonnull final File aDestDir,
+                           @Nonnull final File aLogFile) throws Exception
   {
     try (final PrintStream aPS = new PrintStream (FileHelper.getOutputStream (aLogFile),
                                                   true,
@@ -41,23 +43,24 @@ public final class ConstantAttrFuncTest
     {
       // Don't use Driver.main because it calls System.exit
       FileOperationManager.INSTANCE.createDirRecursiveIfNotExisting (aDestDir);
-      Driver.run (new String [] { aXSDFile.getAbsolutePath (),
-                                  "-b",
-                                  aBindingFile.getAbsolutePath (),
-                                  "-d",
-                                  aDestDir.getAbsolutePath (),
-                                  "-Xph-equalshashcode" },
-                  aPS,
-                  aPS);
+      return Driver.run (new String [] { aXSDFile.getAbsolutePath (),
+                                         "-b",
+                                         aBindingFile.getAbsolutePath (),
+                                         "-d",
+                                         aDestDir.getAbsolutePath (),
+                                         "-Xph-equalshashcode" },
+                         aPS,
+                         aPS);
     }
   }
 
   @Test
   public void testConstantAttr () throws Throwable
   {
-    _run (new File ("src/test/resources/xsd/constant-attr.xsd"),
-          new File ("src/test/resources/xsd/constant-attr.xjb"),
-          new File ("target/constant-attr"),
-          new File ("target/constant-attr-result.txt"));
+    final int n = _run (new File ("src/test/resources/xsd/constant-attr.xsd"),
+                        new File ("src/test/resources/xsd/constant-attr.xjb"),
+                        new File ("target/constant-attr"),
+                        new File ("target/constant-attr-result.txt"));
+    assertEquals (0, n);
   }
 }

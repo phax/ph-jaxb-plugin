@@ -16,6 +16,8 @@
  */
 package com.helger.jaxb22.plugin.supplementary.issues;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -30,9 +32,9 @@ import com.sun.tools.xjc.Driver;
 
 public final class Issue2FuncTest
 {
-  private static void _run (@Nonnull final File aXSDFile,
-                            @Nonnull final File aDestDir,
-                            @Nonnull final File aLogFile) throws Exception
+  private static int _run (@Nonnull final File aXSDFile,
+                           @Nonnull final File aDestDir,
+                           @Nonnull final File aLogFile) throws Exception
   {
     try (final PrintStream aPS = new PrintStream (FileHelper.getOutputStream (aLogFile),
                                                   true,
@@ -40,20 +42,21 @@ public final class Issue2FuncTest
     {
       // Don't use Driver.main because it calls System.exit
       FileOperationManager.INSTANCE.createDirRecursiveIfNotExisting (aDestDir);
-      Driver.run (new String [] { aXSDFile.getAbsolutePath (),
-                                  "-d",
-                                  aDestDir.getAbsolutePath (),
-                                  "-Xph-bean-validation11" },
-                  aPS,
-                  aPS);
+      return Driver.run (new String [] { aXSDFile.getAbsolutePath (),
+                                         "-d",
+                                         aDestDir.getAbsolutePath (),
+                                         "-Xph-bean-validation11" },
+                         aPS,
+                         aPS);
     }
   }
 
   @Test
   public void testIssue2 () throws Throwable
   {
-    _run (new File ("src/test/resources/xsd/issue2.xsd"),
-          new File ("target/issue2"),
-          new File ("target/issue2-result.txt"));
+    final int n = _run (new File ("src/test/resources/xsd/issue2.xsd"),
+                        new File ("target/issue2"),
+                        new File ("target/issue2-result.txt"));
+    assertEquals (0, n);
   }
 }
