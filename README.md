@@ -44,7 +44,7 @@ Add something **like** the following to your pom.xml to use this artifact:
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-jaxb22-plugin</artifactId>
-      <version>2.3.2.5</version>
+      <version>2.3.2.6</version>
     </dependency>
   </dependencies>
 </plugin>
@@ -78,6 +78,8 @@ Add something **like** the following to your pom.xml to use this artifact:
 
 # News and noteworthy
 
+* v2.3.2.6 - 2020-04-29
+    * Fixed an error in cloning if an enumeration from an episode was referenced
 * v2.3.2.5 - 2020-04-24
     * Ignoring static fields if the global binding `fixedAttributeAsConstantProperty="true"` is used
 * v2.3.2.4 - 2019-12-12
