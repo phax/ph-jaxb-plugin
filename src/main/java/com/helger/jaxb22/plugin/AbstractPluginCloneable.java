@@ -16,12 +16,19 @@
  */
 package com.helger.jaxb22.plugin;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.lang.CloneHelper;
 import com.helger.jaxb.JAXBHelper;
 import com.sun.codemodel.ClassType;
+import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
@@ -37,6 +44,34 @@ import com.sun.codemodel.JType;
  */
 public abstract class AbstractPluginCloneable extends AbstractPlugin
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractPluginCloneable.class);
+
+  private static final Map <String, Boolean> s_aEnumCache = new HashMap <> ();
+
+  private static boolean _loadClassAndCheckIfEnum (final String sName)
+  {
+    try
+    {
+      if (LOGGER.isTraceEnabled ())
+        LOGGER.trace ("Trying to load class '" + sName + "'");
+
+      final Class <?> aClass = Class.forName (sName);
+      if (Enum.class.isAssignableFrom (aClass))
+      {
+        if (LOGGER.isTraceEnabled ())
+          LOGGER.trace ("Class '" + sName + "' is an enum");
+        return true;
+      }
+    }
+    catch (final Throwable t)
+    {
+      // Just ignore whatever can go wrong in loading
+    }
+    if (LOGGER.isTraceEnabled ())
+      LOGGER.trace ("Class '" + sName + "' is NOT an enum");
+    return false;
+  }
+
   protected static boolean _isImmutable (@Nonnull final JType aType)
   {
     // int, byte, boolean etc?
@@ -46,8 +81,24 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
     // Is it an enum?
     if (aType instanceof JDefinedClass)
     {
+      // Does not work for enums from episodes
       final JDefinedClass aClass = (JDefinedClass) aType;
       if (aClass.getClassType () == ClassType.ENUM)
+        return true;
+    }
+
+    if (aType instanceof JClass)
+    {
+      // If it is a "JDirectClass" -> it could not be loaded. Add as a
+      // dependency to the Maven plugin to resolve this
+      // If it is a "JCodeModel$JReferencedClass" -> it is in the classpath but
+      // external
+      final JClass aCls = (JClass) aType;
+
+      // -> try to load via reflection and analyze
+      final Boolean aIsEnum = s_aEnumCache.computeIfAbsent (aCls.binaryName (),
+                                                            k -> Boolean.valueOf (_loadClassAndCheckIfEnum (k)));
+      if (aIsEnum.booleanValue ())
         return true;
     }
 
