@@ -50,25 +50,29 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
 
   private static boolean _loadClassAndCheckIfEnum (final String sName)
   {
+    final boolean bDebugLog = false;
+
     try
     {
-      if (LOGGER.isTraceEnabled ())
-        LOGGER.trace ("Trying to load class '" + sName + "'");
+      if (bDebugLog)
+        LOGGER.info ("Trying to load class '" + sName + "'");
 
       final Class <?> aClass = Class.forName (sName);
       if (Enum.class.isAssignableFrom (aClass))
       {
-        if (LOGGER.isTraceEnabled ())
-          LOGGER.trace ("Class '" + sName + "' is an enum");
+        if (bDebugLog)
+          LOGGER.info ("Class '" + sName + "' was loaded and is an enum");
         return true;
       }
+      if (bDebugLog)
+        LOGGER.info ("Class '" + sName + "' was loaded and is NOT an enum");
     }
     catch (final Throwable t)
     {
       // Just ignore whatever can go wrong in loading
+      if (bDebugLog)
+        LOGGER.info ("Class '" + sName + "' was not loaded and is therefore NOT an enum");
     }
-    if (LOGGER.isTraceEnabled ())
-      LOGGER.trace ("Class '" + sName + "' is NOT an enum");
     return false;
   }
 
