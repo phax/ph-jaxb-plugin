@@ -78,6 +78,8 @@ Add something **like** the following to your pom.xml to use this artifact:
 
 # News and noteworthy
 
+* v2.3.3.0 - 2020-09-17
+    * Updated to Jakarta JAXB 2.3.3
 * v2.3.2.6 - 2020-04-29
     * Fixed an error in cloning if an enumeration from an episode was referenced
 * v2.3.2.5 - 2020-04-24

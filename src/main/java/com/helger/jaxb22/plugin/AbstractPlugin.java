@@ -17,9 +17,11 @@
 package com.helger.jaxb22.plugin;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.ReturnsMutableCopy;
@@ -42,7 +44,7 @@ import com.sun.tools.xjc.outline.ClassOutline;
  */
 public abstract class AbstractPlugin extends Plugin
 {
-  private static final Logger LOGGER = com.sun.xml.bind.Util.getClassLogger ();
+  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractPlugin.class);
 
   @Override
   @CodingStyleguideUnaware
@@ -68,7 +70,8 @@ public abstract class AbstractPlugin extends Plugin
       // Ignore static fields
       if ((aFieldVar.mods ().getValue () & JMod.STATIC) == JMod.STATIC)
       {
-        LOGGER.fine ("Ignoring static field '" + sFieldVarName + "'");
+        if (LOGGER.isDebugEnabled ())
+          LOGGER.debug ("Ignoring static field '" + sFieldVarName + "'");
         continue;
       }
 
@@ -86,8 +89,7 @@ public abstract class AbstractPlugin extends Plugin
           throw new IllegalStateException ("'" +
                                            aFieldVar.name () +
                                            "' not found in " +
-                                           new CommonsArrayList <> (aClassOutline.target.getProperties (),
-                                                                    pi -> pi.getName (false)) +
+                                           new CommonsArrayList <> (aClassOutline.target.getProperties (), pi -> pi.getName (false)) +
                                            " of " +
                                            jClass.fullName ());
         }

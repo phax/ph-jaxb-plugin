@@ -21,8 +21,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,6 +32,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.CodingStyleguideUnaware;
@@ -75,15 +75,9 @@ import com.sun.xml.xsom.impl.parser.DelayedRef;
  */
 public abstract class AbstractPluginBeanValidation extends Plugin
 {
-  private static final Logger LOGGER = com.sun.xml.bind.Util.getClassLogger ();
+  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractPluginBeanValidation.class);
   private static final BigInteger UNBOUNDED = BigInteger.valueOf (XSParticle.UNBOUNDED);
-  private static final String [] NUMBER_TYPES = new String [] { "BigDecimal",
-                                                                "BigInteger",
-                                                                "String",
-                                                                "byte",
-                                                                "short",
-                                                                "int",
-                                                                "long" };
+  private static final String [] NUMBER_TYPES = new String [] { "BigDecimal", "BigInteger", "String", "byte", "short", "int", "long" };
 
   // JSR 303 = Bean Validation 1.0
   // JSR 349 = Bean Validation 1.1
@@ -133,7 +127,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
     }
     catch (final Exception ex)
     {
-      LOGGER.log (Level.SEVERE, "Internal error creating bean validation", ex);
+      LOGGER.error ("Internal error creating bean validation", ex);
       return false;
     }
   }
@@ -141,8 +135,7 @@ public abstract class AbstractPluginBeanValidation extends Plugin
   /*
    * XS:Element
    */
-  private void _processElementProperty (@Nonnull final CElementPropertyInfo aElement,
-                                        @Nonnull final ClassOutline aClassOutline)
+  private void _processElementProperty (@Nonnull final CElementPropertyInfo aElement, @Nonnull final ClassOutline aClassOutline)
   {
     // It's a ParticleImpl
     final XSParticle aParticle = (XSParticle) aElement.getSchemaComponent ();
@@ -318,10 +311,8 @@ public abstract class AbstractPluginBeanValidation extends Plugin
 
     final XSFacet aXSTotalDigits = aSimpleType.getFacet ("totalDigits");
     final XSFacet aXSFractionDigits = aSimpleType.getFacet ("fractionDigits");
-    final Integer aTotalDigits = aXSTotalDigits == null ? null
-                                                        : StringParser.parseIntObj (aXSTotalDigits.getValue ().value);
-    final Integer aFractionDigits = aXSFractionDigits == null ? null
-                                                              : StringParser.parseIntObj (aXSFractionDigits.getValue ().value);
+    final Integer aTotalDigits = aXSTotalDigits == null ? null : StringParser.parseIntObj (aXSTotalDigits.getValue ().value);
+    final Integer aFractionDigits = aXSFractionDigits == null ? null : StringParser.parseIntObj (aXSFractionDigits.getValue ().value);
     if (!_hasAnnotation (aField, Digits.class) && aTotalDigits != null)
     {
       final JAnnotationUse aAnnotDigits = aField.annotate (Digits.class);
