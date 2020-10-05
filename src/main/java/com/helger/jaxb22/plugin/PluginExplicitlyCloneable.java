@@ -17,6 +17,7 @@
 package com.helger.jaxb22.plugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -25,7 +26,6 @@ import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.lang.IExplicitlyCloneable;
 import com.sun.codemodel.JBlock;
@@ -64,21 +64,17 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
   @Override
   public String getUsage ()
   {
-    return "  -" +
-           OPT +
-           "    :  implement clone() of IExplicitlyCloneable interface and cloneTo(target) - req. ph-commons >= 9.1.8";
+    return "  -" + OPT + "    :  implement clone() of IExplicitlyCloneable interface and cloneTo(target) - req. ph-commons >= 9.1.8";
   }
 
   @Override
-  public boolean run (@Nonnull final Outline aOutline,
-                      @Nonnull final Options aOpts,
-                      @Nonnull final ErrorHandler aErrorHandler)
+  public boolean run (@Nonnull final Outline aOutline, @Nonnull final Options aOpts, @Nonnull final ErrorHandler aErrorHandler)
   {
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     final JClass jObject = aCodeModel.ref (Object.class);
     final JClass jExplicitlyCloneable = aCodeModel.ref (IExplicitlyCloneable.class);
-    final JClass jCollectionHelper = aCodeModel.ref (CollectionHelper.class);
     final JClass jArrayList = aCodeModel.ref (ArrayList.class);
+    final JClass jHashMap = aCodeModel.ref (HashMap.class);
 
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
@@ -138,8 +134,7 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
               final String sGetter = CJAXB22.getGetterName (aField.type (), aEntry.getValue ());
               final JForEach jForEach = aJElse.forEach (aTypeParam, "aItem", JExpr.invoke (sGetter));
               // aTargetList.add (_cloneOf_ (aItem))
-              jForEach.body ()
-                      .add (aTargetList.invoke ("add").arg (_getCloneCode (aCodeModel, jForEach.var (), aTypeParam)));
+              jForEach.body ().add (aTargetList.invoke ("add").arg (_getCloneCode (aCodeModel, jForEach.var (), aTypeParam)));
               aJElse.assign (jRet.ref (aField), aTargetList);
             }
           }
@@ -150,7 +145,9 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
               // has no setter - need to assign directly!
               final JConditional aIf = mCloneTo.body ()._if (aField.eq (JExpr._null ()));
               aIf._then ().assign (jRet.ref (aField), JExpr._null ());
-              aIf._else ().assign (jRet.ref (aField), jCollectionHelper.staticInvoke ("newMap").arg (aField));
+              // Use regular HashMap to ensure the same type is created
+              final JBlock aElse = aIf._else ();
+              aElse.assign (jRet.ref (aField), JExpr._new (jHashMap.narrow (((JClass) aField.type ()).getTypeParameters ())).arg (aField));
             }
             else
             {
@@ -197,8 +194,7 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
       }
 
       // General information
-      jClass.javadoc ()
-            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
+      jClass.javadoc ().add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
     return true;
   }

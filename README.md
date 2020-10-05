@@ -78,6 +78,8 @@ Add something **like** the following to your pom.xml to use this artifact:
 
 # News and noteworthy
 
+* v2.3.3.1 - 2020-10-05
+    * Cloneable plugins now create a "HashMap" instead of a "CommonsHashMap"
 * v2.3.3.0 - 2020-09-17
     * Updated to Jakarta JAXB 2.3.3
 * v2.3.2.6 - 2020-04-29
