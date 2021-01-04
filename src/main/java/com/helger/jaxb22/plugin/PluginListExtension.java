@@ -68,7 +68,7 @@ public class PluginListExtension extends Plugin
    * Does not work because upon reading the object gets filled with a regular
    * java.util.ArrayList!
    */
-  private static final boolean USE_COMMONS_LIST = false;
+  private static final boolean USE_COMMONS_LIST = Boolean.FALSE.booleanValue ();
   private static final String OPT = "Xph-list-extension";
 
   @Override
@@ -132,8 +132,7 @@ public class PluginListExtension extends Plugin
           // Create a new getter
           if (USE_COMMONS_LIST)
           {
-            final JMethod aOldGetter = jClass.getMethod (CJAXB22.getGetterName (aField.type (), sFieldName),
-                                                         new JType [0]);
+            final JMethod aOldGetter = jClass.getMethod (CJAXB22.getGetterName (aField.type (), sFieldName), new JType [0]);
             jClass.methods ().remove (aOldGetter);
             final JMethod aNewGetter = jClass.method (JMod.PUBLIC, aNewType, aOldGetter.name ());
             aNewGetter.annotate (Nonnull.class);
@@ -166,9 +165,7 @@ public class PluginListExtension extends Plugin
 
             // boolean hasXXXEntries ()
             {
-              final JMethod mHasEntries = jClass.method (JMod.PUBLIC,
-                                                         aCodeModel.BOOLEAN,
-                                                         "has" + sRelevantTypeName + "Entries");
+              final JMethod mHasEntries = jClass.method (JMod.PUBLIC, aCodeModel.BOOLEAN, "has" + sRelevantTypeName + "Entries");
               if (USE_COMMONS_LIST)
                 mHasEntries.body ()._return (JExpr.invoke (aMethod).invoke ("isNotEmpty"));
               else
@@ -182,14 +179,10 @@ public class PluginListExtension extends Plugin
 
             // boolean hasNoXXXEntries ()
             {
-              final JMethod mHasNoEntries = jClass.method (JMod.PUBLIC,
-                                                           aCodeModel.BOOLEAN,
-                                                           "hasNo" + sRelevantTypeName + "Entries");
+              final JMethod mHasNoEntries = jClass.method (JMod.PUBLIC, aCodeModel.BOOLEAN, "hasNo" + sRelevantTypeName + "Entries");
               mHasNoEntries.body ()._return (JExpr.invoke (aMethod).invoke ("isEmpty"));
 
-              mHasNoEntries.javadoc ()
-                           .addReturn ()
-                           .add ("<code>true</code> if no item is contained, <code>false</code> otherwise.");
+              mHasNoEntries.javadoc ().addReturn ().add ("<code>true</code> if no item is contained, <code>false</code> otherwise.");
               mHasNoEntries.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }
 
@@ -205,9 +198,7 @@ public class PluginListExtension extends Plugin
 
             // ELEMENTTYPE getXXXAtIndex (int) throws IndexOutOfBoundsException
             {
-              final JMethod mAtIndex = jClass.method (JMod.PUBLIC,
-                                                      aListElementType,
-                                                      "get" + sRelevantTypeName + "AtIndex");
+              final JMethod mAtIndex = jClass.method (JMod.PUBLIC, aListElementType, "get" + sRelevantTypeName + "AtIndex");
               mAtIndex.annotate (Nullable.class);
               mAtIndex._throws (IndexOutOfBoundsException.class);
               final JVar aParam = mAtIndex.param (JMod.FINAL, aCodeModel.INT, "index");
@@ -242,8 +233,7 @@ public class PluginListExtension extends Plugin
     for (final JDefinedClass jClass : aEffectedClasses)
     {
       // General information
-      jClass.javadoc ()
-            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
+      jClass.javadoc ().add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
 
     return true;
