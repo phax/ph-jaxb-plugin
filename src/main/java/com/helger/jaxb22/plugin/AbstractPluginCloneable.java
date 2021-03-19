@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.lang.CloneHelper;
-import com.helger.jaxb.JAXBHelper;
+import com.helger.jaxb.adapter.JAXBHelper;
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
