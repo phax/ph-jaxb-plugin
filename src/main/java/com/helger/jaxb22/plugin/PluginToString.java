@@ -50,32 +50,19 @@ public class PluginToString extends AbstractPlugin
   public static final String OPT = "Xph-tostring";
   private static final Logger LOGGER = LoggerFactory.getLogger (PluginToString.class);
 
-  private final boolean m_bLegacy;
-  private final String m_sOpt;
-
   public PluginToString ()
-  {
-    this (false, OPT);
-  }
-
-  protected PluginToString (final boolean bLegacy, final String sOpt)
-  {
-    m_bLegacy = bLegacy;
-    m_sOpt = sOpt;
-  }
+  {}
 
   @Override
   public String getOptionName ()
   {
-    return m_sOpt;
+    return OPT;
   }
 
   @Override
   public String getUsage ()
   {
-    return "  -" +
-           m_sOpt +
-           "    :  auto implement toString using com.helger.commons.string.ToStringGenerator (ph-commons >= 8.6.2)";
+    return "  -" + OPT + "    :  auto implement toString using com.helger.commons.string.ToStringGenerator";
   }
 
   @Override
@@ -131,14 +118,14 @@ public class PluginToString extends AbstractPlugin
             aInvocation = aInvocation.invoke ("append").arg (JExpr.lit (sFieldName)).arg (JExpr.ref (sFieldName));
           }
         }
-        mToString.body ()._return (aInvocation.invoke (m_bLegacy ? "toString" : "getToString"));
+        mToString.body ()._return (aInvocation.invoke ("getToString"));
 
-        mToString.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + m_sOpt);
+        mToString.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
       }
 
       // General information
       jClass.javadoc ()
-            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + m_sOpt + "</p>\n");
+            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
     return true;
   }

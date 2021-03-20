@@ -72,14 +72,16 @@ Add something **like** the following to your pom.xml to use this artifact:
     * `int get...Count()` - returns the number of contained entries
     * `T get...AtIndex(int)` - get the element at the specified index
     * `void add...(T)` - add a new entry to the list
+* `ph-offset-dt-extension` (since 2.3.3.2) - add additional methods for Offset* date time types using their `Local` counterparts
 * `ph-tostring` - auto implement `toString` using `com.helger.commons.string.ToStringGenerator.getToString()`. This requires the created code to depend on [ph-commons >= 8.6.2](https://github.com/phax/ph-commons). 
-* `ph-tostring-legacy` (since 2.2.11.9) - auto implement `toString` using `com.helger.commons.string.ToStringGenerator.toString()`. This requires the created code to depend on [ph-commons <= 8.6.1](https://github.com/phax/ph-commons). 
 * `ph-value-extender` (since 2.3.1.3) - create additional constructors with the 'value' as argument as well as getter and setter for the value
 
 # News and noteworthy
 
 * v2.3.3.2 - work in progress
     * Updated to ph-commons 10
+    * Added new plugin `-Xph-offset-dt-extension`
+    * Removed plugin `-Xph-tostring-legacy`
 * v2.3.3.1 - 2020-10-05
     * Cloneable plugins now create a "HashMap" instead of a "CommonsHashMap"
 * v2.3.3.0 - 2020-09-17
