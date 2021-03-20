@@ -512,6 +512,8 @@ public class PluginValueExtender extends AbstractPlugin
     final boolean bHasPluginOffsetDT = CollectionHelper.containsAny (aOpts.getAllPlugins (),
                                                                      p -> p.getOptionName ()
                                                                            .equals (PluginOffsetDTExtension.OPT));
+    if (bHasPluginOffsetDT)
+      LOGGER.info ("ValueExtender found OffsetDTExtension plugin");
 
     _addDefaultCtors (aOutline);
 
