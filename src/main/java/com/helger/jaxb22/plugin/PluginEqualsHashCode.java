@@ -49,7 +49,7 @@ import com.sun.tools.xjc.outline.Outline;
 @IsSPIImplementation
 public class PluginEqualsHashCode extends AbstractPlugin
 {
-  private static final String OPT = "Xph-equalshashcode";
+  public static final String OPT = "Xph-equalshashcode";
 
   @Override
   public String getOptionName ()

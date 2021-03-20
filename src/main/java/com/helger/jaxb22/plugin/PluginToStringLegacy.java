@@ -28,7 +28,8 @@ import com.helger.commons.string.ToStringGenerator;
 @IsSPIImplementation
 public class PluginToStringLegacy extends PluginToString
 {
-  private static final String OPT = "Xph-tostring-legacy";
+  @SuppressWarnings ("hiding")
+  public static final String OPT = "Xph-tostring-legacy";
 
   public PluginToStringLegacy ()
   {

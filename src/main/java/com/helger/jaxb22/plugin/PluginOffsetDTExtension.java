@@ -22,29 +22,26 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
-import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.datetime.OffsetDate;
+import com.helger.jaxb22.plugin.cm.MyTernaryOp;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
-import com.sun.codemodel.JOp;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
@@ -57,9 +54,9 @@ import com.sun.tools.xjc.outline.Outline;
  * @since 2.3.3.2
  */
 @IsSPIImplementation
-public class PluginOffsetDTExtension extends Plugin
+public class PluginOffsetDTExtension extends AbstractPlugin
 {
-  private static final String OPT = "Xph-offset-dt-extension";
+  public static final String OPT = "Xph-offset-dt-extension";
 
   @Override
   public String getOptionName ()
@@ -73,11 +70,20 @@ public class PluginOffsetDTExtension extends Plugin
     return "  -" + OPT + " :  add additional methods for Offset* date time types";
   }
 
-  @Override
-  @CodingStyleguideUnaware
-  public List <String> getCustomizationURIs ()
+  @Nullable
+  public static JType getOtherType (@Nonnull final JType aType, @Nonnull final JCodeModel cm)
   {
-    return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
+    switch (aType.name ())
+    {
+      case "OffsetDate":
+        return cm.ref (LocalDate.class);
+      case "OffsetTime":
+        return cm.ref (LocalTime.class);
+      case "OffsetDateTime":
+        return cm.ref (LocalDateTime.class);
+      // Ignore all others
+    }
+    return null;
   }
 
   @Override
@@ -108,7 +114,9 @@ public class PluginOffsetDTExtension extends Plugin
                                                      CJAXB22.getGetterName (aOldType, aField.name ()) + "Local");
               aGetter.annotate (Nullable.class);
               aGetter.body ()
-                     ._return (JOp.cond (aField.eq (JExpr._null ()), JExpr._null (), aField.invoke ("toLocalDate")));
+                     ._return (MyTernaryOp.cond (aField.eq (JExpr._null ()),
+                                                 JExpr._null (),
+                                                 aField.invoke ("toLocalDate")));
               aGetter.javadoc ()
                      .addReturn ()
                      .add ("The LocalDate representation of " + aField.name () + ". May be <code>null</code>.");
@@ -124,12 +132,12 @@ public class PluginOffsetDTExtension extends Plugin
               aParam.annotate (Nullable.class);
               aSetter.body ()
                      .assign (aField,
-                              JOp.cond (aParam.eq (JExpr._null ()),
-                                        JExpr._null (),
-                                        aCodeModel.ref (OffsetDate.class)
-                                                  .staticInvoke ("of")
-                                                  .arg (aParam)
-                                                  .arg (aCodeModel.ref (ZoneOffset.class).staticRef ("UTC"))));
+                              MyTernaryOp.cond (aParam.eq (JExpr._null ()),
+                                                JExpr._null (),
+                                                aCodeModel.ref (OffsetDate.class)
+                                                          .staticInvoke ("of")
+                                                          .arg (aParam)
+                                                          .arg (aCodeModel.ref (ZoneOffset.class).staticRef ("UTC"))));
               aSetter.javadoc ().addParam (aParam).add ("The LocalDate to set. May be <code>null</code>.");
               aSetter.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }
@@ -148,7 +156,9 @@ public class PluginOffsetDTExtension extends Plugin
                                                      CJAXB22.getGetterName (aOldType, aField.name ()) + "Local");
               aGetter.annotate (Nullable.class);
               aGetter.body ()
-                     ._return (JOp.cond (aField.eq (JExpr._null ()), JExpr._null (), aField.invoke ("toLocalTime")));
+                     ._return (MyTernaryOp.cond (aField.eq (JExpr._null ()),
+                                                 JExpr._null (),
+                                                 aField.invoke ("toLocalTime")));
               aGetter.javadoc ()
                      .addReturn ()
                      .add ("The LocalTime representation of " + aField.name () + ". May be <code>null</code>.");
@@ -164,12 +174,12 @@ public class PluginOffsetDTExtension extends Plugin
               aParam.annotate (Nullable.class);
               aSetter.body ()
                      .assign (aField,
-                              JOp.cond (aParam.eq (JExpr._null ()),
-                                        JExpr._null (),
-                                        aCodeModel.ref (OffsetTime.class)
-                                                  .staticInvoke ("of")
-                                                  .arg (aParam)
-                                                  .arg (aCodeModel.ref (ZoneOffset.class).staticRef ("UTC"))));
+                              MyTernaryOp.cond (aParam.eq (JExpr._null ()),
+                                                JExpr._null (),
+                                                aCodeModel.ref (OffsetTime.class)
+                                                          .staticInvoke ("of")
+                                                          .arg (aParam)
+                                                          .arg (aCodeModel.ref (ZoneOffset.class).staticRef ("UTC"))));
               aSetter.javadoc ().addParam (aParam).add ("The LocalTime to set. May be <code>null</code>.");
               aSetter.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }
@@ -188,9 +198,9 @@ public class PluginOffsetDTExtension extends Plugin
                                                      CJAXB22.getGetterName (aOldType, aField.name ()) + "Local");
               aGetter.annotate (Nullable.class);
               aGetter.body ()
-                     ._return (JOp.cond (aField.eq (JExpr._null ()),
-                                         JExpr._null (),
-                                         aField.invoke ("toLocalDateTime")));
+                     ._return (MyTernaryOp.cond (aField.eq (JExpr._null ()),
+                                                 JExpr._null (),
+                                                 aField.invoke ("toLocalDateTime")));
               aGetter.javadoc ()
                      .addReturn ()
                      .add ("The LocalDateTime representation of " + aField.name () + ". May be <code>null</code>.");
@@ -206,12 +216,12 @@ public class PluginOffsetDTExtension extends Plugin
               aParam.annotate (Nullable.class);
               aSetter.body ()
                      .assign (aField,
-                              JOp.cond (aParam.eq (JExpr._null ()),
-                                        JExpr._null (),
-                                        aCodeModel.ref (OffsetDateTime.class)
-                                                  .staticInvoke ("of")
-                                                  .arg (aParam)
-                                                  .arg (aCodeModel.ref (ZoneOffset.class).staticRef ("UTC"))));
+                              MyTernaryOp.cond (aParam.eq (JExpr._null ()),
+                                                JExpr._null (),
+                                                aCodeModel.ref (OffsetDateTime.class)
+                                                          .staticInvoke ("of")
+                                                          .arg (aParam)
+                                                          .arg (aCodeModel.ref (ZoneOffset.class).staticRef ("UTC"))));
               aSetter.javadoc ().addParam (aParam).add ("The LocalDateTime to set. May be <code>null</code>.");
               aSetter.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }

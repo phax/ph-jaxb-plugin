@@ -36,8 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.CodingStyleguideUnaware;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.math.MathHelper;
 import com.helger.commons.string.StringParser;
 import com.sun.codemodel.JAnnotationUse;
@@ -47,7 +45,6 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JPackage;
 import com.sun.codemodel.JType;
 import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.model.CAttributePropertyInfo;
 import com.sun.tools.xjc.model.CElementPropertyInfo;
 import com.sun.tools.xjc.model.CPropertyInfo;
@@ -73,11 +70,17 @@ import com.sun.xml.xsom.impl.parser.DelayedRef;
  *
  * @author Philip Helger
  */
-public abstract class AbstractPluginBeanValidation extends Plugin
+public abstract class AbstractPluginBeanValidation extends AbstractPlugin
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (AbstractPluginBeanValidation.class);
   private static final BigInteger UNBOUNDED = BigInteger.valueOf (XSParticle.UNBOUNDED);
-  private static final String [] NUMBER_TYPES = new String [] { "BigDecimal", "BigInteger", "String", "byte", "short", "int", "long" };
+  private static final String [] NUMBER_TYPES = new String [] { "BigDecimal",
+                                                                "BigInteger",
+                                                                "String",
+                                                                "byte",
+                                                                "short",
+                                                                "int",
+                                                                "long" };
 
   // JSR 303 = Bean Validation 1.0
   // JSR 349 = Bean Validation 1.1
@@ -86,13 +89,6 @@ public abstract class AbstractPluginBeanValidation extends Plugin
   protected AbstractPluginBeanValidation (final boolean bValidation10)
   {
     m_bJSR349 = !bValidation10;
-  }
-
-  @Override
-  @CodingStyleguideUnaware
-  public List <String> getCustomizationURIs ()
-  {
-    return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
   }
 
   @Override
@@ -135,7 +131,8 @@ public abstract class AbstractPluginBeanValidation extends Plugin
   /*
    * XS:Element
    */
-  private void _processElementProperty (@Nonnull final CElementPropertyInfo aElement, @Nonnull final ClassOutline aClassOutline)
+  private void _processElementProperty (@Nonnull final CElementPropertyInfo aElement,
+                                        @Nonnull final ClassOutline aClassOutline)
   {
     // It's a ParticleImpl
     final XSParticle aParticle = (XSParticle) aElement.getSchemaComponent ();
@@ -311,8 +308,10 @@ public abstract class AbstractPluginBeanValidation extends Plugin
 
     final XSFacet aXSTotalDigits = aSimpleType.getFacet ("totalDigits");
     final XSFacet aXSFractionDigits = aSimpleType.getFacet ("fractionDigits");
-    final Integer aTotalDigits = aXSTotalDigits == null ? null : StringParser.parseIntObj (aXSTotalDigits.getValue ().value);
-    final Integer aFractionDigits = aXSFractionDigits == null ? null : StringParser.parseIntObj (aXSFractionDigits.getValue ().value);
+    final Integer aTotalDigits = aXSTotalDigits == null ? null
+                                                        : StringParser.parseIntObj (aXSTotalDigits.getValue ().value);
+    final Integer aFractionDigits = aXSFractionDigits == null ? null
+                                                              : StringParser.parseIntObj (aXSFractionDigits.getValue ().value);
     if (!_hasAnnotation (aField, Digits.class) && aTotalDigits != null)
     {
       final JAnnotationUse aAnnotDigits = aField.annotate (Digits.class);

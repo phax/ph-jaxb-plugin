@@ -16,21 +16,17 @@
  */
 package com.helger.jaxb22.plugin;
 
-import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.locale.LocaleCache;
 import com.helger.commons.string.StringHelper;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.outline.Outline;
 
 /**
@@ -41,9 +37,9 @@ import com.sun.tools.xjc.outline.Outline;
  * @author Philip Helger
  */
 @IsSPIImplementation
-public class PluginDefaultLocale extends Plugin
+public class PluginDefaultLocale extends AbstractPlugin
 {
-  private static final String OPT = "Xph-default-locale";
+  public static final String OPT = "Xph-default-locale";
 
   @Override
   public String getOptionName ()
@@ -55,13 +51,6 @@ public class PluginDefaultLocale extends Plugin
   public String getUsage ()
   {
     return "  -" + OPT + " locale   :  set Java default locale to the specified parameter. Use e.g. 'en_US'";
-  }
-
-  @Override
-  @CodingStyleguideUnaware
-  public List <String> getCustomizationURIs ()
-  {
-    return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
   }
 
   @Override

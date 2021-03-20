@@ -17,13 +17,10 @@
 package com.helger.jaxb22.plugin;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.regex.RegExHelper;
 import com.helger.graph.IMutableDirectedGraphNode;
@@ -33,7 +30,6 @@ import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.EnumOutline;
 import com.sun.tools.xjc.outline.Outline;
@@ -45,10 +41,11 @@ import com.sun.tools.xjc.outline.Outline;
  * @author Philip Helger
  */
 @IsSPIImplementation
-public class PluginImplements extends Plugin
+public class PluginImplements extends AbstractPlugin
 {
+  public static final String OPT = "Xph-implements";
+
   private static final String GRAPH_ATTR_VALUE = "value";
-  private static final String OPT = "Xph-implements";
   private ICommonsList <String> m_aInterfacesToImplement;
 
   @Override
@@ -75,13 +72,6 @@ public class PluginImplements extends Plugin
       return 2;
     }
     return 0;
-  }
-
-  @Override
-  @CodingStyleguideUnaware
-  public List <String> getCustomizationURIs ()
-  {
-    return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
   }
 
   @Override

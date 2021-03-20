@@ -26,7 +26,7 @@ import com.helger.commons.annotation.IsSPIImplementation;
 @IsSPIImplementation
 public class PluginBeanValidation10 extends AbstractPluginBeanValidation
 {
-  private static final String OPT = "Xph-bean-validation10";
+  public static final String OPT = "Xph-bean-validation10";
 
   public PluginBeanValidation10 ()
   {

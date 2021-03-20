@@ -45,7 +45,7 @@ import com.sun.tools.xjc.outline.Outline;
 @IsSPIImplementation
 public class PluginToString extends AbstractPlugin
 {
-  private static final String OPT = "Xph-tostring";
+  public static final String OPT = "Xph-tostring";
 
   private final boolean m_bLegacy;
   private final String m_sOpt;

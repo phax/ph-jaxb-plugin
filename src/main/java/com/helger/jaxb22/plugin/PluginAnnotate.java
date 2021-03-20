@@ -23,7 +23,6 @@ import javax.annotation.Nullable;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.ReturnsMutableObject;
 import com.helger.commons.collection.CollectionHelper;
@@ -35,7 +34,6 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.model.CElementInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
@@ -47,9 +45,9 @@ import com.sun.tools.xjc.outline.Outline;
  * @author Philip Helger
  */
 @IsSPIImplementation
-public class PluginAnnotate extends Plugin
+public class PluginAnnotate extends AbstractPlugin
 {
-  private static final String OPT = "Xph-annotate";
+  public static final String OPT = "Xph-annotate";
 
   @Override
   public String getOptionName ()
@@ -63,13 +61,6 @@ public class PluginAnnotate extends Plugin
     return "  -" +
            OPT +
            " :  add @javax.annotation.Nullable/@javax.annotation.Nonnull annotations to getters and setters";
-  }
-
-  @Override
-  @CodingStyleguideUnaware
-  public List <String> getCustomizationURIs ()
-  {
-    return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
   }
 
   @Override

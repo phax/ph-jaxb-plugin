@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.annotation.ReturnsMutableCopy;
 import com.helger.commons.collection.CollectionHelper;
@@ -52,156 +51,30 @@ import com.sun.codemodel.JOp;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
-/**
- * Add special "value" constructors, setters and getters for JAXB generated
- * elements. This is used e.g. for UBL and CII code generation.
- *
- * @author Philip Helger
- */
-@IsSPIImplementation
-public class PluginValueExtender extends Plugin
+final class SuperClassMap extends CommonsHashMap <String, JType>
 {
-  public static final String OPT = "Xph-value-extender";
-  // @author is only valid for file comments
-  public static final String AUTHOR = "<br>\nNote: automatically created by " + CJAXB22.PLUGIN_NAME + " -" + OPT;
+  private static final Logger LOGGER = LoggerFactory.getLogger (SuperClassMap.class);
 
-  private static final Logger LOGGER = LoggerFactory.getLogger (PluginValueExtender.class);
-
-  @Override
-  public String getOptionName ()
+  public SuperClassMap (@Nonnull final JCodeModel cm)
   {
-    return OPT;
+    // Add some classes that are known to be such super types
+    // Reside in ph-xsds-ccts-cct-schemamodule
+    put ("com.helger.xsds.ccts.cct.schemamodule.AmountType", cm.ref (BigDecimal.class));
+    put ("com.helger.xsds.ccts.cct.schemamodule.BinaryObjectType", cm.ref (byte [].class));
+    put ("com.helger.xsds.ccts.cct.schemamodule.CodeType", cm.ref (String.class));
+    put ("com.helger.xsds.ccts.cct.schemamodule.DateTimeType", cm.ref (String.class));
+    put ("com.helger.xsds.ccts.cct.schemamodule.IdentifierType", cm.ref (String.class));
+    put ("com.helger.xsds.ccts.cct.schemamodule.MeasureType", cm.ref (BigDecimal.class));
+    put ("com.helger.xsds.ccts.cct.schemamodule.NumericType", cm.ref (BigDecimal.class));
+    put ("com.helger.xsds.ccts.cct.schemamodule.QuantityType", cm.ref (BigDecimal.class));
+    put ("com.helger.xsds.ccts.cct.schemamodule.TextType", cm.ref (String.class));
   }
 
-  @Override
-  public String getUsage ()
+  public void fill (final Outline aOutline)
   {
-    return "  -" +
-           OPT +
-           "    :  create additional constructors with the 'value' as argument + getter and setter for the value";
-  }
-
-  @Override
-  @CodingStyleguideUnaware
-  public List <String> getCustomizationURIs ()
-  {
-    return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
-  }
-
-  private static void _addDefaultCtors (@Nonnull final Outline aOutline)
-  {
-    for (final ClassOutline aClassOutline : aOutline.getClasses ())
-    {
-      final JDefinedClass jClass = aClassOutline.implClass;
-
-      // Always add default constructor
-      final JMethod aDefCtor = jClass.constructor (JMod.PUBLIC);
-      aDefCtor.javadoc ().add ("Default constructor");
-      aDefCtor.javadoc ().add (AUTHOR);
-
-      // General information
-      jClass.javadoc ()
-            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
-    }
-  }
-
-  private static void _recursiveAddValueConstructorToDerivedClasses (@Nonnull final Outline aOutline,
-                                                                     @Nonnull final JDefinedClass jParentClass,
-                                                                     @Nonnull final JType aValueType,
-                                                                     @Nonnull final Set <JClass> aAllRelevantClasses)
-  {
-    for (final ClassOutline aClassOutline : aOutline.getClasses ())
-    {
-      final JDefinedClass jCurClass = aClassOutline.implClass;
-      if (jCurClass._extends () == jParentClass)
-      {
-        aAllRelevantClasses.add (jCurClass);
-        final JMethod aValueCtor = jCurClass.constructor (JMod.PUBLIC);
-        final JVar aParam = aValueCtor.param (JMod.FINAL, aValueType, "valueParam");
-        if (!aValueType.isPrimitive ())
-          aParam.annotate (Nullable.class);
-        aValueCtor.body ().invoke ("super").arg (aParam);
-        aValueCtor.javadoc ()
-                  .add ("Constructor for value of type " +
-                        aValueType.erasure ().name () +
-                        " calling super class constructor.");
-        aValueCtor.javadoc ()
-                  .addParam (aParam)
-                  .add ("The value to be set." + (aValueType.isPrimitive () ? "" : " May be <code>null</code>."));
-        aValueCtor.javadoc ().add (AUTHOR);
-
-        // Set in all derived classes
-        _recursiveAddValueConstructorToDerivedClasses (aOutline, jCurClass, aValueType, aAllRelevantClasses);
-      }
-    }
-  }
-
-  private static void _addValueSetterInUsingClasses (@Nonnull final Outline aOutline,
-                                                     @Nonnull final JType aValueType,
-                                                     @Nonnull final Set <JClass> aAllRelevantClasses)
-  {
-    for (final ClassOutline aClassOutline : aOutline.getClasses ())
-    {
-      final JDefinedClass jClass = aClassOutline.implClass;
-      for (final JMethod aMethod : new CommonsArrayList <> (jClass.methods ()))
-        // Must be a setter
-        if (aMethod.name ().startsWith ("set"))
-        {
-          // Must have exactly 1 parameter that is part of aAllRelevantClasses
-          final List <JVar> aParams = aMethod.params ();
-          if (aParams.size () == 1 && aAllRelevantClasses.contains (aParams.get (0).type ()))
-          {
-            final JType aImplType = aParams.get (0).type ();
-            final JMethod aSetter = jClass.method (JMod.PUBLIC, aImplType, aMethod.name ());
-            aSetter.annotate (Nonnull.class);
-            final JVar aParam = aSetter.param (JMod.FINAL, aValueType, "valueParam");
-            if (!aValueType.isPrimitive ())
-              aParam.annotate (Nullable.class);
-            final JVar aObj = aSetter.body ()
-                                     .decl (aImplType, "aObj", JExpr.invoke ("get" + aMethod.name ().substring (3)));
-            final JConditional aIf = aSetter.body ()._if (aObj.eq (JExpr._null ()));
-            aIf._then ().assign (aObj, JExpr._new (aImplType).arg (aParam));
-            aIf._then ().invoke (aMethod).arg (aObj);
-            aIf._else ().invoke (aObj, "setValue").arg (aParam);
-            aSetter.body ()._return (aObj);
-            aSetter.javadoc ().add ("Special setter with value of type " + aParam.type ().name ());
-            aSetter.javadoc ()
-                   .addParam (aParam)
-                   .add ("The value to be set." + (aValueType.isPrimitive () ? "" : " May be <code>null</code>."));
-            aSetter.javadoc ()
-                   .addReturn ()
-                   .add ("The created intermediary object of type " +
-                         aImplType.name () +
-                         " and never <code>null</code>");
-            aSetter.javadoc ().add (AUTHOR);
-          }
-        }
-    }
-  }
-
-  @Nonnull
-  @ReturnsMutableCopy
-  private ICommonsMap <JClass, JType> _addValueCtors (@Nonnull final Outline aOutline)
-  {
-    final JCodeModel cm = aOutline.getCodeModel ();
-    final ICommonsMap <String, JType> aAllSuperClassNames = new CommonsHashMap <> ();
-    {
-      // Add some classes that are known to be such super types
-      // Reside in ph-xsds-ccts-cct-schemamodule
-      aAllSuperClassNames.put ("com.helger.xsds.ccts.cct.schemamodule.AmountType", cm.ref (BigDecimal.class));
-      aAllSuperClassNames.put ("com.helger.xsds.ccts.cct.schemamodule.BinaryObjectType", cm.ref (byte [].class));
-      aAllSuperClassNames.put ("com.helger.xsds.ccts.cct.schemamodule.CodeType", cm.ref (String.class));
-      aAllSuperClassNames.put ("com.helger.xsds.ccts.cct.schemamodule.DateTimeType", cm.ref (String.class));
-      aAllSuperClassNames.put ("com.helger.xsds.ccts.cct.schemamodule.IdentifierType", cm.ref (String.class));
-      aAllSuperClassNames.put ("com.helger.xsds.ccts.cct.schemamodule.MeasureType", cm.ref (BigDecimal.class));
-      aAllSuperClassNames.put ("com.helger.xsds.ccts.cct.schemamodule.NumericType", cm.ref (BigDecimal.class));
-      aAllSuperClassNames.put ("com.helger.xsds.ccts.cct.schemamodule.QuantityType", cm.ref (BigDecimal.class));
-      aAllSuperClassNames.put ("com.helger.xsds.ccts.cct.schemamodule.TextType", cm.ref (String.class));
-    }
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
       final JDefinedClass jClass = aClassOutline.implClass;
@@ -225,18 +98,227 @@ public class PluginValueExtender extends Plugin
             if (aField.getName ().equals ("value"))
             {
               // Map from super class name to codemodel value field type
-              aAllSuperClassNames.put (sSuperClassName, aOutline.getCodeModel ()._ref (aField.getType ()));
+              put (sSuperClassName, aOutline.getCodeModel ()._ref (aField.getType ()));
               break;
             }
         }
         else
-          if (!aAllSuperClassNames.containsKey (sSuperClassName))
+          if (!containsKey (sSuperClassName))
             LOGGER.warn ("Failed to load " + sSuperClassName);
       }
     }
+  }
 
+  @Nullable
+  public JType getValueFieldType (@Nonnull final JDefinedClass jClass)
+  {
+    JType aValueType = null;
+    // Check if that class has a "value" member (name of the variable
+    // created by JAXB to indicate the content of an XML element)
+    for (final JFieldVar aField : jClass.fields ().values ())
+      if (aField.name ().equals ("value"))
+      {
+        aValueType = aField.type ();
+        break;
+      }
+
+    if (aValueType == null && jClass._extends () != null && !(jClass._extends () instanceof JDefinedClass))
+    {
+      // Check only super classes that are not defined in this generation run
+      // but e.g. imported via episodes (bindings)
+      aValueType = get (jClass._extends ().fullName ());
+    }
+    return aValueType;
+  }
+
+  @Nonnull
+  public static SuperClassMap create (@Nonnull final Outline aOutline)
+  {
+    final SuperClassMap aAllSuperClassNames = new SuperClassMap (aOutline.getCodeModel ());
+    aAllSuperClassNames.fill (aOutline);
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("Found the following super-classes " + aAllSuperClassNames);
+    return aAllSuperClassNames;
+  }
+}
+
+/**
+ * Add special "value" constructors, setters and getters for JAXB generated
+ * elements. This is used e.g. for UBL and CII code generation.
+ *
+ * @author Philip Helger
+ */
+@IsSPIImplementation
+public class PluginValueExtender extends AbstractPlugin
+{
+  public static final String OPT = "Xph-value-extender";
+  // @author is only valid for file comments
+  public static final String AUTHOR = "<br>\nNote: automatically created by " + CJAXB22.PLUGIN_NAME + " -" + OPT;
+
+  private static final Logger LOGGER = LoggerFactory.getLogger (PluginValueExtender.class);
+
+  @Override
+  public String getOptionName ()
+  {
+    return OPT;
+  }
+
+  @Override
+  public String getUsage ()
+  {
+    return "  -" +
+           OPT +
+           "    :  create additional constructors with the 'value' as argument + getter and setter for the value";
+  }
+
+  private static void _addDefaultCtors (@Nonnull final Outline aOutline)
+  {
+    for (final ClassOutline aClassOutline : aOutline.getClasses ())
+    {
+      final JDefinedClass jClass = aClassOutline.implClass;
+
+      // Always add default constructor
+      final JMethod aDefCtor = jClass.constructor (JMod.PUBLIC);
+      aDefCtor.javadoc ().add ("Default constructor");
+      aDefCtor.javadoc ().add (AUTHOR);
+
+      // General information
+      jClass.javadoc ()
+            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
+    }
+  }
+
+  private static void _recursiveAddValueConstructorToDerivedClasses (@Nonnull final Outline aOutline,
+                                                                     @Nonnull final JDefinedClass jParentClass,
+                                                                     @Nonnull final JType aValueType,
+                                                                     @Nonnull final Set <JClass> aAllRelevantClasses,
+                                                                     final boolean bHasPluginOffsetDT)
+  {
+    for (final ClassOutline aClassOutline : aOutline.getClasses ())
+    {
+      final JDefinedClass jCurClass = aClassOutline.implClass;
+      if (jCurClass._extends () == jParentClass)
+      {
+        aAllRelevantClasses.add (jCurClass);
+        {
+          final JMethod aValueCtor = jCurClass.constructor (JMod.PUBLIC);
+          final JVar aParam = aValueCtor.param (JMod.FINAL, aValueType, "valueParam");
+          if (!aValueType.isPrimitive ())
+            aParam.annotate (Nullable.class);
+          aValueCtor.body ().invoke ("super").arg (aParam);
+          aValueCtor.javadoc ()
+                    .add ("Constructor for value of type " +
+                          aValueType.erasure ().name () +
+                          " calling super class constructor.");
+          aValueCtor.javadoc ()
+                    .addParam (aParam)
+                    .add ("The value to be set." + (aValueType.isPrimitive () ? "" : " May be <code>null</code>."));
+          aValueCtor.javadoc ().add (AUTHOR);
+        }
+
+        if (bHasPluginOffsetDT)
+        {
+          final JType aNewType = PluginOffsetDTExtension.getOtherType (aValueType, aOutline.getCodeModel ());
+          if (aNewType != null)
+          {
+            final JMethod aValueCtor = jCurClass.constructor (JMod.PUBLIC);
+            final JVar aParam = aValueCtor.param (JMod.FINAL, aNewType, "valueParam");
+            aParam.annotate (Nullable.class);
+            aValueCtor.body ().invoke ("setValue").arg (aParam);
+            aValueCtor.javadoc ().add ("Constructor for value of type " + aNewType.name ());
+            aValueCtor.javadoc ().addParam (aParam).add ("The value to be set. May be <code>null</code>.");
+            aValueCtor.javadoc ().add (AUTHOR);
+          }
+        }
+
+        // Set in all derived classes
+        _recursiveAddValueConstructorToDerivedClasses (aOutline,
+                                                       jCurClass,
+                                                       aValueType,
+                                                       aAllRelevantClasses,
+                                                       bHasPluginOffsetDT);
+      }
+    }
+  }
+
+  private static void _addValueSetterInUsingClasses (@Nonnull final Outline aOutline,
+                                                     @Nonnull final JType aValueType,
+                                                     @Nonnull final Set <JClass> aAllRelevantClasses,
+                                                     final boolean bHasPluginOffsetDT)
+  {
+    for (final ClassOutline aClassOutline : aOutline.getClasses ())
+    {
+      final JDefinedClass jClass = aClassOutline.implClass;
+      for (final JMethod aMethod : new CommonsArrayList <> (jClass.methods ()))
+        // Must be a setter
+        if (aMethod.name ().startsWith ("set"))
+        {
+          // Must have exactly 1 parameter that is part of aAllRelevantClasses
+          final List <JVar> aParams = aMethod.params ();
+          if (aParams.size () == 1 && aAllRelevantClasses.contains (aParams.get (0).type ()))
+          {
+            final JType aImplType = aParams.get (0).type ();
+            {
+              final JMethod aSetter = jClass.method (JMod.PUBLIC, aImplType, aMethod.name ());
+              aSetter.annotate (Nonnull.class);
+              final JVar aParam = aSetter.param (JMod.FINAL, aValueType, "valueParam");
+              if (!aValueType.isPrimitive ())
+                aParam.annotate (Nullable.class);
+              final JVar aObj = aSetter.body ()
+                                       .decl (aImplType, "aObj", JExpr.invoke ("get" + aMethod.name ().substring (3)));
+              final JConditional aIf = aSetter.body ()._if (aObj.eq (JExpr._null ()));
+              aIf._then ().assign (aObj, JExpr._new (aImplType).arg (aParam));
+              aIf._then ().invoke (aMethod).arg (aObj);
+              aIf._else ().invoke (aObj, "setValue").arg (aParam);
+              aSetter.body ()._return (aObj);
+              aSetter.javadoc ().add ("Special setter with value of type " + aParam.type ().name ());
+              aSetter.javadoc ()
+                     .addParam (aParam)
+                     .add ("The value to be set." + (aValueType.isPrimitive () ? "" : " May be <code>null</code>."));
+              aSetter.javadoc ()
+                     .addReturn ()
+                     .add ("The created intermediary object of type " +
+                           aImplType.name () +
+                           " and never <code>null</code>");
+              aSetter.javadoc ().add (AUTHOR);
+            }
+
+            if (bHasPluginOffsetDT)
+            {
+              final JType aNewType = PluginOffsetDTExtension.getOtherType (aImplType, aOutline.getCodeModel ());
+              if (aNewType != null)
+              {
+                final JMethod aSetter = jClass.method (JMod.PUBLIC, aNewType, aMethod.name ());
+                aSetter.annotate (Nonnull.class);
+                final JVar aParam = aSetter.param (JMod.FINAL, aValueType, "valueParam");
+                aParam.annotate (Nullable.class);
+                final JVar aObj = aSetter.body ()
+                                         .decl (aNewType, "aObj", JExpr.invoke ("get" + aMethod.name ().substring (3)));
+                final JConditional aIf = aSetter.body ()._if (aObj.eq (JExpr._null ()));
+                aIf._then ().assign (aObj, JExpr._new (aNewType).arg (aParam));
+                aIf._then ().invoke (aMethod).arg (aObj);
+                aIf._else ().invoke (aObj, "setValue").arg (aParam);
+                aSetter.body ()._return (aObj);
+                aSetter.javadoc ().add ("Special setter with value of type " + aParam.type ().name ());
+                aSetter.javadoc ().addParam (aParam).add ("The value to be set. May be <code>null</code>.");
+                aSetter.javadoc ()
+                       .addReturn ()
+                       .add ("The created intermediary object of type " +
+                             aNewType.name () +
+                             " and never <code>null</code>");
+                aSetter.javadoc ().add (AUTHOR);
+              }
+            }
+          }
+        }
+    }
+  }
+
+  @Nonnull
+  @ReturnsMutableCopy
+  private ICommonsMap <JClass, JType> _addValueCtors (@Nonnull final Outline aOutline, final boolean bHasPluginOffsetDT)
+  {
+    final SuperClassMap aAllSuperClassNames = SuperClassMap.create (aOutline);
 
     final ICommonsMap <JClass, JType> aAllCtorClasses = new CommonsHashMap <> ();
 
@@ -245,48 +327,53 @@ public class PluginValueExtender extends Plugin
     {
       final JDefinedClass jClass = aClassOutline.implClass;
 
-      JType aValueType = null;
-      // Check if that class has a "value" member (name of the variable
-      // created by JAXB to indicate the content of an XML element)
-      for (final JFieldVar aField : jClass.fields ().values ())
-        if (aField.name ().equals ("value"))
-        {
-          aValueType = aField.type ();
-          break;
-        }
-
-      if (aValueType == null && jClass._extends () != null && !(jClass._extends () instanceof JDefinedClass))
-      {
-        // Check only super classes that are not defined in this generation run
-        // but e.g. imported via episodes (bindings)
-        aValueType = aAllSuperClassNames.get (jClass._extends ().fullName ());
-      }
-
+      final JType aValueType = aAllSuperClassNames.getValueFieldType (jClass);
       if (aValueType != null)
       {
         // Create constructor with value (if available)
-        final JMethod aValueCtor = jClass.constructor (JMod.PUBLIC);
-        final JVar aParam = aValueCtor.param (JMod.FINAL, aValueType, "valueParam");
-        if (!aValueType.isPrimitive ())
-          aParam.annotate (Nullable.class);
-        aValueCtor.body ().invoke ("setValue").arg (aParam);
-        aValueCtor.javadoc ().add ("Constructor for value of type " + aValueType.erasure ().name ());
-        aValueCtor.javadoc ()
-                  .addParam (aParam)
-                  .add ("The value to be set." + (aValueType.isPrimitive () ? "" : " May be <code>null</code>."));
-        aValueCtor.javadoc ().add (AUTHOR);
+        {
+          final JMethod aValueCtor = jClass.constructor (JMod.PUBLIC);
+          final JVar aParam = aValueCtor.param (JMod.FINAL, aValueType, "valueParam");
+          if (!aValueType.isPrimitive ())
+            aParam.annotate (Nullable.class);
+          aValueCtor.body ().invoke ("setValue").arg (aParam);
+          aValueCtor.javadoc ().add ("Constructor for value of type " + aValueType.erasure ().name ());
+          aValueCtor.javadoc ()
+                    .addParam (aParam)
+                    .add ("The value to be set." + (aValueType.isPrimitive () ? "" : " May be <code>null</code>."));
+          aValueCtor.javadoc ().add (AUTHOR);
+        }
+
+        if (bHasPluginOffsetDT)
+        {
+          final JType aNewType = PluginOffsetDTExtension.getOtherType (aValueType, aOutline.getCodeModel ());
+          if (aNewType != null)
+          {
+            final JMethod aValueCtor = jClass.constructor (JMod.PUBLIC);
+            final JVar aParam = aValueCtor.param (JMod.FINAL, aNewType, "valueParam");
+            aParam.annotate (Nullable.class);
+            aValueCtor.body ().invoke ("setValue").arg (aParam);
+            aValueCtor.javadoc ().add ("Constructor for value of type " + aNewType.name ());
+            aValueCtor.javadoc ().addParam (aParam).add ("The value to be set. May be <code>null</code>.");
+            aValueCtor.javadoc ().add (AUTHOR);
+          }
+        }
 
         // Set constructor in all derived classes
         final ICommonsSet <JClass> aAllRelevantClasses = new CommonsHashSet <> ();
         aAllRelevantClasses.add (jClass);
-        _recursiveAddValueConstructorToDerivedClasses (aOutline, jClass, aValueType, aAllRelevantClasses);
+        _recursiveAddValueConstructorToDerivedClasses (aOutline,
+                                                       jClass,
+                                                       aValueType,
+                                                       aAllRelevantClasses,
+                                                       bHasPluginOffsetDT);
 
         for (final JClass jRelevantClass : aAllRelevantClasses)
           aAllCtorClasses.put (jRelevantClass, aValueType);
 
         // Add additional setters in all classes that have a setter with one of
         // the relevant classes
-        _addValueSetterInUsingClasses (aOutline, aValueType, aAllRelevantClasses);
+        _addValueSetterInUsingClasses (aOutline, aValueType, aAllRelevantClasses, bHasPluginOffsetDT);
       }
       else
       {
@@ -422,9 +509,13 @@ public class PluginValueExtender extends Plugin
                       @Nonnull final Options aOpts,
                       @Nonnull final ErrorHandler aErrorHandler)
   {
+    final boolean bHasPluginOffsetDT = CollectionHelper.containsAny (aOpts.getAllPlugins (),
+                                                                     p -> p.getOptionName ()
+                                                                           .equals (PluginOffsetDTExtension.OPT));
+
     _addDefaultCtors (aOutline);
 
-    final ICommonsMap <JClass, JType> aAllCtorClasses = _addValueCtors (aOutline);
+    final ICommonsMap <JClass, JType> aAllCtorClasses = _addValueCtors (aOutline, bHasPluginOffsetDT);
 
     // Create all getters
     _addValueGetter (aOutline, aAllCtorClasses);

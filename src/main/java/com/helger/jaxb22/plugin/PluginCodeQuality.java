@@ -22,7 +22,6 @@ import javax.annotation.Nonnull;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.CodingStyleguideUnaware;
 import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.CommonsHashSet;
@@ -36,7 +35,6 @@ import com.sun.codemodel.JMod;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
-import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.model.CElementInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
@@ -48,9 +46,9 @@ import com.sun.tools.xjc.outline.Outline;
  * @author Philip Helger
  */
 @IsSPIImplementation
-public class PluginCodeQuality extends Plugin
+public class PluginCodeQuality extends AbstractPlugin
 {
-  private static final String OPT = "Xph-code-quality";
+  public static final String OPT = "Xph-code-quality";
 
   private boolean m_bJDK7 = false;
   private boolean m_bJDK8 = false;
@@ -81,13 +79,6 @@ public class PluginCodeQuality extends Plugin
       return m_bJDK7 || m_bJDK8 ? 2 : 1;
     }
     return 0;
-  }
-
-  @Override
-  @CodingStyleguideUnaware
-  public List <String> getCustomizationURIs ()
-  {
-    return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
   }
 
   @Override

@@ -53,7 +53,7 @@ import com.sun.tools.xjc.outline.Outline;
 @IsSPIImplementation
 public class PluginExplicitlyCloneable extends AbstractPluginCloneable
 {
-  private static final String OPT = "Xph-cloneable2";
+  public static final String OPT = "Xph-cloneable2";
 
   @Override
   public String getOptionName ()
@@ -64,11 +64,15 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + "    :  implement clone() of IExplicitlyCloneable interface and cloneTo(target) - req. ph-commons >= 9.1.8";
+    return "  -" +
+           OPT +
+           "    :  implement clone() of IExplicitlyCloneable interface and cloneTo(target) - req. ph-commons >= 9.1.8";
   }
 
   @Override
-  public boolean run (@Nonnull final Outline aOutline, @Nonnull final Options aOpts, @Nonnull final ErrorHandler aErrorHandler)
+  public boolean run (@Nonnull final Outline aOutline,
+                      @Nonnull final Options aOpts,
+                      @Nonnull final ErrorHandler aErrorHandler)
   {
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     final JClass jObject = aCodeModel.ref (Object.class);
@@ -134,7 +138,8 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
               final String sGetter = CJAXB22.getGetterName (aField.type (), aEntry.getValue ());
               final JForEach jForEach = aJElse.forEach (aTypeParam, "aItem", JExpr.invoke (sGetter));
               // aTargetList.add (_cloneOf_ (aItem))
-              jForEach.body ().add (aTargetList.invoke ("add").arg (_getCloneCode (aCodeModel, jForEach.var (), aTypeParam)));
+              jForEach.body ()
+                      .add (aTargetList.invoke ("add").arg (_getCloneCode (aCodeModel, jForEach.var (), aTypeParam)));
               aJElse.assign (jRet.ref (aField), aTargetList);
             }
           }
@@ -147,7 +152,8 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
               aIf._then ().assign (jRet.ref (aField), JExpr._null ());
               // Use regular HashMap to ensure the same type is created
               final JBlock aElse = aIf._else ();
-              aElse.assign (jRet.ref (aField), JExpr._new (jHashMap.narrow (((JClass) aField.type ()).getTypeParameters ())).arg (aField));
+              aElse.assign (jRet.ref (aField),
+                            JExpr._new (jHashMap.narrow (((JClass) aField.type ()).getTypeParameters ())).arg (aField));
             }
             else
             {
@@ -194,7 +200,8 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
       }
 
       // General information
-      jClass.javadoc ().add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
+      jClass.javadoc ()
+            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
     return true;
   }

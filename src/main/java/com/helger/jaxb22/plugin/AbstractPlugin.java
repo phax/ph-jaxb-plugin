@@ -89,7 +89,8 @@ public abstract class AbstractPlugin extends Plugin
           throw new IllegalStateException ("'" +
                                            aFieldVar.name () +
                                            "' not found in " +
-                                           new CommonsArrayList <> (aClassOutline.target.getProperties (), pi -> pi.getName (false)) +
+                                           new CommonsArrayList <> (aClassOutline.target.getProperties (),
+                                                                    pi -> pi.getName (false)) +
                                            " of " +
                                            jClass.fullName ());
         }
