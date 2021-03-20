@@ -94,6 +94,8 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
   @Override
   public boolean run (final Outline aModel, final Options aOpt, final ErrorHandler errorHandler)
   {
+    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
+
     try
     {
       for (final ClassOutline aClassOutline : aModel.getClasses ())

@@ -20,6 +20,8 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
@@ -61,6 +63,7 @@ import com.sun.tools.xjc.outline.Outline;
 public class PluginListExtension extends AbstractPlugin
 {
   public static final String OPT = "Xph-list-extension";
+  private static final Logger LOGGER = LoggerFactory.getLogger (PluginListExtension.class);
 
   /**
    * Does not work because upon reading the object gets filled with a regular
@@ -83,6 +86,8 @@ public class PluginListExtension extends AbstractPlugin
   @Override
   public boolean run (final Outline aOutline, final Options aOpts, final ErrorHandler aErrorHandler)
   {
+    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
+
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     final ICommonsSet <JDefinedClass> aEffectedClasses = new CommonsHashSet <> ();
 

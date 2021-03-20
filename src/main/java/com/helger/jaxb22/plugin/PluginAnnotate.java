@@ -21,6 +21,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
@@ -48,6 +50,7 @@ import com.sun.tools.xjc.outline.Outline;
 public class PluginAnnotate extends AbstractPlugin
 {
   public static final String OPT = "Xph-annotate";
+  private static final Logger LOGGER = LoggerFactory.getLogger (PluginAnnotate.class);
 
   @Override
   public String getOptionName ()
@@ -68,6 +71,8 @@ public class PluginAnnotate extends AbstractPlugin
                       @Nonnull final Options aOpts,
                       @Nonnull final ErrorHandler aErrorHandler)
   {
+    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
+
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     final ICommonsSet <JDefinedClass> aEffectedClasses = new CommonsHashSet <> ();
 

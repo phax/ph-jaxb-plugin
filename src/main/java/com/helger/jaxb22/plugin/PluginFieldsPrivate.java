@@ -18,6 +18,8 @@ package com.helger.jaxb22.plugin;
 
 import javax.annotation.Nonnull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
@@ -36,6 +38,7 @@ import com.sun.tools.xjc.outline.Outline;
 public class PluginFieldsPrivate extends AbstractPlugin
 {
   public static final String OPT = "Xph-fields-private";
+  private static final Logger LOGGER = LoggerFactory.getLogger (PluginFieldsPrivate.class);
 
   @Override
   public String getOptionName ()
@@ -54,6 +57,8 @@ public class PluginFieldsPrivate extends AbstractPlugin
                       @Nonnull final Options aOpts,
                       @Nonnull final ErrorHandler aErrorHandler)
   {
+    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
+
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
       final JDefinedClass jClass = aClassOutline.implClass;

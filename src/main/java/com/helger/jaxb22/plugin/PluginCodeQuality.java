@@ -20,6 +20,8 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
@@ -49,6 +51,7 @@ import com.sun.tools.xjc.outline.Outline;
 public class PluginCodeQuality extends AbstractPlugin
 {
   public static final String OPT = "Xph-code-quality";
+  private static final Logger LOGGER = LoggerFactory.getLogger (PluginCodeQuality.class);
 
   private boolean m_bJDK7 = false;
   private boolean m_bJDK8 = false;
@@ -86,6 +89,8 @@ public class PluginCodeQuality extends AbstractPlugin
                       @Nonnull final Options aOpts,
                       @Nonnull final ErrorHandler aErrorHandler)
   {
+    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
+
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
       final JDefinedClass jClass = aClassOutline.implClass;

@@ -18,6 +18,8 @@ package com.helger.jaxb22.plugin;
 
 import java.io.Serializable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
@@ -44,6 +46,7 @@ import com.sun.tools.xjc.outline.Outline;
 public class PluginImplements extends AbstractPlugin
 {
   public static final String OPT = "Xph-implements";
+  private static final Logger LOGGER = LoggerFactory.getLogger (PluginImplements.class);
 
   private static final String GRAPH_ATTR_VALUE = "value";
   private ICommonsList <String> m_aInterfacesToImplement;
@@ -77,6 +80,8 @@ public class PluginImplements extends AbstractPlugin
   @Override
   public boolean run (final Outline aOutline, final Options aOpts, final ErrorHandler aErrorHandler)
   {
+    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
+
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
 
     // Build the graph with all classes and there hierarchy

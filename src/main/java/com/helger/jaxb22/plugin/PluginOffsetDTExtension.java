@@ -26,6 +26,8 @@ import java.time.ZoneOffset;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
@@ -57,6 +59,7 @@ import com.sun.tools.xjc.outline.Outline;
 public class PluginOffsetDTExtension extends AbstractPlugin
 {
   public static final String OPT = "Xph-offset-dt-extension";
+  private static final Logger LOGGER = LoggerFactory.getLogger (PluginOffsetDTExtension.class);
 
   @Override
   public String getOptionName ()
@@ -89,6 +92,8 @@ public class PluginOffsetDTExtension extends AbstractPlugin
   @Override
   public boolean run (final Outline aOutline, final Options aOpts, final ErrorHandler aErrorHandler)
   {
+    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
+
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     final ICommonsSet <JDefinedClass> aEffectedClasses = new CommonsHashSet <> ();
 

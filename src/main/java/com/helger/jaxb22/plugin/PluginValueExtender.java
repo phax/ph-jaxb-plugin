@@ -539,11 +539,12 @@ public class PluginValueExtender extends AbstractPlugin
                       @Nonnull final Options aOpts,
                       @Nonnull final ErrorHandler aErrorHandler)
   {
+    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
     final boolean bHasPluginOffsetDT = CollectionHelper.containsAny (aOpts.getAllPlugins (),
                                                                      p -> p.getOptionName ()
                                                                            .equals (PluginOffsetDTExtension.OPT));
     if (bHasPluginOffsetDT)
-      LOGGER.info ("ValueExtender found OffsetDTExtension plugin");
+      LOGGER.info ("  Found OffsetDTExtension plugin");
 
     _addDefaultCtors (aOutline);
 

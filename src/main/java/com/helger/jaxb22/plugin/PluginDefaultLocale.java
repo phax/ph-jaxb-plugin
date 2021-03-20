@@ -20,6 +20,8 @@ import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
@@ -40,6 +42,7 @@ import com.sun.tools.xjc.outline.Outline;
 public class PluginDefaultLocale extends AbstractPlugin
 {
   public static final String OPT = "Xph-default-locale";
+  private static final Logger LOGGER = LoggerFactory.getLogger (PluginDefaultLocale.class);
 
   @Override
   public String getOptionName ()
@@ -62,6 +65,7 @@ public class PluginDefaultLocale extends AbstractPlugin
       if (StringHelper.hasNoText (sLocale))
         throw new BadCommandLineException ("No locale name provided. Use e.g. 'en_US'");
       Locale.setDefault (LocaleCache.getInstance ().getLocale (sLocale));
+      LOGGER.info ("Default Locale was set to '" + sLocale + "'");
       return 2;
     }
     return 0;

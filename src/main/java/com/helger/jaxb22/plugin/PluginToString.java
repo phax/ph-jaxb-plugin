@@ -18,6 +18,8 @@ package com.helger.jaxb22.plugin;
 
 import javax.annotation.Nonnull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
@@ -46,6 +48,7 @@ import com.sun.tools.xjc.outline.Outline;
 public class PluginToString extends AbstractPlugin
 {
   public static final String OPT = "Xph-tostring";
+  private static final Logger LOGGER = LoggerFactory.getLogger (PluginToString.class);
 
   private final boolean m_bLegacy;
   private final String m_sOpt;
@@ -80,6 +83,8 @@ public class PluginToString extends AbstractPlugin
                       @Nonnull final Options aOpts,
                       @Nonnull final ErrorHandler aErrorHandler)
   {
+    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
+
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     final JClass jObject = aCodeModel.ref (Object.class);
     final JClass jToStringGenerator = aCodeModel.ref (ToStringGenerator.class);

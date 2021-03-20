@@ -22,6 +22,8 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
@@ -52,6 +54,7 @@ import com.sun.tools.xjc.outline.Outline;
 public class PluginCloneable extends AbstractPluginCloneable
 {
   public static final String OPT = "Xph-cloneable";
+  private static final Logger LOGGER = LoggerFactory.getLogger (PluginCloneable.class);
 
   @Override
   public String getOptionName ()
@@ -70,6 +73,8 @@ public class PluginCloneable extends AbstractPluginCloneable
                       @Nonnull final Options aOpts,
                       @Nonnull final ErrorHandler aErrorHandler)
   {
+    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
+
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     final JClass jObject = aCodeModel.ref (Object.class);
     final JClass jCloneable = aCodeModel.ref (Cloneable.class);
