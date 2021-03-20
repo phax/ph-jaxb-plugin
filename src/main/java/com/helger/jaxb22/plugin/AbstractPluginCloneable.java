@@ -125,7 +125,9 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
            sTypeName.equals ("LocalTime") ||
            sTypeName.equals ("Long") ||
            sTypeName.equals ("Object") ||
+           sTypeName.equals ("OffsetDate") ||
            sTypeName.equals ("OffsetDateTime") ||
+           sTypeName.equals ("OffsetTime") ||
            sTypeName.equals ("Period") ||
            sTypeName.equals ("QName") ||
            sTypeName.equals ("Short") ||
