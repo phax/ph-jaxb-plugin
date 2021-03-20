@@ -285,17 +285,19 @@ public class PluginValueExtender extends AbstractPlugin
 
             if (bHasPluginOffsetDT)
             {
-              final JType aNewType = PluginOffsetDTExtension.getOtherType (aImplType, aOutline.getCodeModel ());
+              final JType aNewType = PluginOffsetDTExtension.getOtherType (aValueType, aOutline.getCodeModel ());
               if (aNewType != null)
               {
-                final JMethod aSetter = jClass.method (JMod.PUBLIC, aNewType, aMethod.name ());
+                final JMethod aSetter = jClass.method (JMod.PUBLIC, aImplType, aMethod.name ());
                 aSetter.annotate (Nonnull.class);
-                final JVar aParam = aSetter.param (JMod.FINAL, aValueType, "valueParam");
+                final JVar aParam = aSetter.param (JMod.FINAL, aNewType, "valueParam");
                 aParam.annotate (Nullable.class);
                 final JVar aObj = aSetter.body ()
-                                         .decl (aNewType, "aObj", JExpr.invoke ("get" + aMethod.name ().substring (3)));
+                                         .decl (aImplType,
+                                                "aObj",
+                                                JExpr.invoke ("get" + aMethod.name ().substring (3)));
                 final JConditional aIf = aSetter.body ()._if (aObj.eq (JExpr._null ()));
-                aIf._then ().assign (aObj, JExpr._new (aNewType).arg (aParam));
+                aIf._then ().assign (aObj, JExpr._new (aImplType).arg (aParam));
                 aIf._then ().invoke (aMethod).arg (aObj);
                 aIf._else ().invoke (aObj, "setValue").arg (aParam);
                 aSetter.body ()._return (aObj);
@@ -304,7 +306,7 @@ public class PluginValueExtender extends AbstractPlugin
                 aSetter.javadoc ()
                        .addReturn ()
                        .add ("The created intermediary object of type " +
-                             aNewType.name () +
+                             aImplType.name () +
                              " and never <code>null</code>");
                 aSetter.javadoc ().add (AUTHOR);
               }
