@@ -12,5 +12,4 @@ com.helger.jaxb22.plugin.PluginImplements
 com.helger.jaxb22.plugin.PluginListExtension
 com.helger.jaxb22.plugin.PluginOffsetDTExtension
 com.helger.jaxb22.plugin.PluginToString
-com.helger.jaxb22.plugin.PluginToStringLegacy
 com.helger.jaxb22.plugin.PluginValueExtender
