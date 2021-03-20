@@ -39,6 +39,7 @@ import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.lang.GenericReflection;
+import com.helger.jaxb22.plugin.cm.MyTernaryOp;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JConditional;
@@ -47,7 +48,6 @@ import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
-import com.sun.codemodel.JOp;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
@@ -401,9 +401,12 @@ public class PluginValueExtender extends AbstractPlugin
    *        JAXB outline
    * @param aAllCtorClasses
    *        Map from class with value (direct and derived) to value type
+   * @param bHasPluginOffsetDT
+   *        <code>true</code> if the "OffsetDTExtension" plugin is present
    */
   private static void _addValueGetter (@Nonnull final Outline aOutline,
-                                       @Nonnull final Map <JClass, JType> aAllCtorClasses)
+                                       @Nonnull final Map <JClass, JType> aAllCtorClasses,
+                                       final boolean bHasPluginOffsetDT)
   {
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     // For all generated classes
@@ -450,7 +453,7 @@ public class PluginValueExtender extends AbstractPlugin
                 aGetter = jClass.method (JMod.PUBLIC, aValueType, sMethodName);
                 aParam = aGetter.param (JMod.FINAL, aValueType, "nullValue");
                 final JVar aObj = aGetter.body ().decl (aReturnType, "aObj", JExpr.invoke (aMethod));
-                aGetter.body ()._return (JOp.cond (aObj.eq (JExpr._null ()), aParam, aObj.invoke ("isValue")));
+                aGetter.body ()._return (MyTernaryOp.cond (aObj.eq (JExpr._null ()), aParam, aObj.invoke ("isValue")));
               }
               else
               {
@@ -459,7 +462,7 @@ public class PluginValueExtender extends AbstractPlugin
                 aGetter = jClass.method (JMod.PUBLIC, aValueType, sMethodName);
                 aParam = aGetter.param (JMod.FINAL, aValueType, "nullValue");
                 final JVar aObj = aGetter.body ().decl (aReturnType, "aObj", JExpr.invoke (aMethod));
-                aGetter.body ()._return (JOp.cond (aObj.eq (JExpr._null ()), aParam, aObj.invoke ("getValue")));
+                aGetter.body ()._return (MyTernaryOp.cond (aObj.eq (JExpr._null ()), aParam, aObj.invoke ("getValue")));
               }
 
               // Javadoc
@@ -478,15 +481,42 @@ public class PluginValueExtender extends AbstractPlugin
             else
             {
               // Create the Object get...Value() method
-              final JMethod aGetter = jClass.method (JMod.PUBLIC, aValueType, sMethodName);
-              aGetter.annotate (Nullable.class);
-              final JVar aObj = aGetter.body ().decl (aReturnType, "aObj", JExpr.invoke (aMethod));
-              aGetter.body ()._return (JOp.cond (aObj.eq (JExpr._null ()), JExpr._null (), aObj.invoke ("getValue")));
-              aGetter.javadoc ().add ("Get the value of the contained " + aReturnType.name () + " object");
-              aGetter.javadoc ()
-                     .addReturn ()
-                     .add ("Either the value of the contained " + aReturnType.name () + " object or <code>null</code>");
-              aGetter.javadoc ().add (AUTHOR);
+              {
+                final JMethod aGetter = jClass.method (JMod.PUBLIC, aValueType, sMethodName);
+                aGetter.annotate (Nullable.class);
+                final JVar aObj = aGetter.body ().decl (aReturnType, "aObj", JExpr.invoke (aMethod));
+                aGetter.body ()
+                       ._return (MyTernaryOp.cond (aObj.eq (JExpr._null ()), JExpr._null (), aObj.invoke ("getValue")));
+                aGetter.javadoc ().add ("Get the value of the contained " + aReturnType.name () + " object");
+                aGetter.javadoc ()
+                       .addReturn ()
+                       .add ("Either the value of the contained " +
+                             aReturnType.name () +
+                             " object or <code>null</code>");
+                aGetter.javadoc ().add (AUTHOR);
+              }
+
+              if (bHasPluginOffsetDT)
+              {
+                final JType aNewType = PluginOffsetDTExtension.getOtherType (aValueType, aCodeModel);
+                if (aNewType != null)
+                {
+                  final JMethod aGetter = jClass.method (JMod.PUBLIC, aNewType, sMethodName + "Local");
+                  aGetter.annotate (Nullable.class);
+                  final JVar aObj = aGetter.body ().decl (aReturnType, "aObj", JExpr.invoke (aMethod));
+                  aGetter.body ()
+                         ._return (MyTernaryOp.cond (aObj.eq (JExpr._null ()),
+                                                     JExpr._null (),
+                                                     aObj.invoke ("getValueLocal")));
+                  aGetter.javadoc ().add ("Get the value of the contained " + aReturnType.name () + " object");
+                  aGetter.javadoc ()
+                         .addReturn ()
+                         .add ("Either the value of the contained " +
+                               aReturnType.name () +
+                               " object or <code>null</code>");
+                  aGetter.javadoc ().add (AUTHOR);
+                }
+              }
             }
           }
         }
@@ -520,7 +550,7 @@ public class PluginValueExtender extends AbstractPlugin
     final ICommonsMap <JClass, JType> aAllCtorClasses = _addValueCtors (aOutline, bHasPluginOffsetDT);
 
     // Create all getters
-    _addValueGetter (aOutline, aAllCtorClasses);
+    _addValueGetter (aOutline, aAllCtorClasses, bHasPluginOffsetDT);
     return true;
   }
 }
