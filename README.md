@@ -44,7 +44,7 @@ Add something **like** the following to your pom.xml to use this artifact:
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-jaxb22-plugin</artifactId>
-      <version>2.3.2.6</version>
+      <version>2.3.3.2</version>
     </dependency>
   </dependencies>
 </plugin>
@@ -78,7 +78,7 @@ Add something **like** the following to your pom.xml to use this artifact:
 
 # News and noteworthy
 
-* v2.3.3.2 - work in progress
+* v2.3.3.2 - 2021-03-21
     * Updated to ph-commons 10
     * Added new plugin `-Xph-offset-dt-extension`
     * Removed plugin `-Xph-tostring-legacy`
