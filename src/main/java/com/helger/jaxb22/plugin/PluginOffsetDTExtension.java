@@ -34,6 +34,7 @@ import com.helger.commons.annotation.IsSPIImplementation;
 import com.helger.commons.collection.impl.CommonsHashSet;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.datetime.OffsetDate;
+import com.helger.commons.datetime.XMLOffsetDate;
 import com.helger.jaxb22.plugin.cm.MyTernaryOp;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
@@ -49,8 +50,9 @@ import com.sun.tools.xjc.outline.Outline;
 
 /**
  * Extend all bean members of type <code>OffsetDate</code>,
- * <code>OffsetTime</code> and <code>OffsetDateTime</code> with method to access
- * them as their <code>Local*</code> pendants.
+ * <code>XMLOffsetDate</code> <code>OffsetTime</code> and
+ * <code>OffsetDateTime</code> with method to access them as their
+ * <code>Local*</code> pendants.
  *
  * @author Philip Helger
  * @since 2.3.3.2
@@ -79,6 +81,7 @@ public class PluginOffsetDTExtension extends AbstractPlugin
     switch (aType.name ())
     {
       case "OffsetDate":
+      case "XMLOffsetDate":
         return cm.ref (LocalDate.class);
       case "OffsetTime":
         return cm.ref (LocalTime.class);
@@ -108,41 +111,39 @@ public class PluginOffsetDTExtension extends AbstractPlugin
         final JType aOldType = aField.type ();
         switch (aOldType.name ())
         {
+          case "XMLOffsetDate":
           case "OffsetDate":
           {
             final JType aNewType = aCodeModel.ref (LocalDate.class);
+            // XMLOffsetDate has an optional time zone
+            final boolean bIsXMLOD = aOldType.name ().equals ("XMLOffsetDate");
 
             // Create Getter
             {
-              final JMethod aGetter = jClass.method (JMod.PUBLIC,
-                                                     aNewType,
-                                                     CJAXB22.getGetterName (aOldType, aField.name ()) + "Local");
+              final JMethod aGetter = jClass.method (JMod.PUBLIC, aNewType, CJAXB22.getGetterName (aOldType, aField.name ()) + "Local");
               aGetter.annotate (Nullable.class);
-              aGetter.body ()
-                     ._return (MyTernaryOp.cond (aField.eq (JExpr._null ()),
-                                                 JExpr._null (),
-                                                 aField.invoke ("toLocalDate")));
-              aGetter.javadoc ()
-                     .addReturn ()
-                     .add ("The LocalDate representation of " + aField.name () + ". May be <code>null</code>.");
+              aGetter.body ()._return (MyTernaryOp.cond (aField.eq (JExpr._null ()), JExpr._null (), aField.invoke ("toLocalDate")));
+              aGetter.javadoc ().addReturn ().add ("The LocalDate representation of " + aField.name () + ". May be <code>null</code>.");
               aGetter.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }
 
             // Create Setter
             {
-              final JMethod aSetter = jClass.method (JMod.PUBLIC,
-                                                     aCodeModel.VOID,
-                                                     CJAXB22.getSetterName (aField.name ()));
+              final JMethod aSetter = jClass.method (JMod.PUBLIC, aCodeModel.VOID, CJAXB22.getSetterName (aField.name ()));
               final JVar aParam = aSetter.param (JMod.FINAL, aNewType, "aValue");
               aParam.annotate (Nullable.class);
               aSetter.body ()
                      .assign (aField,
                               MyTernaryOp.cond (aParam.eq (JExpr._null ()),
                                                 JExpr._null (),
-                                                aCodeModel.ref (OffsetDate.class)
-                                                          .staticInvoke ("of")
-                                                          .arg (aParam)
-                                                          .arg (aCodeModel.ref (ZoneOffset.class).staticRef ("UTC"))));
+                                                bIsXMLOD ? aCodeModel.ref (XMLOffsetDate.class)
+                                                                     .staticInvoke ("of")
+                                                                     .arg (aParam)
+                                                                     .arg (JExpr._null ())
+                                                         : aCodeModel.ref (OffsetDate.class)
+                                                                     .staticInvoke ("of")
+                                                                     .arg (aParam)
+                                                                     .arg (aCodeModel.ref (ZoneOffset.class).staticRef ("UTC"))));
               aSetter.javadoc ().addParam (aParam).add ("The LocalDate to set. May be <code>null</code>.");
               aSetter.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }
@@ -156,25 +157,16 @@ public class PluginOffsetDTExtension extends AbstractPlugin
 
             // Create Getter
             {
-              final JMethod aGetter = jClass.method (JMod.PUBLIC,
-                                                     aNewType,
-                                                     CJAXB22.getGetterName (aOldType, aField.name ()) + "Local");
+              final JMethod aGetter = jClass.method (JMod.PUBLIC, aNewType, CJAXB22.getGetterName (aOldType, aField.name ()) + "Local");
               aGetter.annotate (Nullable.class);
-              aGetter.body ()
-                     ._return (MyTernaryOp.cond (aField.eq (JExpr._null ()),
-                                                 JExpr._null (),
-                                                 aField.invoke ("toLocalTime")));
-              aGetter.javadoc ()
-                     .addReturn ()
-                     .add ("The LocalTime representation of " + aField.name () + ". May be <code>null</code>.");
+              aGetter.body ()._return (MyTernaryOp.cond (aField.eq (JExpr._null ()), JExpr._null (), aField.invoke ("toLocalTime")));
+              aGetter.javadoc ().addReturn ().add ("The LocalTime representation of " + aField.name () + ". May be <code>null</code>.");
               aGetter.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }
 
             // Create Setter
             {
-              final JMethod aSetter = jClass.method (JMod.PUBLIC,
-                                                     aCodeModel.VOID,
-                                                     CJAXB22.getSetterName (aField.name ()));
+              final JMethod aSetter = jClass.method (JMod.PUBLIC, aCodeModel.VOID, CJAXB22.getSetterName (aField.name ()));
               final JVar aParam = aSetter.param (JMod.FINAL, aNewType, "aValue");
               aParam.annotate (Nullable.class);
               aSetter.body ()
@@ -198,25 +190,16 @@ public class PluginOffsetDTExtension extends AbstractPlugin
 
             // Create Getter
             {
-              final JMethod aGetter = jClass.method (JMod.PUBLIC,
-                                                     aNewType,
-                                                     CJAXB22.getGetterName (aOldType, aField.name ()) + "Local");
+              final JMethod aGetter = jClass.method (JMod.PUBLIC, aNewType, CJAXB22.getGetterName (aOldType, aField.name ()) + "Local");
               aGetter.annotate (Nullable.class);
-              aGetter.body ()
-                     ._return (MyTernaryOp.cond (aField.eq (JExpr._null ()),
-                                                 JExpr._null (),
-                                                 aField.invoke ("toLocalDateTime")));
-              aGetter.javadoc ()
-                     .addReturn ()
-                     .add ("The LocalDateTime representation of " + aField.name () + ". May be <code>null</code>.");
+              aGetter.body ()._return (MyTernaryOp.cond (aField.eq (JExpr._null ()), JExpr._null (), aField.invoke ("toLocalDateTime")));
+              aGetter.javadoc ().addReturn ().add ("The LocalDateTime representation of " + aField.name () + ". May be <code>null</code>.");
               aGetter.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
             }
 
             // Create Setter
             {
-              final JMethod aSetter = jClass.method (JMod.PUBLIC,
-                                                     aCodeModel.VOID,
-                                                     CJAXB22.getSetterName (aField.name ()));
+              final JMethod aSetter = jClass.method (JMod.PUBLIC, aCodeModel.VOID, CJAXB22.getSetterName (aField.name ()));
               final JVar aParam = aSetter.param (JMod.FINAL, aNewType, "aValue");
               aParam.annotate (Nullable.class);
               aSetter.body ()
@@ -242,8 +225,7 @@ public class PluginOffsetDTExtension extends AbstractPlugin
     for (final JDefinedClass jClass : aEffectedClasses)
     {
       // General information
-      jClass.javadoc ()
-            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
+      jClass.javadoc ().add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
 
     return true;
