@@ -81,6 +81,7 @@ Add something **like** the following to your pom.xml to use this artifact:
 * v2.3.3.3 - work in progress
     * Requires ph-commons 10.0.1
     * Plugin `-Xph-offset-dt-extension` now also supports `XMLOffsetDate`
+    * Added class `PeriodDuration` as being "not clonable"
 * v2.3.3.2 - 2021-03-21
     * Updated to ph-commons 10
     * Added new plugin `-Xph-offset-dt-extension`

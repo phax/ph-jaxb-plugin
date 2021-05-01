@@ -46,7 +46,7 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (AbstractPluginCloneable.class);
 
-  private static final Map <String, Boolean> s_aEnumCache = new HashMap <> ();
+  private static final Map <String, Boolean> ENUM_CACHE = new HashMap <> ();
 
   private static boolean _loadClassAndCheckIfEnum (final String sName)
   {
@@ -100,7 +100,7 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
       final JClass aCls = (JClass) aType;
 
       // -> try to load via reflection and analyze
-      final Boolean aIsEnum = s_aEnumCache.computeIfAbsent (aCls.binaryName (),
+      final Boolean aIsEnum = ENUM_CACHE.computeIfAbsent (aCls.binaryName (),
                                                             k -> Boolean.valueOf (_loadClassAndCheckIfEnum (k)));
       if (aIsEnum.booleanValue ())
         return true;
@@ -129,6 +129,7 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
            sTypeName.equals ("OffsetDateTime") ||
            sTypeName.equals ("OffsetTime") ||
            sTypeName.equals ("Period") ||
+           sTypeName.equals ("PeriodDuration") ||
            sTypeName.equals ("QName") ||
            sTypeName.equals ("Short") ||
            sTypeName.equals ("String") ||
