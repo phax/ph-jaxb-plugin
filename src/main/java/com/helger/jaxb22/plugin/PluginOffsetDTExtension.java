@@ -220,7 +220,7 @@ public class PluginOffsetDTExtension extends AbstractPlugin
           {
             final JType aNewType = aCodeModel.ref (LocalDateTime.class);
             // XMLOffsetDateTime has an optional time zone
-            final boolean bIsXML = aOldType.name ().equals ("XMLOffsetTime");
+            final boolean bIsXML = aOldType.name ().equals ("XMLOffsetDateTime");
 
             // Create Getter
             {
