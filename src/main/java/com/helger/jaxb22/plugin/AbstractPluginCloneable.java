@@ -101,7 +101,7 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
 
       // -> try to load via reflection and analyze
       final Boolean aIsEnum = ENUM_CACHE.computeIfAbsent (aCls.binaryName (),
-                                                            k -> Boolean.valueOf (_loadClassAndCheckIfEnum (k)));
+                                                          k -> Boolean.valueOf (_loadClassAndCheckIfEnum (k)));
       if (aIsEnum.booleanValue ())
         return true;
     }
@@ -134,6 +134,9 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
            sTypeName.equals ("Short") ||
            sTypeName.equals ("String") ||
            sTypeName.equals ("W3CEndpointReference") ||
+           sTypeName.equals ("XMLOffsetDate") ||
+           sTypeName.equals ("XMLOffsetDateTime") ||
+           sTypeName.equals ("XMLOffsetTime") ||
            sTypeName.equals ("ZonedDateTime");
   }
 
