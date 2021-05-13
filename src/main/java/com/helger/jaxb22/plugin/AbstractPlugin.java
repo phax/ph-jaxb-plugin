@@ -48,7 +48,7 @@ public abstract class AbstractPlugin extends Plugin
 
   @Override
   @CodingStyleguideUnaware
-  public final List <String> getCustomizationURIs ()
+  public List <String> getCustomizationURIs ()
   {
     return CollectionHelper.makeUnmodifiable (CJAXB22.NSURI_PH);
   }
