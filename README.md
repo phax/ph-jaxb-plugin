@@ -1,7 +1,8 @@
-# ph-jaxb22-plugin
+# ph-jaxb-plugin
 
-JAXB 2.2 plugin that adds some commonly needed functionality.
-The current version 2.3.2.* is linked against JAXB 2.2.11 (for Java 8) and 2.3.2 (for Java 9+).
+JAXB 4.0 plugin that adds some commonly needed functionality.
+
+The old version for JAXB 2.2 was called `ph-jaxb22-plugin`
 
 This project is licensed under the Apache 2 license.
 
@@ -11,9 +12,9 @@ Add something **like** the following to your pom.xml to use this artifact:
 
 ```xml
 <plugin>
-  <groupId>org.jvnet.jaxb2.maven2</groupId>
-  <artifactId>maven-jaxb2-plugin</artifactId>
-  <version>0.14.0</version>
+  <groupId>com.evolvedbinary.maven.jvnet</groupId>
+  <artifactId>jaxb2-maven-plugin</artifactId>
+  <version>0.15.0</version>
   <executions>
     <execution>
       <goals>
@@ -22,9 +23,9 @@ Add something **like** the following to your pom.xml to use this artifact:
     </execution>
   </executions>
   <configuration>
-    ...regular plugin configuration...
+    <!-- regular plugin configuration goes here -->
     <args>
-      ...other direct arguments like -no-header...
+      <!-- other direct arguments like -no-header -->
       <arg>-Xph-default-locale</arg>
       <arg>en_US</arg>
       <arg>-Xph-annotate</arg>
@@ -43,11 +44,22 @@ Add something **like** the following to your pom.xml to use this artifact:
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
-      <artifactId>ph-jaxb22-plugin</artifactId>
-      <version>2.3.3.2</version>
+      <artifactId>ph-jaxb-plugin</artifactId>
+      <!-- Use the right version below -->
+      <version>4.0.0</version>
     </dependency>
   </dependencies>
 </plugin>
+```
+
+For usage with JAXB 2.2 use this dependency:
+
+```xml
+    <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>ph-jaxb22-plugin</artifactId> <!-- different!!! -->
+      <version>2.3.3.3</version>
+    </dependency>
 ```
 
 # JAXB Plugins
@@ -78,7 +90,11 @@ Add something **like** the following to your pom.xml to use this artifact:
 
 # News and noteworthy
 
-* v2.3.3.4 - work in progress
+* v4.0.0 - work in progress
+    * Updated to JAXB 4.0
+    * Requires at least Java 11
+    * Changed the artifact ID from `ph-jaxb22-plugin` to `ph-jaxb-plugin`
+    * Changed all the internal namespaces from `com.helger.jaxb22.plugin` to `com.helger.jaxb.plugin`
     * Added new plugin `-Xph-namespace-prefix` to force a certain prefix via `@XmlNs` annotation
 * v2.3.3.3 - 2021-05-02
     * Requires ph-commons 10.1.0
