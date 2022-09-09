@@ -153,7 +153,7 @@ public class PluginValueExtender extends AbstractPlugin
 {
   public static final String OPT = "Xph-value-extender";
   // @author is only valid for file comments
-  public static final String AUTHOR = "<br>\nNote: automatically created by " + CJAXB22.PLUGIN_NAME + " -" + OPT;
+  public static final String AUTHOR = "<br>\nNote: automatically created by " + CJAXB.PLUGIN_NAME + " -" + OPT;
 
   private static final Logger LOGGER = LoggerFactory.getLogger (PluginValueExtender.class);
 
@@ -184,7 +184,7 @@ public class PluginValueExtender extends AbstractPlugin
 
       // General information
       jClass.javadoc ()
-            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
+            .add ("<p>This class contains methods created by " + CJAXB.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
   }
 

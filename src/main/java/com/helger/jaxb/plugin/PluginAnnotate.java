@@ -153,7 +153,7 @@ public class PluginAnnotate extends AbstractPlugin
     for (final JDefinedClass jClass : aEffectedClasses)
     {
       // General information
-      jClass.javadoc ().add ("<p>This class was annotated by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
+      jClass.javadoc ().add ("<p>This class was annotated by " + CJAXB.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
 
     return true;

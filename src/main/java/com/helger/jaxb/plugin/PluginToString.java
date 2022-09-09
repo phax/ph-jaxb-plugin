@@ -120,12 +120,12 @@ public class PluginToString extends AbstractPlugin
         }
         mToString.body ()._return (aInvocation.invoke ("getToString"));
 
-        mToString.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+        mToString.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
       }
 
       // General information
       jClass.javadoc ()
-            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
+            .add ("<p>This class contains methods created by " + CJAXB.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
     return true;
   }

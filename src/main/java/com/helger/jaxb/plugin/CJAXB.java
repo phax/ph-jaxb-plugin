@@ -25,13 +25,13 @@ import com.helger.commons.annotation.Nonempty;
 import com.sun.codemodel.JType;
 
 @Immutable
-public final class CJAXB22
+public final class CJAXB
 {
-  public static final String NSURI_PH = "http://www.helger.com/namespaces/jaxb22/plugin";
+  public static final String NSURI_PH = "http://www.helger.com/namespaces/jaxb/plugin";
 
-  public static final String PLUGIN_NAME = "ph-jaxb22-plugin";
+  public static final String PLUGIN_NAME = "ph-jaxb-plugin";
 
-  private CJAXB22 ()
+  private CJAXB ()
   {}
 
   @Nonnull

@@ -140,7 +140,7 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
                                                     JExpr._new (jArrayList.narrow (aTypeParam)));
 
               // for (X aItem : getX())
-              final String sGetter = CJAXB22.getGetterName (aField.type (), aEntry.getValue ());
+              final String sGetter = CJAXB.getGetterName (aField.type (), aEntry.getValue ());
               final JForEach jForEach = aJElse.forEach (aTypeParam, "aItem", JExpr.invoke (sGetter));
               // aTargetList.add (_cloneOf_ (aItem))
               jForEach.body ()
@@ -166,7 +166,7 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
             }
         }
 
-        mCloneTo.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+        mCloneTo.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
       }
 
       // Cannot instantiate abstract classes
@@ -183,7 +183,7 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
 
         mClone.javadoc ().addReturn ().add ("The cloned object. Never <code>null</code>.");
 
-        mClone.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+        mClone.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
       }
       else
       {
@@ -201,12 +201,12 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
         mClone.body ().invoke (mCloneTo).arg (jRet);
         mClone.body ()._return (jRet);
 
-        mClone.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+        mClone.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
       }
 
       // General information
       jClass.javadoc ()
-            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
+            .add ("<p>This class contains methods created by " + CJAXB.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
     return true;
   }

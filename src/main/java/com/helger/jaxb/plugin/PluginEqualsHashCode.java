@@ -147,7 +147,7 @@ public class PluginEqualsHashCode extends AbstractPlugin
           jBody._return (JExpr.TRUE);
         }
 
-        mEquals.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+        mEquals.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
       }
 
       // hashCode
@@ -189,12 +189,12 @@ public class PluginEqualsHashCode extends AbstractPlugin
           mHashCode.body ()._return (aInvocation.invoke ("getHashCode"));
         }
 
-        mHashCode.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+        mHashCode.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
       }
 
       // General information
       jClass.javadoc ()
-            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
+            .add ("<p>This class contains methods created by " + CJAXB.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
     return true;
   }

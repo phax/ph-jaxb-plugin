@@ -116,18 +116,18 @@ public class PluginListExtension extends AbstractPlugin
 
           // Create Setter
           {
-            final JMethod aSetter = jClass.method (JMod.PUBLIC, aCodeModel.VOID, CJAXB22.getSetterName (sFieldName));
+            final JMethod aSetter = jClass.method (JMod.PUBLIC, aCodeModel.VOID, CJAXB.getSetterName (sFieldName));
             final JVar aParam = aSetter.param (JMod.FINAL, USE_COMMONS_LIST ? aNewType : aField.type (), "aList");
             aParam.annotate (Nullable.class);
             aSetter.body ().assign (aField, aParam);
             aSetter.javadoc ().addParam (aParam).add ("The new list member to set. May be <code>null</code>.");
-            aSetter.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+            aSetter.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
           }
 
           // Create a new getter
           if (USE_COMMONS_LIST)
           {
-            final JMethod aOldGetter = jClass.getMethod (CJAXB22.getGetterName (aField.type (), sFieldName),
+            final JMethod aOldGetter = jClass.getMethod (CJAXB.getGetterName (aField.type (), sFieldName),
                                                          new JType [0]);
             jClass.methods ().remove (aOldGetter);
             final JMethod aNewGetter = jClass.method (JMod.PUBLIC, aNewType, aOldGetter.name ());
@@ -142,7 +142,7 @@ public class PluginListExtension extends AbstractPlugin
                                                                    .narrow (((JClass) aOldType).getTypeParameters ()))));
             aNewGetter.body ()._return (aJRet);
             aNewGetter.javadoc ().addReturn ().add ("The mutable list and never <code>null</code>");
-            aNewGetter.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+            aNewGetter.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
           }
 
           aEffectedClasses.add (jClass);
@@ -172,7 +172,7 @@ public class PluginListExtension extends AbstractPlugin
               mHasEntries.javadoc ()
                          .addReturn ()
                          .add ("<code>true</code> if at least one item is contained, <code>false</code> otherwise.");
-              mHasEntries.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+              mHasEntries.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
             }
 
             // boolean hasNoXXXEntries ()
@@ -185,7 +185,7 @@ public class PluginListExtension extends AbstractPlugin
               mHasNoEntries.javadoc ()
                            .addReturn ()
                            .add ("<code>true</code> if no item is contained, <code>false</code> otherwise.");
-              mHasNoEntries.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+              mHasNoEntries.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
             }
 
             // int getXXXCount ()
@@ -195,7 +195,7 @@ public class PluginListExtension extends AbstractPlugin
               mCount.body ()._return (JExpr.invoke (aMethod).invoke ("size"));
 
               mCount.javadoc ().addReturn ().add ("The number of contained elements. Always &ge; 0.");
-              mCount.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+              mCount.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
             }
 
             // ELEMENTTYPE getXXXAtIndex (int) throws IndexOutOfBoundsException
@@ -215,7 +215,7 @@ public class PluginListExtension extends AbstractPlugin
               mAtIndex.javadoc ().addParam (aParam).add ("The index to retrieve");
               mAtIndex.javadoc ().addReturn ().add ("The element at the specified index. May be <code>null</code>");
               mAtIndex.javadoc ().addThrows (IndexOutOfBoundsException.class).add ("if the index is invalid!");
-              mAtIndex.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+              mAtIndex.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
             }
 
             // void addXXX (ELEMENTTYPE)
@@ -226,7 +226,7 @@ public class PluginListExtension extends AbstractPlugin
               mAdd.body ().add (JExpr.invoke (aMethod).invoke ("add").arg (aParam));
 
               mAdd.javadoc ().addParam (aParam).add ("The element to be added. May not be <code>null</code>.");
-              mAdd.javadoc ().add ("Created by " + CJAXB22.PLUGIN_NAME + " -" + OPT);
+              mAdd.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
             }
 
             aEffectedClasses.add (jClass);
@@ -238,7 +238,7 @@ public class PluginListExtension extends AbstractPlugin
     {
       // General information
       jClass.javadoc ()
-            .add ("<p>This class contains methods created by " + CJAXB22.PLUGIN_NAME + " -" + OPT + "</p>\n");
+            .add ("<p>This class contains methods created by " + CJAXB.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
 
     return true;

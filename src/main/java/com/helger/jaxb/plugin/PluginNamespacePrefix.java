@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
@@ -52,11 +54,11 @@ import jakarta.xml.bind.annotation.XmlNs;
 import jakarta.xml.bind.annotation.XmlSchema;
 
 /**
- * This plugin adds {@link javax.xml.bind.annotation.XmlNs} annotations to
+ * This plugin adds {@link jakarta.xml.bind.annotation.XmlNs} annotations to
  * <i>package-info.java</i> files. Those annotations tells Jaxb2 to generate XML
  * schema's instances with specific namespaces prefixes, instead of the
- * auto-generated (ns1, ns2, ...) prefixes. Definition of thoses prefixes is
- * done in the bindings.xml file.
+ * auto-generated (ns1, ns2, ...) prefixes. Definition of those prefixes is done
+ * in the bindings.xml file.
  * <p/>
  * Bindings.xml file example:
  *
@@ -85,8 +87,30 @@ import jakarta.xml.bind.annotation.XmlSchema;
 @IsSPIImplementation
 public class PluginNamespacePrefix extends AbstractPlugin
 {
+  private static final class Pair
+  {
+    private final String m_sNamespace;
+    private final String m_sPrefix;
+
+    private Pair (final String namespace, final String prefix)
+    {
+      this.m_sNamespace = namespace;
+      this.m_sPrefix = prefix;
+    }
+
+    public String getNamespace ()
+    {
+      return m_sNamespace;
+    }
+
+    public String getPrefix ()
+    {
+      return m_sPrefix;
+    }
+  }
+
   public static final String OPT = "Xph-namespace-prefix";
-  public static final String NAMESPACE_URI = CJAXB22.NSURI_PH + "/namespace-prefix";
+  public static final String NAMESPACE_URI = CJAXB.NSURI_PH + "/namespace-prefix";
 
   private static final Logger LOGGER = LoggerFactory.getLogger (PluginNamespacePrefix.class);
 
@@ -158,6 +182,7 @@ public class PluginNamespacePrefix extends AbstractPlugin
     return true;
   }
 
+  @Nonnull
   private static Set <String> _getPackageNamespace (final PackageOutline packageOutline)
   {
     final Map <String, Integer> map = _getUriCountMap (packageOutline);
@@ -322,25 +347,4 @@ public class PluginNamespacePrefix extends AbstractPlugin
     }
   }
 
-  private static class Pair
-  {
-    private final String m_sNamespace;
-    private final String m_sPrefix;
-
-    private Pair (final String namespace, final String prefix)
-    {
-      this.m_sNamespace = namespace;
-      this.m_sPrefix = prefix;
-    }
-
-    public String getNamespace ()
-    {
-      return m_sNamespace;
-    }
-
-    public String getPrefix ()
-    {
-      return m_sPrefix;
-    }
-  }
 }
