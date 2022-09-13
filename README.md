@@ -90,7 +90,7 @@ For usage with JAXB 2.2 use this dependency:
 
 # News and noteworthy
 
-* v4.0.0 - work in progress
+* v4.0.0 - 2022-09-13
     * Updated to JAXB 4.0
     * Requires at least Java 11
     * Changed the artifact ID from `ph-jaxb22-plugin` to `ph-jaxb-plugin`
