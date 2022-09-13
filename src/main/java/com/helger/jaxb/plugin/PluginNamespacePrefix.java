@@ -58,8 +58,7 @@ import jakarta.xml.bind.annotation.XmlSchema;
  * <i>package-info.java</i> files. Those annotations tells Jaxb2 to generate XML
  * schema's instances with specific namespaces prefixes, instead of the
  * auto-generated (ns1, ns2, ...) prefixes. Definition of those prefixes is done
- * in the bindings.xml file.
- * <p/>
+ * in the bindings.xml file. <br>
  * Bindings.xml file example:
  *
  * <pre>
