@@ -40,9 +40,9 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:git@github.com:phax/ph-jaxb22-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:phax/ph-jaxb22-plugin.git</developerConnection>
-    <url>http://github.com/phax/ph-jaxb22-plugin</url>
+    <connection>scm:git:git@github.com:phax/ph-jaxb-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:phax/ph-jaxb-plugin.git</developerConnection>
+    <url>http://github.com/phax/ph-jaxb-plugin</url>
     <tag>HEAD</tag>
   </scm>
 
