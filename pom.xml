@@ -178,6 +178,8 @@
           <excludes>
             <!-- uses setAccessible -->
             <exclude>**/PluginNamespacePrefix.class</exclude>
+            <!-- uses System.out -->
+            <exclude>**/Issue5FuncTest.class</exclude>
           </excludes>
         </configuration>
         <!-- local executions are ignored -->
