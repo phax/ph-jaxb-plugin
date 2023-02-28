@@ -121,6 +121,31 @@
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- for issue #5 test -->
+    <dependency>
+      <groupId>com.helger.xsd</groupId>
+      <artifactId>ph-xsds-xmldsig</artifactId>
+      <version>3.0.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.helger.xsd</groupId>
+      <artifactId>ph-xsds-xades132</artifactId>
+      <version>3.0.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.helger.xsd</groupId>
+      <artifactId>ph-xsds-xades141</artifactId>
+      <version>3.0.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.helger.xsd</groupId>
+      <artifactId>ph-xsds-ccts-cct-schemamodule</artifactId>
+      <version>3.0.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   
   <build>
