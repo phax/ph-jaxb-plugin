@@ -39,6 +39,7 @@ import com.helger.commons.io.file.FileOperationManager;
 import com.helger.commons.io.file.FilenameHelper;
 import com.helger.commons.io.file.SimpleFileIO;
 import com.helger.commons.lang.ClassPathHelper;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.wrapper.Wrapper;
 import com.sun.tools.xjc.Driver;
 
@@ -78,16 +79,16 @@ public final class Issue5FuncTest
         final File f = new File (URLDecoder.decode (x, StandardCharsets.ISO_8859_1));
         final Function <String, String> mod = FilenameHelper::getPathUsingUnixSeparator;
         if (f.getName ().startsWith ("ph-xsds-xmldsig-"))
-          aCatalogXML.set (aCatalogXML.get ().replace ("$1", mod.apply (x)));
+          aCatalogXML.set (StringHelper.replaceAll (aCatalogXML.get (), "$1", mod.apply (x)));
         else
           if (f.getName ().startsWith ("ph-xsds-xades132-"))
-            aCatalogXML.set (aCatalogXML.get ().replace ("$2", mod.apply (x)));
+            aCatalogXML.set (StringHelper.replaceAll (aCatalogXML.get (), "$2", mod.apply (x)));
           else
             if (f.getName ().startsWith ("ph-xsds-xades141-"))
-              aCatalogXML.set (aCatalogXML.get ().replace ("$3", mod.apply (x)));
+              aCatalogXML.set (StringHelper.replaceAll (aCatalogXML.get (), "$3", mod.apply (x)));
             else
               if (f.getName ().startsWith ("ph-xsds-ccts-cct-schemamodule-"))
-                aCatalogXML.set (aCatalogXML.get ().replace ("$4", mod.apply (x)));
+                aCatalogXML.set (StringHelper.replaceAll (aCatalogXML.get (), "$4", mod.apply (x)));
 
         aParams.add (x);
 
