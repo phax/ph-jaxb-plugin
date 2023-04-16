@@ -67,6 +67,7 @@ final class SuperClassMap extends CommonsHashMap <String, JType>
     put ("com.helger.xsds.ccts.cct.schemamodule.CodeType", cm.ref (String.class));
     put ("com.helger.xsds.ccts.cct.schemamodule.DateTimeType", cm.ref (String.class));
     put ("com.helger.xsds.ccts.cct.schemamodule.IdentifierType", cm.ref (String.class));
+    // Indicator is complex
     put ("com.helger.xsds.ccts.cct.schemamodule.MeasureType", cm.ref (BigDecimal.class));
     put ("com.helger.xsds.ccts.cct.schemamodule.NumericType", cm.ref (BigDecimal.class));
     put ("com.helger.xsds.ccts.cct.schemamodule.QuantityType", cm.ref (BigDecimal.class));
@@ -183,8 +184,7 @@ public class PluginValueExtender extends AbstractPlugin
       aDefCtor.javadoc ().add (AUTHOR);
 
       // General information
-      jClass.javadoc ()
-            .add ("<p>This class contains methods created by " + CJAXB.PLUGIN_NAME + " -" + OPT + "</p>\n");
+      jClass.javadoc ().add ("<p>This class contains methods created by " + CJAXB.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
   }
 
@@ -253,11 +253,14 @@ public class PluginValueExtender extends AbstractPlugin
         // Must be a setter
         if (aMethod.name ().startsWith ("set"))
         {
+          // jClass.name ().equals ("DocumentDistributionType")
+
           // Must have exactly 1 parameter that is part of aAllRelevantClasses
           final List <JVar> aParams = aMethod.params ();
           if (aParams.size () == 1 && aAllRelevantClasses.contains (aParams.get (0).type ()))
           {
             final JType aImplType = aParams.get (0).type ();
+            LOGGER.info ("  New setter " + jClass.name () + "." + aMethod.name () + "(" + aImplType.name () + ")");
             {
               final JMethod aSetter = jClass.method (JMod.PUBLIC, aImplType, aMethod.name ());
               aSetter.annotate (Nonnull.class);
@@ -318,7 +321,8 @@ public class PluginValueExtender extends AbstractPlugin
 
   @Nonnull
   @ReturnsMutableCopy
-  private ICommonsMap <JClass, JType> _addValueCtors (@Nonnull final Outline aOutline, final boolean bHasPluginOffsetDT)
+  private ICommonsMap <JClass, JType> _addValueCtorsAndSetters (@Nonnull final Outline aOutline,
+                                                                final boolean bHasPluginOffsetDT)
   {
     final SuperClassMap aAllSuperClassNames = SuperClassMap.create (aOutline);
 
@@ -332,6 +336,8 @@ public class PluginValueExtender extends AbstractPlugin
       final JType aValueType = aAllSuperClassNames.getValueFieldType (jClass);
       if (aValueType != null)
       {
+        LOGGER.info ("Adding ctor and setter for '" + jClass.name () + "'");
+
         // Create constructor with value (if available)
         {
           final JMethod aValueCtor = jClass.constructor (JMod.PUBLIC);
@@ -364,6 +370,8 @@ public class PluginValueExtender extends AbstractPlugin
         // Set constructor in all derived classes
         final ICommonsSet <JClass> aAllRelevantClasses = new CommonsHashSet <> ();
         aAllRelevantClasses.add (jClass);
+
+        // Add the constructor in all derived classes
         _recursiveAddValueConstructorToDerivedClasses (aOutline,
                                                        jClass,
                                                        aValueType,
@@ -550,7 +558,7 @@ public class PluginValueExtender extends AbstractPlugin
 
     _addDefaultCtors (aOutline);
 
-    final ICommonsMap <JClass, JType> aAllCtorClasses = _addValueCtors (aOutline, bHasPluginOffsetDT);
+    final ICommonsMap <JClass, JType> aAllCtorClasses = _addValueCtorsAndSetters (aOutline, bHasPluginOffsetDT);
 
     // Create all getters
     _addValueGetter (aOutline, aAllCtorClasses, bHasPluginOffsetDT);

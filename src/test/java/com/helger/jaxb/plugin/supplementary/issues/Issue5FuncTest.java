@@ -17,6 +17,7 @@
 package com.helger.jaxb.plugin.supplementary.issues;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.PrintStream;
@@ -117,11 +118,23 @@ public final class Issue5FuncTest
   @Test
   public void testIssue5 () throws Throwable
   {
-    final int n = _run (new File ("src/test/resources/xsd/ubl23/maindoc/UBL-Waybill-2.3.xsd"),
-                        new File ("src/test/resources/xsd/ubl23/bindings23.xjb"),
-                        new File ("src/test/resources/xsd/ubl23/catalog.xml"),
-                        new File ("target/ubl23-waybill"),
-                        true ? null : new File ("target/ubl23-waybill-result.txt"));
-    assertEquals (0, n);
+    // Main code generation
+    final File fTargetDir = new File ("target/ubl23-waybill");
+    final int nErrorCode = _run (new File ("src/test/resources/external/ubl23/maindoc/UBL-Waybill-2.3.xsd"),
+                                 new File ("src/test/resources/external/ubl23/bindings23.xjb"),
+                                 new File ("src/test/resources/external/ubl23/catalog.xml"),
+                                 fTargetDir,
+                                 false ? null : new File ("target/ubl23-waybill-result.txt"));
+    assertEquals (0, nErrorCode);
+
+    // Check outcome
+    final File fFileUnderQuestion = new File (fTargetDir,
+                                              "oasis/names/specification/ubl/schema/xsd/commonaggregatecomponents_23/DocumentDistributionType.java");
+    assertTrue (fFileUnderQuestion.exists ());
+
+    final ICommonsList <String> aFileLines = SimpleFileIO.getAllFileLines (fFileUnderQuestion, StandardCharsets.UTF_8);
+    final int nStart = 378;
+    assertTrue (aFileLines.size () > nStart);
+    LOGGER.info ("...\n" + StringHelper.imploder ().source (aFileLines).offset (nStart).separator ('\n').build ());
   }
 }
