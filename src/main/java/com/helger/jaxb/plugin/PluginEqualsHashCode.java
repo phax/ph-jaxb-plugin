@@ -16,8 +16,6 @@
  */
 package com.helger.jaxb.plugin;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
@@ -52,7 +50,6 @@ import com.sun.tools.xjc.outline.Outline;
 public class PluginEqualsHashCode extends AbstractPlugin
 {
   public static final String OPT = "Xph-equalshashcode";
-  private static final Logger LOGGER = LoggerFactory.getLogger (PluginEqualsHashCode.class);
 
   @Override
   public String getOptionName ()
@@ -71,7 +68,8 @@ public class PluginEqualsHashCode extends AbstractPlugin
   @Override
   public boolean run (final Outline aOutline, final Options aOpts, final ErrorHandler aErrorHandler)
   {
-    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
+    initPluginLogging (aOpts.debugMode);
+    logInfo ("Running JAXB plugin -" + getOptionName ());
 
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     final JClass jObject = aCodeModel.ref (Object.class);
@@ -193,8 +191,7 @@ public class PluginEqualsHashCode extends AbstractPlugin
       }
 
       // General information
-      jClass.javadoc ()
-            .add ("<p>This class contains methods created by " + CJAXB.PLUGIN_NAME + " -" + OPT + "</p>\n");
+      jClass.javadoc ().add ("<p>This class contains methods created by " + CJAXB.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
     return true;
   }

@@ -26,8 +26,6 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
@@ -54,95 +52,6 @@ import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
-final class SuperClassMap extends CommonsHashMap <String, JType>
-{
-  private static final Logger LOGGER = LoggerFactory.getLogger (SuperClassMap.class);
-
-  public SuperClassMap (@Nonnull final JCodeModel cm)
-  {
-    // Add some classes that are known to be such super types
-    // Reside in ph-xsds-ccts-cct-schemamodule
-    put ("com.helger.xsds.ccts.cct.schemamodule.AmountType", cm.ref (BigDecimal.class));
-    put ("com.helger.xsds.ccts.cct.schemamodule.BinaryObjectType", cm.ref (byte [].class));
-    put ("com.helger.xsds.ccts.cct.schemamodule.CodeType", cm.ref (String.class));
-    put ("com.helger.xsds.ccts.cct.schemamodule.DateTimeType", cm.ref (String.class));
-    put ("com.helger.xsds.ccts.cct.schemamodule.IdentifierType", cm.ref (String.class));
-    // Indicator is complex
-    put ("com.helger.xsds.ccts.cct.schemamodule.MeasureType", cm.ref (BigDecimal.class));
-    put ("com.helger.xsds.ccts.cct.schemamodule.NumericType", cm.ref (BigDecimal.class));
-    put ("com.helger.xsds.ccts.cct.schemamodule.QuantityType", cm.ref (BigDecimal.class));
-    put ("com.helger.xsds.ccts.cct.schemamodule.TextType", cm.ref (String.class));
-  }
-
-  public void fill (final Outline aOutline)
-  {
-    for (final ClassOutline aClassOutline : aOutline.getClasses ())
-    {
-      final JDefinedClass jClass = aClassOutline.implClass;
-
-      // Take only "external", meaning non-generated super classes
-      final JClass aExtends = jClass._extends ();
-      if (aExtends != null && !(aExtends instanceof JDefinedClass))
-      {
-        final String sSuperClassName = aExtends.fullName ();
-
-        // Ignore all system super classes
-        if (sSuperClassName.startsWith ("java."))
-          continue;
-
-        final Class <?> aSuperClass = GenericReflection.getClassFromNameSafe (sSuperClassName);
-        if (aSuperClass != null)
-        {
-          // Check if that class has a "value" field (name of the variable
-          // created by JAXB to indicate the content of an XML element)
-          for (final Field aField : aSuperClass.getFields ())
-            if (aField.getName ().equals ("value"))
-            {
-              // Map from super class name to codemodel value field type
-              put (sSuperClassName, aOutline.getCodeModel ()._ref (aField.getType ()));
-              break;
-            }
-        }
-        else
-          if (!containsKey (sSuperClassName))
-            LOGGER.warn ("Failed to load " + sSuperClassName);
-      }
-    }
-  }
-
-  @Nullable
-  public JType getValueFieldType (@Nonnull final JDefinedClass jClass)
-  {
-    JType aValueType = null;
-    // Check if that class has a "value" member (name of the variable
-    // created by JAXB to indicate the content of an XML element)
-    for (final JFieldVar aField : jClass.fields ().values ())
-      if (aField.name ().equals ("value"))
-      {
-        aValueType = aField.type ();
-        break;
-      }
-
-    if (aValueType == null && jClass._extends () != null && !(jClass._extends () instanceof JDefinedClass))
-    {
-      // Check only super classes that are not defined in this generation run
-      // but e.g. imported via episodes (bindings)
-      aValueType = get (jClass._extends ().fullName ());
-    }
-    return aValueType;
-  }
-
-  @Nonnull
-  public static SuperClassMap create (@Nonnull final Outline aOutline)
-  {
-    final SuperClassMap aAllSuperClassNames = new SuperClassMap (aOutline.getCodeModel ());
-    aAllSuperClassNames.fill (aOutline);
-    if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("Found the following super-classes " + aAllSuperClassNames);
-    return aAllSuperClassNames;
-  }
-}
-
 /**
  * Add special "value" constructors, setters and getters for JAXB generated
  * elements. This is used e.g. for UBL and CII code generation.
@@ -152,11 +61,109 @@ final class SuperClassMap extends CommonsHashMap <String, JType>
 @IsSPIImplementation
 public class PluginValueExtender extends AbstractPlugin
 {
+  final class SuperClassMap extends CommonsHashMap <String, JType>
+  {
+    private static final String FIELD_VALUE = "value";
+
+    public SuperClassMap (@Nonnull final Outline aOutline)
+    {
+      this (aOutline.getCodeModel ());
+      fill (aOutline);
+      logDebug ( () -> "Found the following super-classes " + this);
+    }
+
+    private SuperClassMap (@Nonnull final JCodeModel cm)
+    {
+      // Add some classes that are known to be such super types
+
+      // Reside in ph-xsds-ccts-cct-schemamodule
+      put ("com.helger.xsds.ccts.cct.schemamodule.AmountType", cm.ref (BigDecimal.class));
+      put ("com.helger.xsds.ccts.cct.schemamodule.BinaryObjectType", cm.ref (byte [].class));
+      put ("com.helger.xsds.ccts.cct.schemamodule.CodeType", cm.ref (String.class));
+      put ("com.helger.xsds.ccts.cct.schemamodule.DateTimeType", cm.ref (String.class));
+      put ("com.helger.xsds.ccts.cct.schemamodule.IdentifierType", cm.ref (String.class));
+      // Indicator is complex
+      put ("com.helger.xsds.ccts.cct.schemamodule.MeasureType", cm.ref (BigDecimal.class));
+      put ("com.helger.xsds.ccts.cct.schemamodule.NumericType", cm.ref (BigDecimal.class));
+      put ("com.helger.xsds.ccts.cct.schemamodule.QuantityType", cm.ref (BigDecimal.class));
+      put ("com.helger.xsds.ccts.cct.schemamodule.TextType", cm.ref (String.class));
+    }
+
+    public void fill (@Nonnull final Outline aOutline)
+    {
+      for (final ClassOutline aClassOutline : aOutline.getClasses ())
+      {
+        final JDefinedClass jClass = aClassOutline.implClass;
+
+        // Take only "external", meaning non-generated super classes
+        final JClass aExtends = jClass._extends ();
+        if (aExtends != null && !(aExtends instanceof JDefinedClass))
+        {
+          final String sSuperClassFullName = aExtends.fullName ();
+
+          // Ignore all system super classes
+          if (sSuperClassFullName.startsWith ("java."))
+            continue;
+
+          // Try to load class
+          final Class <?> aSuperClass = GenericReflection.getClassFromNameSafe (sSuperClassFullName);
+          if (aSuperClass != null)
+          {
+            logInfo ("Successfully loaded super class '" + sSuperClassFullName + "' via reflection");
+
+            // Check if that class has a "value" field (name of the variable
+            // created by JAXB to indicate the content of an XML element)
+            for (final Field aField : aSuperClass.getFields ())
+              if (aField.getName ().equals (FIELD_VALUE))
+              {
+                // Map from super class name to codemodel value field type
+                put (sSuperClassFullName, aOutline.getCodeModel ()._ref (aField.getType ()));
+                break;
+              }
+          }
+          else
+          {
+            if (!containsKey (sSuperClassFullName))
+              logWarn ("Failed to load super class '" + sSuperClassFullName + "' via reflection");
+          }
+        }
+      }
+    }
+
+    /**
+     * Get the {@link JType} of the <code>value</code> field in the provided
+     * class
+     *
+     * @param jClass
+     *        Class to inspect
+     * @return <code>null</code> if none was found
+     */
+    @Nullable
+    public JType getValueFieldType (@Nonnull final JDefinedClass jClass)
+    {
+      JType aValueType = null;
+      // Check if that class has a "value" member (name of the variable
+      // created by JAXB to indicate the content of an XML element)
+      for (final JFieldVar aField : jClass.fields ().values ())
+        if (aField.name ().equals (FIELD_VALUE))
+        {
+          aValueType = aField.type ();
+          break;
+        }
+
+      if (aValueType == null && jClass._extends () != null && !(jClass._extends () instanceof JDefinedClass))
+      {
+        // Check only super classes that are not defined in this generation run
+        // but e.g. imported via episodes (bindings)
+        aValueType = get (jClass._extends ().fullName ());
+      }
+      return aValueType;
+    }
+  }
+
   public static final String OPT = "Xph-value-extender";
   // @author is only valid for file comments
   public static final String AUTHOR = "<br>\nNote: automatically created by " + CJAXB.PLUGIN_NAME + " -" + OPT;
-
-  private static final Logger LOGGER = LoggerFactory.getLogger (PluginValueExtender.class);
 
   @Override
   public String getOptionName ()
@@ -241,10 +248,10 @@ public class PluginValueExtender extends AbstractPlugin
     }
   }
 
-  private static void _addValueSetterInUsingClasses (@Nonnull final Outline aOutline,
-                                                     @Nonnull final JType aValueType,
-                                                     @Nonnull final Set <JClass> aAllRelevantClasses,
-                                                     final boolean bHasPluginOffsetDT)
+  private void _addValueSetterInUsingClasses (@Nonnull final Outline aOutline,
+                                              @Nonnull final JType aValueType,
+                                              @Nonnull final Set <JClass> aAllRelevantClasses,
+                                              final boolean bHasPluginOffsetDT)
   {
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
@@ -260,7 +267,9 @@ public class PluginValueExtender extends AbstractPlugin
           if (aParams.size () == 1 && aAllRelevantClasses.contains (aParams.get (0).type ()))
           {
             final JType aImplType = aParams.get (0).type ();
-            LOGGER.info ("  New setter " + jClass.name () + "." + aMethod.name () + "(" + aImplType.name () + ")");
+
+            logDebug ( () -> "  New setter " + jClass.name () + "." + aMethod.name () + "(" + aImplType.name () + ")");
+
             {
               final JMethod aSetter = jClass.method (JMod.PUBLIC, aImplType, aMethod.name ());
               aSetter.annotate (Nonnull.class);
@@ -288,6 +297,7 @@ public class PluginValueExtender extends AbstractPlugin
 
             if (bHasPluginOffsetDT)
             {
+              // Add the setter for the 2nd data type as well
               final JType aNewType = PluginOffsetDTExtension.getOtherType (aValueType, aOutline.getCodeModel ());
               if (aNewType != null)
               {
@@ -324,7 +334,7 @@ public class PluginValueExtender extends AbstractPlugin
   private ICommonsMap <JClass, JType> _addValueCtorsAndSetters (@Nonnull final Outline aOutline,
                                                                 final boolean bHasPluginOffsetDT)
   {
-    final SuperClassMap aAllSuperClassNames = SuperClassMap.create (aOutline);
+    final SuperClassMap aAllSuperClassNames = new SuperClassMap (aOutline);
 
     final ICommonsMap <JClass, JType> aAllCtorClasses = new CommonsHashMap <> ();
 
@@ -336,7 +346,7 @@ public class PluginValueExtender extends AbstractPlugin
       final JType aValueType = aAllSuperClassNames.getValueFieldType (jClass);
       if (aValueType != null)
       {
-        LOGGER.info ("Adding ctor and setter for '" + jClass.name () + "'");
+        logDebug ( () -> "Adding ctor and setter for '" + jClass.name () + "'");
 
         // Create constructor with value (if available)
         {
@@ -387,8 +397,10 @@ public class PluginValueExtender extends AbstractPlugin
       }
       else
       {
-        if (LOGGER.isDebugEnabled ())
-          LOGGER.debug (jClass.getClass ().getSimpleName () + " " + jClass.fullName () + " is not a value-based class");
+        logDebug ( () -> jClass.getClass ().getSimpleName () +
+                         " " +
+                         jClass.fullName () +
+                         " is not a value-based class");
       }
     }
 
@@ -414,9 +426,9 @@ public class PluginValueExtender extends AbstractPlugin
    * @param bHasPluginOffsetDT
    *        <code>true</code> if the "OffsetDTExtension" plugin is present
    */
-  private static void _addValueGetter (@Nonnull final Outline aOutline,
-                                       @Nonnull final Map <JClass, JType> aAllCtorClasses,
-                                       final boolean bHasPluginOffsetDT)
+  private void _addValueGetter (@Nonnull final Outline aOutline,
+                                @Nonnull final Map <JClass, JType> aAllCtorClasses,
+                                final boolean bHasPluginOffsetDT)
   {
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     // For all generated classes
@@ -444,11 +456,11 @@ public class PluginValueExtender extends AbstractPlugin
               // "XValue" in the same type.
               // Noticed in CII D16B for BasicWorkItemType with "Index" and
               // "IndexValue" elements
-              LOGGER.error ("Another method with name '" +
-                            sMethodName +
-                            "' and no parameters is already present in class '" +
-                            jClass.name () +
-                            "' - not creating it.");
+              logError ("Another method with name '" +
+                        sMethodName +
+                        "' and no parameters is already present in class '" +
+                        jClass.name () +
+                        "' - not creating it.");
               continue;
             }
 
@@ -549,12 +561,14 @@ public class PluginValueExtender extends AbstractPlugin
                       @Nonnull final Options aOpts,
                       @Nonnull final ErrorHandler aErrorHandler)
   {
-    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
+    initPluginLogging (aOpts.debugMode);
+    logInfo ("Running JAXB plugin -" + getOptionName ());
+
     final boolean bHasPluginOffsetDT = CollectionHelper.containsAny (aOpts.getAllPlugins (),
                                                                      p -> p.getOptionName ()
                                                                            .equals (PluginOffsetDTExtension.OPT));
     if (bHasPluginOffsetDT)
-      LOGGER.info ("  Found OffsetDTExtension plugin");
+      logInfo ("  Found OffsetDTExtension plugin");
 
     _addDefaultCtors (aOutline);
 

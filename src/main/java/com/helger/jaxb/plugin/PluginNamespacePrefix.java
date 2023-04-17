@@ -26,8 +26,6 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
@@ -93,8 +91,8 @@ public class PluginNamespacePrefix extends AbstractPlugin
 
     private Pair (final String namespace, final String prefix)
     {
-      this.m_sNamespace = namespace;
-      this.m_sPrefix = prefix;
+      m_sNamespace = namespace;
+      m_sPrefix = prefix;
     }
 
     public String getNamespace ()
@@ -110,8 +108,6 @@ public class PluginNamespacePrefix extends AbstractPlugin
 
   public static final String OPT = "Xph-namespace-prefix";
   public static final String NAMESPACE_URI = CJAXB.NSURI_PH + "/namespace-prefix";
-
-  private static final Logger LOGGER = LoggerFactory.getLogger (PluginNamespacePrefix.class);
 
   @Override
   public String getOptionName ()
@@ -138,14 +134,15 @@ public class PluginNamespacePrefix extends AbstractPlugin
   }
 
   @Override
-  public boolean run (final Outline outline, final Options options, final ErrorHandler errorHandler)
+  public boolean run (final Outline aOutline, final Options aOpts, final ErrorHandler aErrorHandler)
   {
-    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
+    initPluginLogging (aOpts.debugMode);
+    logInfo ("Running JAXB plugin -" + getOptionName ());
 
-    final JClass jXmlNsClass = outline.getCodeModel ().ref (XmlNs.class);
-    final JClass jXmlSchemaClass = outline.getCodeModel ().ref (XmlSchema.class);
+    final JClass jXmlNsClass = aOutline.getCodeModel ().ref (XmlNs.class);
+    final JClass jXmlSchemaClass = aOutline.getCodeModel ().ref (XmlSchema.class);
 
-    for (final PackageOutline packageOutline : outline.getAllPackageContexts ())
+    for (final PackageOutline packageOutline : aOutline.getAllPackageContexts ())
     {
       final JPackage p = packageOutline._package ();
 

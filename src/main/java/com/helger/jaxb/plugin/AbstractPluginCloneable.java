@@ -21,9 +21,6 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.helger.commons.collection.ArrayHelper;
 import com.helger.commons.lang.CloneHelper;
 import com.helger.jaxb.adapter.JAXBHelper;
@@ -44,39 +41,31 @@ import com.sun.codemodel.JType;
  */
 public abstract class AbstractPluginCloneable extends AbstractPlugin
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractPluginCloneable.class);
-
   private static final Map <String, Boolean> ENUM_CACHE = new HashMap <> ();
 
-  private static boolean _loadClassAndCheckIfEnum (final String sName)
+  private boolean _loadClassAndCheckIfEnum (final String sName)
   {
-    final boolean bDebugLog = false;
-
     try
     {
-      if (bDebugLog)
-        LOGGER.info ("Trying to load class '" + sName + "'");
+      logDebug ( () -> "Trying to load class '" + sName + "'");
 
       final Class <?> aClass = Class.forName (sName);
       if (Enum.class.isAssignableFrom (aClass))
       {
-        if (bDebugLog)
-          LOGGER.info ("Class '" + sName + "' was loaded and is an enum");
+        logDebug ( () -> "Class '" + sName + "' was loaded and is an enum");
         return true;
       }
-      if (bDebugLog)
-        LOGGER.info ("Class '" + sName + "' was loaded and is NOT an enum");
+      logDebug ( () -> "Class '" + sName + "' was loaded and is NOT an enum");
     }
     catch (final Throwable t)
     {
       // Just ignore whatever can go wrong in loading
-      if (bDebugLog)
-        LOGGER.info ("Class '" + sName + "' was not loaded and is therefore NOT an enum");
+      logDebug ( () -> "Class '" + sName + "' was not loaded and is therefore NOT an enum");
     }
     return false;
   }
 
-  protected static boolean _isImmutable (@Nonnull final JType aType)
+  protected boolean _isImmutable (@Nonnull final JType aType)
   {
     // int, byte, boolean etc?
     if (aType.isPrimitive ())
@@ -147,15 +136,13 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
     return sTypeName.equals ("XMLGregorianCalendar");
   }
 
-  protected static boolean _isImmutableArray (@Nonnull final JType aType)
+  protected boolean _isImmutableArray (@Nonnull final JType aType)
   {
     return aType.isArray () && _isImmutable (aType.elementType ());
   }
 
   @Nonnull
-  protected static JExpression _getCloneCode (final JCodeModel aCodeModel,
-                                              final JExpression aGetter,
-                                              final JType aTypeParam)
+  protected JExpression _getCloneCode (final JCodeModel aCodeModel, final JExpression aGetter, final JType aTypeParam)
   {
     if (_isImmutable (aTypeParam))
     {

@@ -17,8 +17,10 @@
 package com.helger.jaxb.plugin;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +46,44 @@ import com.sun.tools.xjc.outline.ClassOutline;
  */
 public abstract class AbstractPlugin extends Plugin
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractPlugin.class);
+  private final Logger m_aLogger;
+  private boolean m_bDebugMode;
+
+  protected AbstractPlugin ()
+  {
+    m_aLogger = LoggerFactory.getLogger (getClass ());
+  }
+
+  protected final void initPluginLogging (final boolean bDebugMode)
+  {
+    m_bDebugMode = bDebugMode;
+  }
+
+  protected final void logDebug (@Nonnull final Supplier <String> a)
+  {
+    if (m_bDebugMode)
+      logInfo (a.get ());
+  }
+
+  protected final void logInfo (final String s)
+  {
+    m_aLogger.info (s);
+  }
+
+  protected final void logWarn (final String s)
+  {
+    m_aLogger.warn (s);
+  }
+
+  protected final void logError (final String s)
+  {
+    m_aLogger.error (s);
+  }
+
+  protected final void logError (final String s, @Nullable final Exception ex)
+  {
+    m_aLogger.error (s, ex);
+  }
 
   @Override
   @CodingStyleguideUnaware
@@ -55,7 +94,7 @@ public abstract class AbstractPlugin extends Plugin
 
   @Nonnull
   @ReturnsMutableCopy
-  protected static ICommonsOrderedMap <JFieldVar, String> getAllInstanceFields (@Nonnull final ClassOutline aClassOutline)
+  protected ICommonsOrderedMap <JFieldVar, String> getAllInstanceFields (@Nonnull final ClassOutline aClassOutline)
   {
     final ICommonsOrderedMap <JFieldVar, String> ret = new CommonsLinkedHashMap <> ();
 
@@ -70,8 +109,7 @@ public abstract class AbstractPlugin extends Plugin
       // Ignore static fields
       if ((aFieldVar.mods ().getValue () & JMod.STATIC) == JMod.STATIC)
       {
-        if (LOGGER.isDebugEnabled ())
-          LOGGER.debug ("Ignoring static field '" + sFieldVarName + "'");
+        logDebug ( () -> "Ignoring static field '" + sFieldVarName + "'");
         continue;
       }
 

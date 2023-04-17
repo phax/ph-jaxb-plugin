@@ -25,8 +25,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.math.MathHelper;
@@ -73,9 +71,14 @@ import jakarta.validation.constraints.Size;
  */
 public abstract class AbstractPluginBeanValidation extends AbstractPlugin
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (AbstractPluginBeanValidation.class);
   private static final BigInteger UNBOUNDED = BigInteger.valueOf (XSParticle.UNBOUNDED);
-  private static final String [] NUMBER_TYPES = new String [] { "BigDecimal", "BigInteger", "String", "byte", "short", "int", "long" };
+  private static final String [] NUMBER_TYPES = new String [] { "BigDecimal",
+                                                                "BigInteger",
+                                                                "String",
+                                                                "byte",
+                                                                "short",
+                                                                "int",
+                                                                "long" };
 
   // JSR 303 = Bean Validation 1.0
   // JSR 349 = Bean Validation 1.1
@@ -87,9 +90,10 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
   }
 
   @Override
-  public boolean run (final Outline aModel, final Options aOpt, final ErrorHandler errorHandler)
+  public boolean run (final Outline aModel, final Options aOpts, final ErrorHandler errorHandler)
   {
-    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
+    initPluginLogging (aOpts.debugMode);
+    logInfo ("Running JAXB plugin -" + getOptionName ());
 
     try
     {
@@ -112,7 +116,7 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
                   // Ignore
                 }
                 else
-                  LOGGER.info ("Unsupported property: " + aPropertyInfo);
+                  logWarn ("Unsupported property: " + aPropertyInfo);
         }
       }
 
@@ -120,7 +124,7 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
     }
     catch (final Exception ex)
     {
-      LOGGER.error ("Internal error creating bean validation", ex);
+      logError ("Internal error creating bean validation", ex);
       return false;
     }
   }
@@ -128,7 +132,8 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
   /*
    * XS:Element
    */
-  private void _processElementProperty (@Nonnull final CElementPropertyInfo aElement, @Nonnull final ClassOutline aClassOutline)
+  private void _processElementProperty (@Nonnull final CElementPropertyInfo aElement,
+                                        @Nonnull final ClassOutline aClassOutline)
   {
     // It's a ParticleImpl
     final XSParticle aParticle = (XSParticle) aElement.getSchemaComponent ();
@@ -185,7 +190,7 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
         while (cit.hasNext ())
         {
           final JDefinedClass c = cit.next ();
-          LOGGER.info ("  " + c.fullName ());
+          logInfo ("  " + c.fullName ());
         }
       }
     }
@@ -205,11 +210,11 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
           if (false)
           {
             final XSParticle [] c = ((XSModelGroup) aTerm).getChildren ();
-            LOGGER.info ("XSModelGroup children are: '" + Arrays.toString (c) + "'");
+            logInfo ("XSModelGroup children are: '" + Arrays.toString (c) + "'");
           }
         }
         else
-          LOGGER.info ("Unsupported particle term '" + aTerm + "'");
+          logWarn ("Unsupported particle term '" + aTerm + "'");
   }
 
   private void _processElement (@Nonnull final JFieldVar aField, final ElementDecl aElement)
@@ -304,8 +309,10 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
 
     final XSFacet aXSTotalDigits = aSimpleType.getFacet ("totalDigits");
     final XSFacet aXSFractionDigits = aSimpleType.getFacet ("fractionDigits");
-    final Integer aTotalDigits = aXSTotalDigits == null ? null : StringParser.parseIntObj (aXSTotalDigits.getValue ().value);
-    final Integer aFractionDigits = aXSFractionDigits == null ? null : StringParser.parseIntObj (aXSFractionDigits.getValue ().value);
+    final Integer aTotalDigits = aXSTotalDigits == null ? null
+                                                        : StringParser.parseIntObj (aXSTotalDigits.getValue ().value);
+    final Integer aFractionDigits = aXSFractionDigits == null ? null
+                                                              : StringParser.parseIntObj (aXSFractionDigits.getValue ().value);
     if (!_hasAnnotation (aField, Digits.class) && aTotalDigits != null)
     {
       final JAnnotationUse aAnnotDigits = aField.annotate (Digits.class);

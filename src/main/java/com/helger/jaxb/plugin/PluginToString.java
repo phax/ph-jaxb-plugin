@@ -18,8 +18,6 @@ package com.helger.jaxb.plugin;
 
 import javax.annotation.Nonnull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.commons.annotation.IsSPIImplementation;
@@ -48,7 +46,6 @@ import com.sun.tools.xjc.outline.Outline;
 public class PluginToString extends AbstractPlugin
 {
   public static final String OPT = "Xph-tostring";
-  private static final Logger LOGGER = LoggerFactory.getLogger (PluginToString.class);
 
   public PluginToString ()
   {}
@@ -70,7 +67,8 @@ public class PluginToString extends AbstractPlugin
                       @Nonnull final Options aOpts,
                       @Nonnull final ErrorHandler aErrorHandler)
   {
-    LOGGER.info ("Running JAXB plugin -" + getOptionName ());
+    initPluginLogging (aOpts.debugMode);
+    logInfo ("Running JAXB plugin -" + getOptionName ());
 
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     final JClass jObject = aCodeModel.ref (Object.class);
@@ -124,8 +122,7 @@ public class PluginToString extends AbstractPlugin
       }
 
       // General information
-      jClass.javadoc ()
-            .add ("<p>This class contains methods created by " + CJAXB.PLUGIN_NAME + " -" + OPT + "</p>\n");
+      jClass.javadoc ().add ("<p>This class contains methods created by " + CJAXB.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
     return true;
   }
