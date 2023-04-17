@@ -268,20 +268,28 @@ public class PluginValueExtender extends AbstractPlugin
           final List <JVar> aParams = aMethod.params ();
           if (aParams.size () == 1 && aAllRelevantClasses.contains (aParams.get (0).type ()))
           {
-            final JType aImplType = aParams.get (0).type ();
+            final JType aParamType = aParams.get (0).type ();
 
-            logDebug ( () -> "  New setter " + jClass.name () + "." + aMethod.name () + "(" + aImplType.name () + ")");
+            logDebug ( () -> "  New setter " +
+                             aParamType.name () +
+                             " " +
+                             jClass.name () +
+                             "." +
+                             aMethod.name () +
+                             "(" +
+                             aValueType.name () +
+                             ")");
 
             {
-              final JMethod aSetter = jClass.method (JMod.PUBLIC, aImplType, aMethod.name ());
+              final JMethod aSetter = jClass.method (JMod.PUBLIC, aParamType, aMethod.name ());
               aSetter.annotate (Nonnull.class);
               final JVar aParam = aSetter.param (JMod.FINAL, aValueType, "valueParam");
               if (!aValueType.isPrimitive ())
                 aParam.annotate (Nullable.class);
               final JVar aObj = aSetter.body ()
-                                       .decl (aImplType, "aObj", JExpr.invoke ("get" + aMethod.name ().substring (3)));
+                                       .decl (aParamType, "aObj", JExpr.invoke ("get" + aMethod.name ().substring (3)));
               final JConditional aIf = aSetter.body ()._if (aObj.eq (JExpr._null ()));
-              aIf._then ().assign (aObj, JExpr._new (aImplType).arg (aParam));
+              aIf._then ().assign (aObj, JExpr._new (aParamType).arg (aParam));
               aIf._then ().invoke (aMethod).arg (aObj);
               aIf._else ().invoke (aObj, "setValue").arg (aParam);
               aSetter.body ()._return (aObj);
@@ -292,7 +300,7 @@ public class PluginValueExtender extends AbstractPlugin
               aSetter.javadoc ()
                      .addReturn ()
                      .add ("The created intermediary object of type " +
-                           aImplType.name () +
+                           aParamType.name () +
                            " and never <code>null</code>");
               aSetter.javadoc ().add (AUTHOR);
             }
@@ -303,16 +311,16 @@ public class PluginValueExtender extends AbstractPlugin
               final JType aNewType = PluginOffsetDTExtension.getOtherType (aValueType, aOutline.getCodeModel ());
               if (aNewType != null)
               {
-                final JMethod aSetter = jClass.method (JMod.PUBLIC, aImplType, aMethod.name ());
+                final JMethod aSetter = jClass.method (JMod.PUBLIC, aParamType, aMethod.name ());
                 aSetter.annotate (Nonnull.class);
                 final JVar aParam = aSetter.param (JMod.FINAL, aNewType, "valueParam");
                 aParam.annotate (Nullable.class);
                 final JVar aObj = aSetter.body ()
-                                         .decl (aImplType,
+                                         .decl (aParamType,
                                                 "aObj",
                                                 JExpr.invoke ("get" + aMethod.name ().substring (3)));
                 final JConditional aIf = aSetter.body ()._if (aObj.eq (JExpr._null ()));
-                aIf._then ().assign (aObj, JExpr._new (aImplType).arg (aParam));
+                aIf._then ().assign (aObj, JExpr._new (aParamType).arg (aParam));
                 aIf._then ().invoke (aMethod).arg (aObj);
                 aIf._else ().invoke (aObj, "setValue").arg (aParam);
                 aSetter.body ()._return (aObj);
@@ -321,7 +329,7 @@ public class PluginValueExtender extends AbstractPlugin
                 aSetter.javadoc ()
                        .addReturn ()
                        .add ("The created intermediary object of type " +
-                             aImplType.name () +
+                             aParamType.name () +
                              " and never <code>null</code>");
                 aSetter.javadoc ().add (AUTHOR);
               }
