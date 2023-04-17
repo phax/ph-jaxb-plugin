@@ -90,6 +90,8 @@ For usage with JAXB 2.2 use this dependency:
 
 # News and noteworthy
 
+* v4.0.1 - 2023-04-17
+    * Improved logging, so that the `-debug` switch of XJC is honoured
 * v4.0.0 - 2022-09-13
     * Updated to JAXB 4.0
     * Requires at least Java 11
