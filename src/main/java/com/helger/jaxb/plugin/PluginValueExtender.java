@@ -68,7 +68,7 @@ public class PluginValueExtender extends AbstractPlugin
     public SuperClassMap (@Nonnull final Outline aOutline)
     {
       this (aOutline.getCodeModel ());
-      fill (aOutline);
+      _fill (aOutline);
       logDebug ( () -> "Found the following super-classes " + this);
     }
 
@@ -89,7 +89,7 @@ public class PluginValueExtender extends AbstractPlugin
       put ("com.helger.xsds.ccts.cct.schemamodule.TextType", cm.ref (String.class));
     }
 
-    public void fill (@Nonnull final Outline aOutline)
+    private void _fill (@Nonnull final Outline aOutline)
     {
       for (final ClassOutline aClassOutline : aOutline.getClasses ())
       {
@@ -109,7 +109,7 @@ public class PluginValueExtender extends AbstractPlugin
           final Class <?> aSuperClass = GenericReflection.getClassFromNameSafe (sSuperClassFullName);
           if (aSuperClass != null)
           {
-            logInfo ("Successfully loaded super class '" + sSuperClassFullName + "' via reflection");
+            logDebug ( () -> "Successfully loaded super class '" + sSuperClassFullName + "' via reflection");
 
             // Check if that class has a "value" field (name of the variable
             // created by JAXB to indicate the content of an XML element)
@@ -179,7 +179,7 @@ public class PluginValueExtender extends AbstractPlugin
            "    :  create additional constructors with the 'value' as argument + getter and setter for the value";
   }
 
-  private static void _addDefaultCtors (@Nonnull final Outline aOutline)
+  private void _addDefaultCtors (@Nonnull final Outline aOutline)
   {
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
@@ -193,13 +193,14 @@ public class PluginValueExtender extends AbstractPlugin
       // General information
       jClass.javadoc ().add ("<p>This class contains methods created by " + CJAXB.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
+    logDebug ( () -> "Added default constructors to " + aOutline.getClasses ().size () + " classes");
   }
 
-  private static void _recursiveAddValueConstructorToDerivedClasses (@Nonnull final Outline aOutline,
-                                                                     @Nonnull final JDefinedClass jParentClass,
-                                                                     @Nonnull final JType aValueType,
-                                                                     @Nonnull final Set <JClass> aAllRelevantClasses,
-                                                                     final boolean bHasPluginOffsetDT)
+  private void _recursiveAddValueConstructorToDerivedClasses (@Nonnull final Outline aOutline,
+                                                              @Nonnull final JDefinedClass jParentClass,
+                                                              @Nonnull final JType aValueType,
+                                                              @Nonnull final Set <JClass> aAllRelevantClasses,
+                                                              final boolean bHasPluginOffsetDT)
   {
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
@@ -207,6 +208,9 @@ public class PluginValueExtender extends AbstractPlugin
       if (jCurClass._extends () == jParentClass)
       {
         aAllRelevantClasses.add (jCurClass);
+
+        logDebug ( () -> "  New ctor " + jCurClass.name () + "(" + aValueType.name () + ")");
+
         {
           final JMethod aValueCtor = jCurClass.constructor (JMod.PUBLIC);
           final JVar aParam = aValueCtor.param (JMod.FINAL, aValueType, "valueParam");
@@ -260,8 +264,6 @@ public class PluginValueExtender extends AbstractPlugin
         // Must be a setter
         if (aMethod.name ().startsWith ("set"))
         {
-          // jClass.name ().equals ("DocumentDistributionType")
-
           // Must have exactly 1 parameter that is part of aAllRelevantClasses
           final List <JVar> aParams = aMethod.params ();
           if (aParams.size () == 1 && aAllRelevantClasses.contains (aParams.get (0).type ()))
@@ -346,7 +348,11 @@ public class PluginValueExtender extends AbstractPlugin
       final JType aValueType = aAllSuperClassNames.getValueFieldType (jClass);
       if (aValueType != null)
       {
-        logDebug ( () -> "Adding ctor and setter for '" + jClass.name () + "'");
+        logDebug ( () -> "Adding value ctor and setter for '" +
+                         jClass.name () +
+                         "' and type '" +
+                         aValueType.name () +
+                         "'");
 
         // Create constructor with value (if available)
         {
@@ -564,6 +570,7 @@ public class PluginValueExtender extends AbstractPlugin
     initPluginLogging (aOpts.debugMode);
     logInfo ("Running JAXB plugin -" + getOptionName ());
 
+    // Check if the "Plugin OffsetDT plugin" is also registered
     final boolean bHasPluginOffsetDT = CollectionHelper.containsAny (aOpts.getAllPlugins (),
                                                                      p -> p.getOptionName ()
                                                                            .equals (PluginOffsetDTExtension.OPT));
@@ -576,6 +583,7 @@ public class PluginValueExtender extends AbstractPlugin
 
     // Create all getters
     _addValueGetter (aOutline, aAllCtorClasses, bHasPluginOffsetDT);
+    logInfo ("  Finished JAXB plugin -" + getOptionName ());
     return true;
   }
 }

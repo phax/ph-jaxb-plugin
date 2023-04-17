@@ -58,7 +58,7 @@ public final class Issue5FuncTest
                                                                    "-d",
                                                                    aDestDir.getAbsolutePath (),
                                                                    "-Xph-value-extender",
-                                                                   "-debug",
+                                                                   // "-debug",
                                                                    "-extension");
     if (aBindingFile != null)
       aParams.addAll ("-b", aBindingFile.getAbsolutePath ());
