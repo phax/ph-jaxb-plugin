@@ -93,17 +93,21 @@ public class PluginValueExtender extends AbstractPlugin
       // Take only "external", meaning non-generated super classes
       if (jType instanceof JDefinedClass)
       {
-        final JDefinedClass jdClass = (JDefinedClass) jType;
-        logDebug ( () -> "  Scanning defined super class '" + sClassFullName + "'");
-        for (final Map.Entry <String, JFieldVar> aFieldEntry : jdClass.fields ().entrySet ())
-          if (aFieldEntry.getKey ().equals (FIELD_VALUE))
-          {
-            put (sClassFullName, aFieldEntry.getValue ().type ());
-            logDebug ( () -> "    Found value field of type '" + aFieldEntry.getValue ().type ().name () + "'");
-            break;
-          }
+        // try 2#
+        if (false)
+        {
+          final JDefinedClass jdClass = (JDefinedClass) jType;
+          logDebug ( () -> "  Scanning defined super class '" + sClassFullName + "'");
+          for (final Map.Entry <String, JFieldVar> aFieldEntry : jdClass.fields ().entrySet ())
+            if (aFieldEntry.getKey ().equals (FIELD_VALUE))
+            {
+              put (sClassFullName, aFieldEntry.getValue ().type ());
+              logDebug ( () -> "    Found value field of type '" + aFieldEntry.getValue ().type ().name () + "'");
+              break;
+            }
 
-        _recursiveFill (aHandledClasses, cm, jdClass._extends ());
+          _recursiveFill (aHandledClasses, cm, jdClass._extends ());
+        }
       }
       else
       {
