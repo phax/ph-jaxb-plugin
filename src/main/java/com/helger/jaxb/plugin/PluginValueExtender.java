@@ -325,14 +325,11 @@ public class PluginValueExtender extends AbstractPlugin
         {
           // Must have exactly 1 parameter that is part of aAllRelevantClasses
           final List <JVar> aParams = aMethod.params ();
-          if (aParams.size () != 1)
-            continue;
-
-          final JType aParamType = aParams.get (0).type ();
-          if (aAllRelevantClasses.contains (aParamType))
+          if (aParams.size () == 1 && aAllRelevantClasses.contains (aParams.get (0).type ()))
           {
+            final JType aImplType = aParams.get (0).type ();
             logDebug ( () -> "  New setter '" +
-                             aParamType.name () +
+                aImplType.name () +
                              " " +
                              jClass.name () +
                              "." +
@@ -342,15 +339,15 @@ public class PluginValueExtender extends AbstractPlugin
                              ")'");
 
             {
-              final JMethod aSetter = jClass.method (JMod.PUBLIC, aParamType, aMethod.name ());
+              final JMethod aSetter = jClass.method (JMod.PUBLIC, aImplType, aMethod.name ());
               aSetter.annotate (Nonnull.class);
               final JVar aParam = aSetter.param (JMod.FINAL, aValueType, "valueParam");
               if (!aValueType.isPrimitive ())
                 aParam.annotate (Nullable.class);
               final JVar aObj = aSetter.body ()
-                                       .decl (aParamType, "aObj", JExpr.invoke ("get" + aMethod.name ().substring (3)));
+                                       .decl (aImplType, "aObj", JExpr.invoke ("get" + aMethod.name ().substring (3)));
               final JConditional aIf = aSetter.body ()._if (aObj.eq (JExpr._null ()));
-              aIf._then ().assign (aObj, JExpr._new (aParamType).arg (aParam));
+              aIf._then ().assign (aObj, JExpr._new (aImplType).arg (aParam));
               aIf._then ().invoke (aMethod).arg (aObj);
               aIf._else ().invoke (aObj, "setValue").arg (aParam);
               aSetter.body ()._return (aObj);
@@ -361,7 +358,7 @@ public class PluginValueExtender extends AbstractPlugin
               aSetter.javadoc ()
                      .addReturn ()
                      .add ("The created intermediary object of type " +
-                           aParamType.name () +
+                         aImplType.name () +
                            " and never <code>null</code>");
               aSetter.javadoc ().add (AUTHOR);
             }
@@ -373,7 +370,7 @@ public class PluginValueExtender extends AbstractPlugin
               if (aNewType != null)
               {
                 logDebug ( () -> "  New setter '" +
-                                 aParamType.name () +
+                    aImplType.name () +
                                  " " +
                                  jClass.name () +
                                  "." +
@@ -382,16 +379,16 @@ public class PluginValueExtender extends AbstractPlugin
                                  aNewType.name () +
                                  ")'");
 
-                final JMethod aSetter = jClass.method (JMod.PUBLIC, aParamType, aMethod.name ());
+                final JMethod aSetter = jClass.method (JMod.PUBLIC, aImplType, aMethod.name ());
                 aSetter.annotate (Nonnull.class);
                 final JVar aParam = aSetter.param (JMod.FINAL, aNewType, "valueParam");
                 aParam.annotate (Nullable.class);
                 final JVar aObj = aSetter.body ()
-                                         .decl (aParamType,
+                                         .decl (aImplType,
                                                 "aObj",
                                                 JExpr.invoke ("get" + aMethod.name ().substring (3)));
                 final JConditional aIf = aSetter.body ()._if (aObj.eq (JExpr._null ()));
-                aIf._then ().assign (aObj, JExpr._new (aParamType).arg (aParam));
+                aIf._then ().assign (aObj, JExpr._new (aImplType).arg (aParam));
                 aIf._then ().invoke (aMethod).arg (aObj);
                 aIf._else ().invoke (aObj, "setValue").arg (aParam);
                 aSetter.body ()._return (aObj);
@@ -400,7 +397,7 @@ public class PluginValueExtender extends AbstractPlugin
                 aSetter.javadoc ()
                        .addReturn ()
                        .add ("The created intermediary object of type " +
-                             aParamType.name () +
+                           aImplType.name () +
                              " and never <code>null</code>");
                 aSetter.javadoc ().add (AUTHOR);
               }
