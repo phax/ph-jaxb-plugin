@@ -57,6 +57,7 @@ public final class Issue5FuncTest
     final ICommonsList <String> aParams = new CommonsArrayList <> (aXSDFile.getAbsolutePath (),
                                                                    "-d",
                                                                    aDestDir.getAbsolutePath (),
+                                                                   "-Xph-offset-dt-extension",
                                                                    "-Xph-value-extender",
                                                                    "-debug",
                                                                    "-extension");

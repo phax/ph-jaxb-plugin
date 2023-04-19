@@ -63,15 +63,15 @@ import com.sun.tools.xjc.outline.Outline;
 @IsSPIImplementation
 public class PluginValueExtender extends AbstractPlugin
 {
+  private static final String FIELD_VALUE = "value";
+
   /**
    * Map from class name to the Codemodel type of the "value" field
    *
    * @author Philip Helger
    */
-  final class SuperClassMap extends CommonsHashMap <String, JType>
+  final class SuperClassValueFieldMap extends CommonsHashMap <String, JType>
   {
-    private static final String FIELD_VALUE = "value";
-
     private void _recursiveFill (@Nonnull final ICommonsSet <String> aHandledClasses,
                                  @Nonnull final JCodeModel cm,
                                  @Nonnull final JType jType)
@@ -93,8 +93,9 @@ public class PluginValueExtender extends AbstractPlugin
       // Take only "external", meaning non-generated super classes
       if (jType instanceof JDefinedClass)
       {
-        logDebug ( () -> "  Searching defined super class '" + sClassFullName + "'");
-        for (final Map.Entry <String, JFieldVar> aFieldEntry : ((JDefinedClass) jType).fields ().entrySet ())
+        final JDefinedClass jdClass = (JDefinedClass) jType;
+        logDebug ( () -> "  Scanning defined super class '" + sClassFullName + "'");
+        for (final Map.Entry <String, JFieldVar> aFieldEntry : jdClass.fields ().entrySet ())
           if (aFieldEntry.getKey ().equals (FIELD_VALUE))
           {
             put (sClassFullName, aFieldEntry.getValue ().type ());
@@ -102,7 +103,7 @@ public class PluginValueExtender extends AbstractPlugin
             break;
           }
 
-        _recursiveFill (aHandledClasses, cm, ((JDefinedClass) jType)._extends ());
+        _recursiveFill (aHandledClasses, cm, jdClass._extends ());
       }
       else
       {
@@ -114,7 +115,7 @@ public class PluginValueExtender extends AbstractPlugin
 
           // Check if that class has a "value" field (name of the variable
           // created by JAXB to indicate the content of an XML element)
-          for (final Field aField : aSuperClass.getFields ())
+          for (final Field aField : aSuperClass.getDeclaredFields ())
             if (aField.getName ().equals (FIELD_VALUE))
             {
               // Map from super class name to codemodel value field type
@@ -151,7 +152,7 @@ public class PluginValueExtender extends AbstractPlugin
         put (sClassname, aFieldType);
     }
 
-    public SuperClassMap (@Nonnull final Outline aOutline)
+    public SuperClassValueFieldMap (@Nonnull final Outline aOutline)
     {
       // Add some classes that are known to be such super types
       final JCodeModel cm = aOutline.getCodeModel ();
@@ -225,6 +226,8 @@ public class PluginValueExtender extends AbstractPlugin
 
   private void _addDefaultCtors (@Nonnull final Outline aOutline)
   {
+    // Add default constructors to all classes, because when adding other
+    // constructors, the "default" one need to be added explicitly
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
       final JDefinedClass jClass = aClassOutline.implClass;
@@ -251,11 +254,12 @@ public class PluginValueExtender extends AbstractPlugin
       final JDefinedClass jCurClass = aClassOutline.implClass;
       if (jCurClass._extends () == jParentClass)
       {
+        // Remember that class was handled
         aAllRelevantClasses.add (jCurClass);
 
-        logDebug ( () -> "  New ctor '" + jCurClass.name () + "(" + aValueType.name () + ")'");
-
         {
+          logDebug ( () -> "  New derived value ctor '" + jCurClass.name () + "(" + aValueType.name () + ")'");
+
           final JMethod aValueCtor = jCurClass.constructor (JMod.PUBLIC);
           final JVar aParam = aValueCtor.param (JMod.FINAL, aValueType, "valueParam");
           if (!aValueType.isPrimitive ())
@@ -276,6 +280,8 @@ public class PluginValueExtender extends AbstractPlugin
           final JType aNewType = PluginOffsetDTExtension.getOtherType (aValueType, aOutline.getCodeModel ());
           if (aNewType != null)
           {
+            logDebug ( () -> "  New derived value ctor '" + jCurClass.name () + "(" + aNewType.name () + ")'");
+
             final JMethod aValueCtor = jCurClass.constructor (JMod.PUBLIC);
             final JVar aParam = aValueCtor.param (JMod.FINAL, aNewType, "valueParam");
             aParam.annotate (Nullable.class);
@@ -301,9 +307,13 @@ public class PluginValueExtender extends AbstractPlugin
                                               @Nonnull final Set <JClass> aAllRelevantClasses,
                                               final boolean bHasPluginOffsetDT)
   {
-    for (final ClassOutline aClassOutline : aOutline.getClasses ())
+    final ICommonsSet <ClassOutline> aAllOutlineClasses = new CommonsTreeSet <> (Comparator.comparing (x -> x.getImplClass ()
+                                                                                                             .name ()));
+    aAllOutlineClasses.addAll (aOutline.getClasses ());
+    for (final ClassOutline aClassOutline : aAllOutlineClasses)
     {
       final JDefinedClass jClass = aClassOutline.implClass;
+
       // Work on a copy of the methods, because they are changed
       for (final JMethod aMethod : new CommonsArrayList <> (jClass.methods ()))
         // Must be a setter
@@ -311,10 +321,12 @@ public class PluginValueExtender extends AbstractPlugin
         {
           // Must have exactly 1 parameter that is part of aAllRelevantClasses
           final List <JVar> aParams = aMethod.params ();
-          if (aParams.size () == 1 && aAllRelevantClasses.contains (aParams.get (0).type ()))
-          {
-            final JType aParamType = aParams.get (0).type ();
+          if (aParams.size () != 1)
+            continue;
 
+          final JType aParamType = aParams.get (0).type ();
+          if (aAllRelevantClasses.contains (aParamType))
+          {
             logDebug ( () -> "  New setter '" +
                              aParamType.name () +
                              " " +
@@ -356,6 +368,16 @@ public class PluginValueExtender extends AbstractPlugin
               final JType aNewType = PluginOffsetDTExtension.getOtherType (aValueType, aOutline.getCodeModel ());
               if (aNewType != null)
               {
+                logDebug ( () -> "  New setter '" +
+                                 aParamType.name () +
+                                 " " +
+                                 jClass.name () +
+                                 "." +
+                                 aMethod.name () +
+                                 "(" +
+                                 aNewType.name () +
+                                 ")'");
+
                 final JMethod aSetter = jClass.method (JMod.PUBLIC, aParamType, aMethod.name ());
                 aSetter.annotate (Nonnull.class);
                 final JVar aParam = aSetter.param (JMod.FINAL, aNewType, "valueParam");
@@ -389,21 +411,27 @@ public class PluginValueExtender extends AbstractPlugin
   private ICommonsMap <JClass, JType> _addValueCtorsAndSetters (@Nonnull final Outline aOutline,
                                                                 final boolean bHasPluginOffsetDT)
   {
-    final SuperClassMap aAllSuperClassNames = new SuperClassMap (aOutline);
+    final JCodeModel cm = aOutline.getCodeModel ();
+
+    // The map from class name to value field type
+    final SuperClassValueFieldMap aClassValueFieldMap = new SuperClassValueFieldMap (aOutline);
 
     final ICommonsMap <JClass, JType> aAllCtorClasses = new CommonsHashMap <> ();
 
+    logDebug ( () -> "Start creating value ctors and setters");
+
     // Check all defined classes
-    final ICommonsSet <ClassOutline> aRemainingOutlineClasses = new CommonsTreeSet <> (Comparator.comparing (x -> x.getImplClass ()
-                                                                                                                   .name ()));
-    aRemainingOutlineClasses.addAll (aOutline.getClasses ());
-    for (final ClassOutline aClassOutline : aRemainingOutlineClasses)
+    final ICommonsSet <ClassOutline> aAllOutlineClasses = new CommonsTreeSet <> (Comparator.comparing (x -> x.getImplClass ()
+                                                                                                             .name ()));
+    aAllOutlineClasses.addAll (aOutline.getClasses ());
+    for (final ClassOutline aClassOutline : aAllOutlineClasses)
     {
       final JDefinedClass jClass = aClassOutline.implClass;
 
-      final JType aValueType = aAllSuperClassNames.getValueFieldType (jClass);
+      final JType aValueType = aClassValueFieldMap.getValueFieldType (jClass);
       if (aValueType != null)
       {
+        logDebug ( () -> "Handling class '" + jClass.name () + "'");
         logDebug ( () -> "  New value ctor '" + jClass.name () + "(" + aValueType.name () + ")'");
 
         // Create constructor with value (if available)
@@ -422,9 +450,11 @@ public class PluginValueExtender extends AbstractPlugin
 
         if (bHasPluginOffsetDT)
         {
-          final JType aNewType = PluginOffsetDTExtension.getOtherType (aValueType, aOutline.getCodeModel ());
+          final JType aNewType = PluginOffsetDTExtension.getOtherType (aValueType, cm);
           if (aNewType != null)
           {
+            logDebug ( () -> "  New value ctor '" + jClass.name () + "(" + aNewType.name () + ")'");
+
             final JMethod aValueCtor = jClass.constructor (JMod.PUBLIC);
             final JVar aParam = aValueCtor.param (JMod.FINAL, aNewType, "valueParam");
             aParam.annotate (Nullable.class);
@@ -455,11 +485,12 @@ public class PluginValueExtender extends AbstractPlugin
       }
       else
       {
-        logDebug ( () -> "[" +
-                         jClass.getClass ().getSimpleName () +
-                         "] " +
-                         jClass.fullName () +
-                         " is not a value-based class");
+        if (false)
+          logDebug ( () -> "[" +
+                           jClass.getClass ().getSimpleName () +
+                           "] " +
+                           jClass.fullName () +
+                           " is not a value-based class");
       }
     }
 
@@ -638,6 +669,7 @@ public class PluginValueExtender extends AbstractPlugin
     if (bHasPluginOffsetDT)
       logInfo ("  Found OffsetDTExtension plugin");
 
+    // Must do anyway
     _addDefaultCtors (aOutline);
 
     final ICommonsMap <JClass, JType> aAllCtorClasses = _addValueCtorsAndSetters (aOutline, bHasPluginOffsetDT);
