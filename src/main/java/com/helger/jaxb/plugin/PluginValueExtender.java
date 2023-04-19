@@ -19,6 +19,7 @@ package com.helger.jaxb.plugin;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,7 @@ import com.helger.commons.collection.CollectionHelper;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.CommonsHashMap;
 import com.helger.commons.collection.impl.CommonsHashSet;
+import com.helger.commons.collection.impl.CommonsTreeSet;
 import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.commons.collection.impl.ICommonsSet;
 import com.helger.commons.lang.GenericReflection;
@@ -61,73 +63,115 @@ import com.sun.tools.xjc.outline.Outline;
 @IsSPIImplementation
 public class PluginValueExtender extends AbstractPlugin
 {
+  /**
+   * Map from class name to the Codemodel type of the "value" field
+   *
+   * @author Philip Helger
+   */
   final class SuperClassMap extends CommonsHashMap <String, JType>
   {
     private static final String FIELD_VALUE = "value";
 
-    public SuperClassMap (@Nonnull final Outline aOutline)
+    private void _recursiveFill (@Nonnull final ICommonsSet <String> aHandledClasses,
+                                 @Nonnull final JCodeModel cm,
+                                 @Nonnull final JType jType)
     {
-      this (aOutline.getCodeModel ());
-      _fill (aOutline);
-      logDebug ( () -> "Found the following super-classes " + this);
-    }
+      final String sClassFullName = jType.fullName ();
 
-    private SuperClassMap (@Nonnull final JCodeModel cm)
-    {
-      // Add some classes that are known to be such super types
+      // Ignore all system super classes
+      if (sClassFullName.startsWith ("java."))
+        return;
 
-      // Reside in ph-xsds-ccts-cct-schemamodule
-      put ("com.helger.xsds.ccts.cct.schemamodule.AmountType", cm.ref (BigDecimal.class));
-      put ("com.helger.xsds.ccts.cct.schemamodule.BinaryObjectType", cm.ref (byte [].class));
-      put ("com.helger.xsds.ccts.cct.schemamodule.CodeType", cm.ref (String.class));
-      put ("com.helger.xsds.ccts.cct.schemamodule.DateTimeType", cm.ref (String.class));
-      put ("com.helger.xsds.ccts.cct.schemamodule.IdentifierType", cm.ref (String.class));
-      // Indicator is complex
-      put ("com.helger.xsds.ccts.cct.schemamodule.MeasureType", cm.ref (BigDecimal.class));
-      put ("com.helger.xsds.ccts.cct.schemamodule.NumericType", cm.ref (BigDecimal.class));
-      put ("com.helger.xsds.ccts.cct.schemamodule.QuantityType", cm.ref (BigDecimal.class));
-      put ("com.helger.xsds.ccts.cct.schemamodule.TextType", cm.ref (String.class));
+      // Try to load each class only once
+      if (!aHandledClasses.add (sClassFullName))
+        return;
+
+      if (false)
+        logDebug ( () -> "!!" + jType.getClass ().getSimpleName () + " -- " + sClassFullName);
+
+      // We don't care about the classes we created
+      // Take only "external", meaning non-generated super classes
+      if (jType instanceof JDefinedClass)
+      {
+        logDebug ( () -> "  Searching defined super class '" + sClassFullName + "'");
+        for (final Map.Entry <String, JFieldVar> aFieldEntry : ((JDefinedClass) jType).fields ().entrySet ())
+          if (aFieldEntry.getKey ().equals (FIELD_VALUE))
+          {
+            put (sClassFullName, aFieldEntry.getValue ().type ());
+            logDebug ( () -> "    Found value field of type '" + aFieldEntry.getValue ().type ().name () + "'");
+            break;
+          }
+
+        _recursiveFill (aHandledClasses, cm, ((JDefinedClass) jType)._extends ());
+      }
+      else
+      {
+        // Try to load class
+        final Class <?> aSuperClass = GenericReflection.getClassFromNameSafe (sClassFullName);
+        if (aSuperClass != null)
+        {
+          logDebug ( () -> "  Successfully loaded super class '" + sClassFullName + "' via reflection");
+
+          // Check if that class has a "value" field (name of the variable
+          // created by JAXB to indicate the content of an XML element)
+          for (final Field aField : aSuperClass.getFields ())
+            if (aField.getName ().equals (FIELD_VALUE))
+            {
+              // Map from super class name to codemodel value field type
+              put (sClassFullName, cm._ref (aField.getType ()));
+              logDebug ( () -> "    Found value field of type '" + aField.getType ().getName () + "'");
+              break;
+            }
+
+          // Use super class of super class
+          _recursiveFill (aHandledClasses, cm, cm.ref (aSuperClass.getSuperclass ()));
+        }
+        else
+        {
+          logWarn ("  Failed to load super class '" + sClassFullName + "' via reflection");
+        }
+      }
     }
 
     private void _fill (@Nonnull final Outline aOutline)
     {
+      final JCodeModel cm = aOutline.getCodeModel ();
+      final ICommonsSet <String> aHandledClasses = new CommonsHashSet <> ();
       for (final ClassOutline aClassOutline : aOutline.getClasses ())
       {
         final JDefinedClass jClass = aClassOutline.implClass;
-
-        // Take only "external", meaning non-generated super classes
-        final JClass aExtends = jClass._extends ();
-        if (aExtends != null && !(aExtends instanceof JDefinedClass))
-        {
-          final String sSuperClassFullName = aExtends.fullName ();
-
-          // Ignore all system super classes
-          if (sSuperClassFullName.startsWith ("java."))
-            continue;
-
-          // Try to load class
-          final Class <?> aSuperClass = GenericReflection.getClassFromNameSafe (sSuperClassFullName);
-          if (aSuperClass != null)
-          {
-            logDebug ( () -> "Successfully loaded super class '" + sSuperClassFullName + "' via reflection");
-
-            // Check if that class has a "value" field (name of the variable
-            // created by JAXB to indicate the content of an XML element)
-            for (final Field aField : aSuperClass.getFields ())
-              if (aField.getName ().equals (FIELD_VALUE))
-              {
-                // Map from super class name to codemodel value field type
-                put (sSuperClassFullName, aOutline.getCodeModel ()._ref (aField.getType ()));
-                break;
-              }
-          }
-          else
-          {
-            if (!containsKey (sSuperClassFullName))
-              logWarn ("Failed to load super class '" + sSuperClassFullName + "' via reflection");
-          }
-        }
+        // Never deal with the classes we created
+        _recursiveFill (aHandledClasses, cm, jClass._extends ());
       }
+    }
+
+    private void _addIfNotPresent (@Nonnull final String sClassname, @Nonnull final JType aFieldType)
+    {
+      if (!containsKey (sClassname))
+        put (sClassname, aFieldType);
+    }
+
+    public SuperClassMap (@Nonnull final Outline aOutline)
+    {
+      // Add some classes that are known to be such super types
+      final JCodeModel cm = aOutline.getCodeModel ();
+
+      _fill (aOutline);
+
+      // Make sure some commonly used classes are present
+      // Reside in ph-xsds-ccts-cct-schemamodule
+      _addIfNotPresent ("com.helger.xsds.ccts.cct.schemamodule.AmountType", cm.ref (BigDecimal.class));
+      _addIfNotPresent ("com.helger.xsds.ccts.cct.schemamodule.BinaryObjectType", cm.ref (byte [].class));
+      _addIfNotPresent ("com.helger.xsds.ccts.cct.schemamodule.CodeType", cm.ref (String.class));
+      _addIfNotPresent ("com.helger.xsds.ccts.cct.schemamodule.DateTimeType", cm.ref (String.class));
+      _addIfNotPresent ("com.helger.xsds.ccts.cct.schemamodule.IdentifierType", cm.ref (String.class));
+      // Indicator is complex
+      _addIfNotPresent ("com.helger.xsds.ccts.cct.schemamodule.MeasureType", cm.ref (BigDecimal.class));
+      _addIfNotPresent ("com.helger.xsds.ccts.cct.schemamodule.NumericType", cm.ref (BigDecimal.class));
+      _addIfNotPresent ("com.helger.xsds.ccts.cct.schemamodule.QuantityType", cm.ref (BigDecimal.class));
+      _addIfNotPresent ("com.helger.xsds.ccts.cct.schemamodule.TextType", cm.ref (String.class));
+
+      logDebug ( () -> "Found " + size () + " super classes with '" + FIELD_VALUE + "' fields");
     }
 
     /**
@@ -209,7 +253,7 @@ public class PluginValueExtender extends AbstractPlugin
       {
         aAllRelevantClasses.add (jCurClass);
 
-        logDebug ( () -> "  New ctor " + jCurClass.name () + "(" + aValueType.name () + ")");
+        logDebug ( () -> "  New ctor '" + jCurClass.name () + "(" + aValueType.name () + ")'");
 
         {
           final JMethod aValueCtor = jCurClass.constructor (JMod.PUBLIC);
@@ -260,6 +304,7 @@ public class PluginValueExtender extends AbstractPlugin
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
       final JDefinedClass jClass = aClassOutline.implClass;
+      // Work on a copy of the methods, because they are changed
       for (final JMethod aMethod : new CommonsArrayList <> (jClass.methods ()))
         // Must be a setter
         if (aMethod.name ().startsWith ("set"))
@@ -270,7 +315,7 @@ public class PluginValueExtender extends AbstractPlugin
           {
             final JType aParamType = aParams.get (0).type ();
 
-            logDebug ( () -> "  New setter " +
+            logDebug ( () -> "  New setter '" +
                              aParamType.name () +
                              " " +
                              jClass.name () +
@@ -278,7 +323,7 @@ public class PluginValueExtender extends AbstractPlugin
                              aMethod.name () +
                              "(" +
                              aValueType.name () +
-                             ")");
+                             ")'");
 
             {
               final JMethod aSetter = jClass.method (JMod.PUBLIC, aParamType, aMethod.name ());
@@ -349,18 +394,17 @@ public class PluginValueExtender extends AbstractPlugin
     final ICommonsMap <JClass, JType> aAllCtorClasses = new CommonsHashMap <> ();
 
     // Check all defined classes
-    for (final ClassOutline aClassOutline : aOutline.getClasses ())
+    final ICommonsSet <ClassOutline> aRemainingOutlineClasses = new CommonsTreeSet <> (Comparator.comparing (x -> x.getImplClass ()
+                                                                                                                   .name ()));
+    aRemainingOutlineClasses.addAll (aOutline.getClasses ());
+    for (final ClassOutline aClassOutline : aRemainingOutlineClasses)
     {
       final JDefinedClass jClass = aClassOutline.implClass;
 
       final JType aValueType = aAllSuperClassNames.getValueFieldType (jClass);
       if (aValueType != null)
       {
-        logDebug ( () -> "Adding value ctor and setter for '" +
-                         jClass.name () +
-                         "' and type '" +
-                         aValueType.name () +
-                         "'");
+        logDebug ( () -> "  New value ctor '" + jClass.name () + "(" + aValueType.name () + ")'");
 
         // Create constructor with value (if available)
         {
@@ -411,8 +455,9 @@ public class PluginValueExtender extends AbstractPlugin
       }
       else
       {
-        logDebug ( () -> jClass.getClass ().getSimpleName () +
-                         " " +
+        logDebug ( () -> "[" +
+                         jClass.getClass ().getSimpleName () +
+                         "] " +
                          jClass.fullName () +
                          " is not a value-based class");
       }
@@ -470,13 +515,21 @@ public class PluginValueExtender extends AbstractPlugin
               // "XValue" in the same type.
               // Noticed in CII D16B for BasicWorkItemType with "Index" and
               // "IndexValue" elements
-              logError ("Another method with name '" +
-                        sMethodName +
-                        "' and no parameters is already present in class '" +
-                        jClass.name () +
-                        "' - not creating it.");
+              logWarn ("Another method with name '" +
+                       sMethodName +
+                       "' and no parameters is already present in class '" +
+                       jClass.name () +
+                       "' - not creating it.");
               continue;
             }
+
+            logDebug ( () -> "  New value getter '" +
+                             aValueType.name () +
+                             " " +
+                             jClass.name () +
+                             "." +
+                             sMethodName +
+                             "'");
 
             // The return type is a generated class
             if (aValueType.isPrimitive ())

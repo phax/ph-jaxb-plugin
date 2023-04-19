@@ -58,7 +58,7 @@ public final class Issue5FuncTest
                                                                    "-d",
                                                                    aDestDir.getAbsolutePath (),
                                                                    "-Xph-value-extender",
-                                                                   // "-debug",
+                                                                   "-debug",
                                                                    "-extension");
     if (aBindingFile != null)
       aParams.addAll ("-b", aBindingFile.getAbsolutePath ());
@@ -135,6 +135,11 @@ public final class Issue5FuncTest
     final ICommonsList <String> aFileLines = SimpleFileIO.getAllFileLines (fFileUnderQuestion, StandardCharsets.UTF_8);
     final int nStart = 378;
     assertTrue (aFileLines.size () > nStart);
-    LOGGER.info ("...\n" + StringHelper.imploder ().source (aFileLines).offset (nStart).separator ('\n').build ());
+    LOGGER.info ("...[" +
+                 nStart +
+                 "-" +
+                 aFileLines.size () +
+                 "]\n" +
+                 StringHelper.imploder ().source (aFileLines).offset (nStart).separator ('\n').build ());
   }
 }
