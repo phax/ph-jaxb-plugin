@@ -664,12 +664,19 @@ public class PluginValueExtender extends AbstractPlugin
                                 @Nonnull final ICommonsNavigableMap <String, JType> aAllCtorClasses,
                                 final boolean bHasPluginOffsetDT)
   {
-    final JCodeModel aCodeModel = aOutline.getCodeModel ();
+    final JCodeModel cm = aOutline.getCodeModel ();
+
+    logDebug ( () -> "Start creating setters for value ctors");
+
     // For all generated classes
-    for (final ClassOutline aClassOutline : aOutline.getClasses ())
+    for (final ClassOutline aClassOutline : _getSortedClassOutlines (aOutline))
     {
       // Get the implementation class
       final JDefinedClass jClass = aClassOutline.implClass;
+      final String sClassFullName = jClass.fullName ();
+
+      logDebug ( () -> "  Handling class '" + sClassFullName + "'");
+
       // For all methods in the class (copy!)
       for (final JMethod aMethod : new CommonsArrayList <> (jClass.methods ()))
         if (aMethod.name ().startsWith ("get") && aMethod.params ().isEmpty ())
@@ -678,12 +685,13 @@ public class PluginValueExtender extends AbstractPlugin
           final JType aValueType = aAllCtorClasses.get (aReturnType.fullName ());
           if (aValueType != null)
           {
-            final boolean bIsBoolean = aValueType == aCodeModel.BOOLEAN;
+            final boolean bIsBoolean = aValueType == cm.BOOLEAN;
             final String sMethodName;
             if (bIsBoolean)
               sMethodName = "is" + aMethod.name ().substring (3) + "Value";
             else
               sMethodName = aMethod.name () + "Value";
+
             if (_containsMethodWithoutParams (jClass.methods (), sMethodName))
             {
               // This can happen if an XSD contains the element "X" and
@@ -698,17 +706,17 @@ public class PluginValueExtender extends AbstractPlugin
               continue;
             }
 
-            logDebug ( () -> "  New value getter '" +
-                             aValueType.name () +
-                             " " +
-                             jClass.name () +
-                             "." +
-                             sMethodName +
-                             "'");
-
             // The return type is a generated class
             if (aValueType.isPrimitive ())
             {
+              logDebug ( () -> "    New value getter '" +
+                               aValueType.name () +
+                               " " +
+                               sMethodName +
+                               "(" +
+                               aValueType.name () +
+                               ")'");
+
               final JMethod aGetter;
               final JVar aParam;
               if (bIsBoolean)
@@ -746,6 +754,8 @@ public class PluginValueExtender extends AbstractPlugin
             {
               // Create the Object get...Value() method
               {
+                logDebug ( () -> "    New value getter '" + aValueType.name () + " " + sMethodName + "()'");
+
                 final JMethod aGetter = jClass.method (JMod.PUBLIC, aValueType, sMethodName);
                 aGetter.annotate (Nullable.class);
                 final JVar aObj = aGetter.body ().decl (aReturnType, "aObj", JExpr.invoke (aMethod));
@@ -762,10 +772,12 @@ public class PluginValueExtender extends AbstractPlugin
 
               if (bHasPluginOffsetDT)
               {
-                final JType aNewType = PluginOffsetDTExtension.getOtherType (aValueType, aCodeModel);
-                if (aNewType != null)
+                final JType aNewValueType = PluginOffsetDTExtension.getOtherType (aValueType, cm);
+                if (aNewValueType != null)
                 {
-                  final JMethod aGetter = jClass.method (JMod.PUBLIC, aNewType, sMethodName + "Local");
+                  logDebug ( () -> "    New value getter '" + aNewValueType.name () + " " + sMethodName + "Local()'");
+
+                  final JMethod aGetter = jClass.method (JMod.PUBLIC, aNewValueType, sMethodName + "Local");
                   aGetter.annotate (Nullable.class);
                   final JVar aObj = aGetter.body ().decl (aReturnType, "aObj", JExpr.invoke (aMethod));
                   aGetter.body ()
@@ -813,20 +825,18 @@ public class PluginValueExtender extends AbstractPlugin
     if (bHasPluginOffsetDT)
       logInfo ("  Found OffsetDTExtension plugin");
 
-    initPluginLogging (false);
-
     // Must do anyway - so that other ctors can be added
     _addDefaultCtors (aOutline);
 
     // Create constructors for "value" types
     final ICommonsNavigableMap <String, JType> aAllCtorClasses = _addValueCtors (aOutline, bHasPluginOffsetDT);
 
-    initPluginLogging (aOpts.debugMode);
-
+    // Create all setters for the new value ctors
     _addValueSetters (aOutline, aAllCtorClasses, bHasPluginOffsetDT);
 
     // Create all getters
     _addValueGetter (aOutline, aAllCtorClasses, bHasPluginOffsetDT);
+
     logInfo ("  Finished JAXB plugin -" + getOptionName ());
     return true;
   }
