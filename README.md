@@ -92,7 +92,7 @@ For usage with JAXB 2.2 use this dependency:
 
 * v4.0.2 - 2023-04-20
     * Improved debug logging further
-    * Improved consistency of `ph-value-extender` plugin. See [issue #5](https://github.com/phax/ph-jaxb-plugin/issues/5) - thx @hujian19
+    * Fixed consistency error in `ph-value-extender` plugin. See [issue #5](https://github.com/phax/ph-jaxb-plugin/issues/5) - thx @hujian19
 * v4.0.1 - 2023-04-17
     * Improved logging, so that the `-debug` switch of XJC is honoured
 * v4.0.0 - 2022-09-13
