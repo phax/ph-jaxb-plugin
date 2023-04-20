@@ -101,7 +101,8 @@ public final class Issue5FuncTest
 
     if (aCatalogFile != null)
     {
-      LOGGER.info (aCatalogXML.get ());
+      if (false)
+        LOGGER.info (aCatalogXML.get ());
       // Write effective catalog
       SimpleFileIO.writeFile (aCatalogFile, aCatalogXML.get ().getBytes (StandardCharsets.UTF_8));
     }
