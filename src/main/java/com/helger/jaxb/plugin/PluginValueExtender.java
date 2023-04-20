@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -282,163 +281,6 @@ public class PluginValueExtender extends AbstractPlugin
     logDebug ( () -> "Added default constructors to " + aOutline.getClasses ().size () + " classes");
   }
 
-  private void _recursiveAddValueConstructorToDerivedClasses (@Nonnull final Outline aOutline,
-                                                              @Nonnull final JDefinedClass jParentClass,
-                                                              @Nonnull final JType aValueType,
-                                                              @Nonnull final Set <JClass> aAllRelevantClasses,
-                                                              final boolean bHasPluginOffsetDT)
-  {
-    for (final ClassOutline aClassOutline : aOutline.getClasses ())
-    {
-      final JDefinedClass jCurClass = aClassOutline.implClass;
-      if (jCurClass._extends () == jParentClass)
-      {
-        // Remember that class was handled
-        aAllRelevantClasses.add (jCurClass);
-
-        {
-          logDebug ( () -> "  New derived value ctor '" + jCurClass.name () + "(" + aValueType.name () + ")'");
-
-          final JMethod aValueCtor = jCurClass.constructor (JMod.PUBLIC);
-          final JVar aParam = aValueCtor.param (JMod.FINAL, aValueType, "valueParam");
-          if (!aValueType.isPrimitive ())
-            aParam.annotate (Nullable.class);
-          aValueCtor.body ().invoke ("super").arg (aParam);
-          aValueCtor.javadoc ()
-                    .add ("Constructor for value of type " +
-                          aValueType.erasure ().name () +
-                          " calling super class constructor.");
-          aValueCtor.javadoc ()
-                    .addParam (aParam)
-                    .add ("The value to be set." + (aValueType.isPrimitive () ? "" : " May be <code>null</code>."));
-          aValueCtor.javadoc ().add (AUTHOR);
-        }
-
-        if (bHasPluginOffsetDT)
-        {
-          final JType aNewType = PluginOffsetDTExtension.getOtherType (aValueType, aOutline.getCodeModel ());
-          if (aNewType != null)
-          {
-            logDebug ( () -> "  New derived value ctor '" + jCurClass.name () + "(" + aNewType.name () + ")'");
-
-            final JMethod aValueCtor = jCurClass.constructor (JMod.PUBLIC);
-            final JVar aParam = aValueCtor.param (JMod.FINAL, aNewType, "valueParam");
-            aParam.annotate (Nullable.class);
-            aValueCtor.body ().invoke ("setValue").arg (aParam);
-            aValueCtor.javadoc ().add ("Constructor for value of type " + aNewType.name ());
-            aValueCtor.javadoc ().addParam (aParam).add ("The value to be set. May be <code>null</code>.");
-            aValueCtor.javadoc ().add (AUTHOR);
-          }
-        }
-
-        // Set in all derived classes
-        _recursiveAddValueConstructorToDerivedClasses (aOutline,
-                                                       jCurClass,
-                                                       aValueType,
-                                                       aAllRelevantClasses,
-                                                       bHasPluginOffsetDT);
-      }
-    }
-  }
-
-  private void _addValueSetterInUsingClasses (@Nonnull final Outline aOutline,
-                                              @Nonnull final JType aValueType,
-                                              @Nonnull final Set <JClass> aAllRelevantClasses,
-                                              final boolean bHasPluginOffsetDT)
-  {
-    for (final ClassOutline aClassOutline : _getSortedClassOutlines (aOutline))
-    {
-      final JDefinedClass jClass = aClassOutline.implClass;
-
-      // Work on a copy of the methods, because they are changed
-      for (final JMethod aMethod : new CommonsArrayList <> (jClass.methods ()))
-        // Must be a setter
-        if (aMethod.name ().startsWith ("set"))
-        {
-          // Must have exactly 1 parameter that is part of aAllRelevantClasses
-          final List <JVar> aParams = aMethod.params ();
-          if (aParams.size () == 1 && aAllRelevantClasses.contains (aParams.get (0).type ()))
-          {
-            final JType aImplType = aParams.get (0).type ();
-            logDebug ( () -> "  New setter '" +
-                             aImplType.name () +
-                             " " +
-                             jClass.name () +
-                             "." +
-                             aMethod.name () +
-                             "(" +
-                             aValueType.name () +
-                             ")'");
-
-            {
-              final JMethod aSetter = jClass.method (JMod.PUBLIC, aImplType, aMethod.name ());
-              aSetter.annotate (Nonnull.class);
-              final JVar aParam = aSetter.param (JMod.FINAL, aValueType, "valueParam");
-              if (!aValueType.isPrimitive ())
-                aParam.annotate (Nullable.class);
-              final JVar aObj = aSetter.body ()
-                                       .decl (aImplType, "aObj", JExpr.invoke ("get" + aMethod.name ().substring (3)));
-              final JConditional aIf = aSetter.body ()._if (aObj.eq (JExpr._null ()));
-              aIf._then ().assign (aObj, JExpr._new (aImplType).arg (aParam));
-              aIf._then ().invoke (aMethod).arg (aObj);
-              aIf._else ().invoke (aObj, "setValue").arg (aParam);
-              aSetter.body ()._return (aObj);
-              aSetter.javadoc ().add ("Special setter with value of type " + aParam.type ().name ());
-              aSetter.javadoc ()
-                     .addParam (aParam)
-                     .add ("The value to be set." + (aValueType.isPrimitive () ? "" : " May be <code>null</code>."));
-              aSetter.javadoc ()
-                     .addReturn ()
-                     .add ("The created intermediary object of type " +
-                           aImplType.name () +
-                           " and never <code>null</code>");
-              aSetter.javadoc ().add (AUTHOR);
-            }
-
-            if (bHasPluginOffsetDT)
-            {
-              // Add the setter for the 2nd data type as well
-              final JType aNewType = PluginOffsetDTExtension.getOtherType (aValueType, aOutline.getCodeModel ());
-              if (aNewType != null)
-              {
-                logDebug ( () -> "  New setter '" +
-                                 aImplType.name () +
-                                 " " +
-                                 jClass.name () +
-                                 "." +
-                                 aMethod.name () +
-                                 "(" +
-                                 aNewType.name () +
-                                 ")'");
-
-                final JMethod aSetter = jClass.method (JMod.PUBLIC, aImplType, aMethod.name ());
-                aSetter.annotate (Nonnull.class);
-                final JVar aParam = aSetter.param (JMod.FINAL, aNewType, "valueParam");
-                aParam.annotate (Nullable.class);
-                final JVar aObj = aSetter.body ()
-                                         .decl (aImplType,
-                                                "aObj",
-                                                JExpr.invoke ("get" + aMethod.name ().substring (3)));
-                final JConditional aIf = aSetter.body ()._if (aObj.eq (JExpr._null ()));
-                aIf._then ().assign (aObj, JExpr._new (aImplType).arg (aParam));
-                aIf._then ().invoke (aMethod).arg (aObj);
-                aIf._else ().invoke (aObj, "setValue").arg (aParam);
-                aSetter.body ()._return (aObj);
-                aSetter.javadoc ().add ("Special setter with value of type " + aParam.type ().name ());
-                aSetter.javadoc ().addParam (aParam).add ("The value to be set. May be <code>null</code>.");
-                aSetter.javadoc ()
-                       .addReturn ()
-                       .add ("The created intermediary object of type " +
-                             aImplType.name () +
-                             " and never <code>null</code>");
-                aSetter.javadoc ().add (AUTHOR);
-              }
-            }
-          }
-        }
-    }
-  }
-
   @Nonnull
   @ReturnsMutableCopy
   private ICommonsNavigableMap <String, JType> _addValueCtors (@Nonnull final Outline aOutline,
@@ -502,30 +344,7 @@ public class PluginValueExtender extends AbstractPlugin
           }
         }
 
-        if (true)
-        {
-          aAllCtorClasses.put (sClassFullName, aValueType);
-        }
-        else
-        {
-          // Set constructor in all derived classes
-          final ICommonsSet <JClass> aAllRelevantClasses = new CommonsHashSet <> ();
-          aAllRelevantClasses.add (jClass);
-
-          // Add the constructor in all derived classes
-          _recursiveAddValueConstructorToDerivedClasses (aOutline,
-                                                         jClass,
-                                                         aValueType,
-                                                         aAllRelevantClasses,
-                                                         bHasPluginOffsetDT);
-
-          for (final JClass jRelevantClass : aAllRelevantClasses)
-            aAllCtorClasses.put (jRelevantClass.fullName (), aValueType);
-
-          // Add additional setters in all classes that have a setter with one
-          // of the relevant classes
-          _addValueSetterInUsingClasses (aOutline, aValueType, aAllRelevantClasses, bHasPluginOffsetDT);
-        }
+        aAllCtorClasses.put (sClassFullName, aValueType);
       }
       else
       {
