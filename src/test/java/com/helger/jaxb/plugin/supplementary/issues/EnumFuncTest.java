@@ -57,8 +57,8 @@ public final class EnumFuncTest
   @Test
   public void testConstantAttr () throws Throwable
   {
-    final int n = _run (new File ("src/test/resources/xsd/enum/enumeration.xsd"),
-                        new File ("src/test/resources/xsd/enum/enumeration.xjb"),
+    final int n = _run (new File ("src/test/resources/external/xsd/enum/enumeration.xsd"),
+                        new File ("src/test/resources/external/xsd/enum/enumeration.xjb"),
                         new File ("target/enum"),
                         new File ("target/enum-result.txt"));
     assertEquals (0, n);

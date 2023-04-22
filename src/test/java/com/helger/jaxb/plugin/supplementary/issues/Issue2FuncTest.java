@@ -54,7 +54,7 @@ public final class Issue2FuncTest
   @Test
   public void testIssue2 () throws Throwable
   {
-    final int n = _run (new File ("src/test/resources/xsd/issue2.xsd"),
+    final int n = _run (new File ("src/test/resources/external/xsd/issue2.xsd"),
                         new File ("target/issue2"),
                         new File ("target/issue2-result.txt"));
     assertEquals (0, n);

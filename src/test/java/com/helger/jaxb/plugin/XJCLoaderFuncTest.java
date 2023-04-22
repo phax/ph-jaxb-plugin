@@ -16,6 +16,8 @@
  */
 package com.helger.jaxb.plugin;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -40,14 +42,17 @@ public final class XJCLoaderFuncTest
     {
       // Don't use Driver.main because it calls System.exit
       FileOperationManager.INSTANCE.createDirRecursiveIfNotExisting (aDestDir);
-      Driver.run (new String [] { aXSDFile.getAbsolutePath (), "-d", aDestDir.getAbsolutePath () }, aPS, aPS);
+      final int nEC = Driver.run (new String [] { aXSDFile.getAbsolutePath (), "-d", aDestDir.getAbsolutePath () },
+                                  aPS,
+                                  aPS);
+      assertEquals (0, nEC);
     }
   }
 
   @Test
   public void testLoadXJC () throws Throwable
   {
-    _run (new File ("src/test/resources/xsd/changelog-1.0.xsd"),
+    _run (new File ("src/test/resources/external/xsd/changelog-1.0.xsd"),
           new File ("target/basic"),
           new File ("target/basic-result.txt"));
   }

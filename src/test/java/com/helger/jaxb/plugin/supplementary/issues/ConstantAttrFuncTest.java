@@ -57,8 +57,8 @@ public final class ConstantAttrFuncTest
   @Test
   public void testConstantAttr () throws Throwable
   {
-    final int n = _run (new File ("src/test/resources/xsd/constant-attr.xsd"),
-                        new File ("src/test/resources/xsd/constant-attr.xjb"),
+    final int n = _run (new File ("src/test/resources/external/xsd/constant-attr.xsd"),
+                        new File ("src/test/resources/external/xsd/constant-attr.xjb"),
                         new File ("target/constant-attr"),
                         new File ("target/constant-attr-result.txt"));
     assertEquals (0, n);
