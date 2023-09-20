@@ -66,7 +66,9 @@ public class PluginListExtension extends AbstractPlugin
    * Does not work because upon reading the object gets filled with a regular
    * java.util.ArrayList!
    */
-  private static final boolean USE_COMMONS_LIST = Boolean.FALSE.booleanValue ();
+  private static final boolean USE_COMMONS_LIST = false;
+
+  private static final JType [] JTYPE_EMPTY = {};
 
   @Override
   public String getOptionName ()
@@ -125,8 +127,7 @@ public class PluginListExtension extends AbstractPlugin
           // Create a new getter
           if (USE_COMMONS_LIST)
           {
-            final JMethod aOldGetter = jClass.getMethod (CJAXB.getGetterName (aField.type (), sFieldName),
-                                                         new JType [0]);
+            final JMethod aOldGetter = jClass.getMethod (CJAXB.getGetterName (aField.type (), sFieldName), JTYPE_EMPTY);
             jClass.methods ().remove (aOldGetter);
             final JMethod aNewGetter = jClass.method (JMod.PUBLIC, aNewType, aOldGetter.name ());
             aNewGetter.annotate (Nonnull.class);
@@ -186,14 +187,23 @@ public class PluginListExtension extends AbstractPlugin
               mHasNoEntries.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
             }
 
-            // int getXXXCount ()
+            // int getXXXCount () or getXXXListCount ()
             {
-              final JMethod mCount = jClass.method (JMod.PUBLIC, aCodeModel.INT, "get" + sRelevantTypeName + "Count");
-              mCount.annotate (Nonnegative.class);
-              mCount.body ()._return (JExpr.invoke (aMethod).invoke ("size"));
+              String sName = "get" + sRelevantTypeName + "Count";
+              if (jClass.getMethod (sName, JTYPE_EMPTY) != null)
+                sName = "get" + sRelevantTypeName + "ListCount";
 
-              mCount.javadoc ().addReturn ().add ("The number of contained elements. Always &ge; 0.");
-              mCount.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
+              if (jClass.getMethod (sName, JTYPE_EMPTY) == null)
+              {
+                final JMethod mCount = jClass.method (JMod.PUBLIC, aCodeModel.INT, sName);
+                mCount.annotate (Nonnegative.class);
+                mCount.body ()._return (JExpr.invoke (aMethod).invoke ("size"));
+
+                mCount.javadoc ().addReturn ().add ("The number of contained elements. Always &ge; 0.");
+                mCount.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
+              }
+              else
+                logWarn ("Cannot create 'get" + sRelevantTypeName + "Count' method because it already exists");
             }
 
             // ELEMENTTYPE getXXXAtIndex (int) throws IndexOutOfBoundsException
