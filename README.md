@@ -92,7 +92,6 @@ For usage with JAXB 2.2 use this dependency:
 
 * v4.0.3 - 2023-09-20
     * If the `ph-list-extension` is used and  `get...Count()` is already present, a `get...ListCount()` is created instead
-    * Not creating the `getXXXCount` 
 * v4.0.2 - 2023-04-20
     * Improved debug logging further
     * Fixed consistency error in `ph-value-extender` plugin. See [issue #5](https://github.com/phax/ph-jaxb-plugin/issues/5) - thx @hujian19
