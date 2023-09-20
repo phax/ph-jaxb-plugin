@@ -70,6 +70,13 @@
         <scope>import</scope>
       </dependency>
       <dependency>
+        <groupId>com.helger.xsd</groupId>
+        <artifactId>ph-xsds-parent-pom</artifactId>
+        <version>3.0.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
         <groupId>jakarta.validation</groupId>
         <artifactId>jakarta.validation-api</artifactId>
         <version>3.0.2</version>
@@ -125,25 +132,21 @@
     <dependency>
       <groupId>com.helger.xsd</groupId>
       <artifactId>ph-xsds-xmldsig</artifactId>
-      <version>3.0.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.helger.xsd</groupId>
       <artifactId>ph-xsds-xades132</artifactId>
-      <version>3.0.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.helger.xsd</groupId>
       <artifactId>ph-xsds-xades141</artifactId>
-      <version>3.0.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.helger.xsd</groupId>
       <artifactId>ph-xsds-ccts-cct-schemamodule</artifactId>
-      <version>3.0.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -81,7 +81,7 @@ For usage with JAXB 2.2 use this dependency:
     * `void set...(List)` - set a new `List`
     * `boolean has...Entries()` - returns `true` if at least one entry is present
     * `boolean hasNo...Entries()` - returns `true` if no entry is present
-    * `int get...Count()` - returns the number of contained entries
+    * `int get...Count()` (or `get...ListCount`) - returns the number of contained entries
     * `T get...AtIndex(int)` - get the element at the specified index
     * `void add...(T)` - add a new entry to the list
 * `ph-offset-dt-extension` (since 2.3.3.2) - add additional methods for Offset* date time types using their `Local` counterparts
@@ -90,6 +90,9 @@ For usage with JAXB 2.2 use this dependency:
 
 # News and noteworthy
 
+* v4.0.3 - 2023-09-20
+    * If the `ph-list-extension` is used and  `get...Count()` is already present, a `get...ListCount()` is created instead
+    * Not creating the `getXXXCount` 
 * v4.0.2 - 2023-04-20
     * Improved debug logging further
     * Fixed consistency error in `ph-value-extender` plugin. See [issue #5](https://github.com/phax/ph-jaxb-plugin/issues/5) - thx @hujian19
