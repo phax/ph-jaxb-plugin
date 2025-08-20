@@ -126,9 +126,16 @@ public class PluginEqualsHashCode extends AbstractPlugin
             for (final JFieldVar aField : aFieldVars.keySet ())
             {
               final String sFieldName = aField.name ();
+
+              if (false)
+                logWarn ("Gen [" + sFieldName + "] " + aField.type ().fullName ());
+
               if (aField.type ().erasure ().name ().equals ("List"))
               {
                 final JClass aTypeParam = ((JClass) aField.type ()).getTypeParameters ().get (0);
+
+                if (false)
+                  logWarn ("  List [" + sFieldName + "] " + aTypeParam.erasure ().name ());
 
                 if (aTypeParam.erasure ().name ().equals ("JAXBElement"))
                 {
@@ -152,18 +159,30 @@ public class PluginEqualsHashCode extends AbstractPlugin
                   jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
                 }
                 else
-                {
-                  /*
-                   * Ensure that "EqualsHelper.equals" is invoked on all child elements. This is an
-                   * issue with "List<JAXBElement<?>>" in Java9 onwards, because JAXBElement does
-                   * not implement equals. Note: use "equalsCollection" to allow for null values as
-                   * well
-                   */
-                  final JExpression aThisExpr = jCollEqualsHelper.staticInvoke ("equalsCollection")
-                                                                 .arg (JExpr.ref (sFieldName))
-                                                                 .arg (jTyped.ref (sFieldName));
-                  jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
-                }
+                  if (aTypeParam.erasure ().name ().equals ("Object"))
+                  {
+                    // Special case needed
+                    // List<Object> means a List of "anything" and needs special attention on
+                    // JAXBElements and DOM nodes
+
+                    final JExpression aThisExpr = jJaxbHelper.staticInvoke ("equalAnyLists")
+                                                             .arg (JExpr.ref (sFieldName))
+                                                             .arg (jTyped.ref (sFieldName));
+                    jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
+                  }
+                  else
+                  {
+                    /*
+                     * Ensure that "EqualsHelper.equals" is invoked on all child elements. This is
+                     * an issue with "List<JAXBElement<?>>" in Java9 onwards, because JAXBElement
+                     * does not implement equals. Note: use "equalsCollection" to allow for null
+                     * values as well
+                     */
+                    final JExpression aThisExpr = jCollEqualsHelper.staticInvoke ("equalsCollection")
+                                                                   .arg (JExpr.ref (sFieldName))
+                                                                   .arg (jTyped.ref (sFieldName));
+                    jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
+                  }
               }
               else
                 if (aField.type ().erasure ().name ().equals ("JAXBElement"))
@@ -238,22 +257,30 @@ public class PluginEqualsHashCode extends AbstractPlugin
                 boolean bNeedsCast = aTypeParam.getTypeParameters ().get (0) instanceof JDefinedClass;
 
                 aInvocation = aInvocation.invoke ("append")
-                                         .arg (jJaxbHelper.staticInvoke ("getListHashcode")
+                                         .arg (jJaxbHelper.staticInvoke ("getListJAXBElementHashCode")
                                                           .arg (bNeedsCast ? jGenericReflection.staticInvoke ("uncheckedCast")
                                                                                                .arg (JExpr.ref (sFieldName))
                                                                            : JExpr.ref (sFieldName)));
               }
               else
-              {
-                aInvocation = aInvocation.invoke ("append").arg (JExpr.ref (sFieldName));
-              }
+                if (aTypeParam.erasure ().name ().equals ("Object"))
+                {
+                  // Special hashCode
+                  aInvocation = aInvocation.invoke ("append")
+                                           .arg (jJaxbHelper.staticInvoke ("getListAnyHashCode")
+                                                            .arg (JExpr.ref (sFieldName)));
+                }
+                else
+                {
+                  aInvocation = aInvocation.invoke ("append").arg (JExpr.ref (sFieldName));
+                }
             }
             else
               if (aField.type ().erasure ().name ().equals ("JAXBElement"))
               {
                 // Special hashCode
                 aInvocation = aInvocation.invoke ("append")
-                                         .arg (jJaxbHelper.staticInvoke ("getHashcode").arg (JExpr.ref (sFieldName)));
+                                         .arg (jJaxbHelper.staticInvoke ("getHashCode").arg (JExpr.ref (sFieldName)));
               }
               else
                 if (aField.type ().erasure ().name ().equals ("Object"))
