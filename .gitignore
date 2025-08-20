@@ -1,7 +1,8 @@
+.settings/ 
 target/
+
 .pmd
 *.iml
-.settings/ 
 .project 
 .classpath 
-src/test/resources/xsd/ubl23/catalog.xml
+src/test/resources/external/ubl23/catalog.xml
