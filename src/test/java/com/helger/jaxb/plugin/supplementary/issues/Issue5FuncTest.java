@@ -25,6 +25,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,6 +124,7 @@ public final class Issue5FuncTest
   }
 
   @Test
+  @Ignore ("This must be ignored during release building, because there is a circular dependency between ph-xsds and this plugin")
   public void testIssue5 () throws Throwable
   {
     // Main code generation
