@@ -91,7 +91,7 @@ For usage with JAXB 2.2 use this dependency:
 
 # News and noteworthy
 
-v4.1.0 - work in progress
+v5.0.0 - work in progress
 * Requires Java 17 as the minimum version
 * Updated to ph-commons 12.0.0
 * The generated code requires ph-commons 12.0.0
