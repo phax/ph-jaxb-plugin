@@ -16,14 +16,17 @@
  */
 package com.helger.jaxb.plugin;
 
+import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.annotation.style.IsSPIImplementation;
 import com.helger.base.array.ArrayHelper;
 import com.helger.base.equals.EqualsHelper;
 import com.helger.base.hashcode.HashCodeGenerator;
+import com.helger.base.reflection.GenericReflection;
 import com.helger.collection.commons.ICommonsOrderedMap;
 import com.helger.collection.helper.CollectionEqualsHelper;
+import com.helger.jaxb.adapter.JAXBHelper;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
@@ -74,9 +77,12 @@ public class PluginEqualsHashCode extends AbstractPlugin
 
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     final JClass jObject = aCodeModel.ref (Object.class);
+    final JClass jNode = aCodeModel.ref (Node.class);
     final JClass jEqualsHelper = aCodeModel.ref (EqualsHelper.class);
     final JClass jCollEqualsHelper = aCodeModel.ref (CollectionEqualsHelper.class);
+    final JClass jJaxbHelper = aCodeModel.ref (JAXBHelper.class);
     final JClass jHashCodeGenerator = aCodeModel.ref (HashCodeGenerator.class);
+    final JClass jGenericReflection = aCodeModel.ref (GenericReflection.class);
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
       final FieldOutline [] aFields = aClassOutline.getDeclaredFields ();
@@ -122,23 +128,71 @@ public class PluginEqualsHashCode extends AbstractPlugin
               final String sFieldName = aField.name ();
               if (aField.type ().erasure ().name ().equals ("List"))
               {
-                /*
-                 * Ensure that "EqualsHelper.equals" is invoked on all child elements. This is an
-                 * issue with "List<JAXBElement<?>>" in Java9 onwards, because JAXBElement does not
-                 * implement equals. Note: use "equalsCollection" to allow for null values as well
-                 */
-                final JExpression aThisExpr = jCollEqualsHelper.staticInvoke ("equalsCollection")
-                                                               .arg (JExpr.ref (sFieldName))
-                                                               .arg (jTyped.ref (sFieldName));
-                jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
+                final JClass aTypeParam = ((JClass) aField.type ()).getTypeParameters ().get (0);
+
+                if (aTypeParam.erasure ().name ().equals ("JAXBElement"))
+                {
+                  // Special case needed
+
+                  // The method expects List<JAXBElement<?>> which does not work with a defined
+                  // class
+                  // -> that's why it requires an uncheckedCast instead
+                  // Examples:
+                  // a. [com.sun.codemodel.JTypeWildcard(? extends Object)]
+                  // b. [com.sun.codemodel.JDefinedClass(Ebi40ReductionAndSurchargeType)]
+                  boolean bNeedsCast = aTypeParam.getTypeParameters ().get (0) instanceof JDefinedClass;
+
+                  final JExpression aThisExpr = jJaxbHelper.staticInvoke ("equalJAXBElementLists")
+                                                           .arg (bNeedsCast ? jGenericReflection.staticInvoke ("uncheckedCast")
+                                                                                                .arg (JExpr.ref (sFieldName))
+                                                                            : JExpr.ref (sFieldName))
+                                                           .arg (bNeedsCast ? jGenericReflection.staticInvoke ("uncheckedCast")
+                                                                                                .arg (jTyped.ref (sFieldName))
+                                                                            : jTyped.ref (sFieldName));
+                  jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
+                }
+                else
+                {
+                  /*
+                   * Ensure that "EqualsHelper.equals" is invoked on all child elements. This is an
+                   * issue with "List<JAXBElement<?>>" in Java9 onwards, because JAXBElement does
+                   * not implement equals. Note: use "equalsCollection" to allow for null values as
+                   * well
+                   */
+                  final JExpression aThisExpr = jCollEqualsHelper.staticInvoke ("equalsCollection")
+                                                                 .arg (JExpr.ref (sFieldName))
+                                                                 .arg (jTyped.ref (sFieldName));
+                  jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
+                }
               }
               else
-              {
-                final JExpression aThisExpr = jEqualsHelper.staticInvoke ("equals")
+                if (aField.type ().erasure ().name ().equals ("JAXBElement"))
+                {
+                  final JExpression aThisExpr = jJaxbHelper.staticInvoke ("equalJAXBElements")
                                                            .arg (JExpr.ref (sFieldName))
                                                            .arg (jTyped.ref (sFieldName));
-                jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
-              }
+                  jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
+                }
+                else
+                  if (aField.type ().erasure ().name ().equals ("Object"))
+                  {
+                    // Runtime check, if an xs:any "Object" is a DOM Node or not
+                    final JExpression aNodeExpr = jJaxbHelper.staticInvoke ("equalDOMNodes")
+                                                             .arg (JExpr.cast (jNode, JExpr.ref (sFieldName)))
+                                                             .arg (JExpr.cast (jNode, jTyped.ref (sFieldName)));
+                    final JExpression aThisExpr = jEqualsHelper.staticInvoke ("equals")
+                                                               .arg (JExpr.ref (sFieldName))
+                                                               .arg (jTyped.ref (sFieldName));
+                    JExpression aEquals = JOp.cond (JExpr.ref (sFieldName)._instanceof (jNode), aNodeExpr, aThisExpr);
+                    jBody._if (JOp.not (aEquals))._then ()._return (JExpr.FALSE);
+                  }
+                  else
+                  {
+                    final JExpression aThisExpr = jEqualsHelper.staticInvoke ("equals")
+                                                               .arg (JExpr.ref (sFieldName))
+                                                               .arg (jTyped.ref (sFieldName));
+                    jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
+                  }
             }
           }
           jBody._return (JExpr.TRUE);
@@ -165,24 +219,56 @@ public class PluginEqualsHashCode extends AbstractPlugin
           else
             aInvocation = jHashCodeGenerator.staticInvoke ("getDerived").arg (JExpr._super ().invoke (mHashCode));
 
-          if (true)
+          // Instance fields only
+          for (final JFieldVar aField : aFieldVars.keySet ())
           {
-            // Instance fields only
-            for (final JFieldVar aField : aFieldVars.keySet ())
+            final String sFieldName = aField.name ();
+            if (aField.type ().erasure ().name ().equals ("List"))
             {
-              final String sFieldName = aField.name ();
-              aInvocation = aInvocation.invoke ("append").arg (JExpr.ref (sFieldName));
+              final JClass aTypeParam = ((JClass) aField.type ()).getTypeParameters ().get (0);
+
+              if (aTypeParam.erasure ().name ().equals ("JAXBElement"))
+              {
+                // Special hashCode
+                // The method expects List<JAXBElement<?>> which does not work with a defined class
+                // -> that's why it requires an uncheckedCast instead
+                // Examples:
+                // a. [com.sun.codemodel.JTypeWildcard(? extends Object)]
+                // b. [com.sun.codemodel.JDefinedClass(Ebi40ReductionAndSurchargeType)]
+                boolean bNeedsCast = aTypeParam.getTypeParameters ().get (0) instanceof JDefinedClass;
+
+                aInvocation = aInvocation.invoke ("append")
+                                         .arg (jJaxbHelper.staticInvoke ("getListHashcode")
+                                                          .arg (bNeedsCast ? jGenericReflection.staticInvoke ("uncheckedCast")
+                                                                                               .arg (JExpr.ref (sFieldName))
+                                                                           : JExpr.ref (sFieldName)));
+              }
+              else
+              {
+                aInvocation = aInvocation.invoke ("append").arg (JExpr.ref (sFieldName));
+              }
             }
+            else
+              if (aField.type ().erasure ().name ().equals ("JAXBElement"))
+              {
+                // Special hashCode
+                aInvocation = aInvocation.invoke ("append")
+                                         .arg (jJaxbHelper.staticInvoke ("getHashcode").arg (JExpr.ref (sFieldName)));
+              }
+              else
+                if (aField.type ().erasure ().name ().equals ("Object"))
+                {
+                  // Runtime check, if an xs:any "Object" is a DOM Node or not
+                  final JExpression aNodeExpr = jJaxbHelper.staticInvoke ("getHashCode")
+                                                           .arg (JExpr.cast (jNode, JExpr.ref (sFieldName)));
+                  final JExpression aThisExpr = JExpr.ref (sFieldName);
+                  JExpression aHashCode = JOp.cond (JExpr.ref (sFieldName)._instanceof (jNode), aNodeExpr, aThisExpr);
+                  aInvocation = aInvocation.invoke ("append").arg (aHashCode);
+                }
+                else
+                  aInvocation = aInvocation.invoke ("append").arg (JExpr.ref (sFieldName));
           }
-          else
-          {
-            // Does not handle static fields
-            for (final FieldOutline aField : aFields)
-            {
-              final String sFieldName = aField.getPropertyInfo ().getName (false);
-              aInvocation = aInvocation.invoke ("append").arg (JExpr.ref (sFieldName));
-            }
-          }
+
           mHashCode.body ()._return (aInvocation.invoke ("getHashCode"));
         }
 
