@@ -23,18 +23,15 @@ import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.collection.impl.CommonsHashSet;
-import com.helger.commons.collection.impl.ICommonsSet;
-import com.helger.commons.datetime.OffsetDate;
-import com.helger.commons.datetime.XMLOffsetDate;
-import com.helger.commons.datetime.XMLOffsetDateTime;
-import com.helger.commons.datetime.XMLOffsetTime;
+import com.helger.annotation.style.IsSPIImplementation;
+import com.helger.collection.commons.CommonsHashSet;
+import com.helger.collection.commons.ICommonsSet;
+import com.helger.datetime.rt.OffsetDate;
+import com.helger.datetime.xml.XMLOffsetDate;
+import com.helger.datetime.xml.XMLOffsetDateTime;
+import com.helger.datetime.xml.XMLOffsetTime;
 import com.helger.jaxb.plugin.cm.MyTernaryOp;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
@@ -47,6 +44,9 @@ import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * Extend all bean members of type <code>OffsetDate</code>,

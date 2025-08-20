@@ -16,13 +16,11 @@
  */
 package com.helger.jaxb.plugin;
 
-import javax.annotation.Nonnull;
-
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.collection.impl.ICommonsOrderedMap;
-import com.helger.commons.string.ToStringGenerator;
+import com.helger.annotation.style.IsSPIImplementation;
+import com.helger.base.tostring.ToStringGenerator;
+import com.helger.collection.commons.ICommonsOrderedMap;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
@@ -35,6 +33,8 @@ import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Add default toString method using the {@link ToStringGenerator} class (using

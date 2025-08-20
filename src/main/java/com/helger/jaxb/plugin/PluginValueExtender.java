@@ -23,23 +23,20 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.CommonsHashMap;
-import com.helger.commons.collection.impl.CommonsHashSet;
-import com.helger.commons.collection.impl.CommonsTreeMap;
-import com.helger.commons.collection.impl.CommonsTreeSet;
-import com.helger.commons.collection.impl.ICommonsNavigableMap;
-import com.helger.commons.collection.impl.ICommonsNavigableSet;
-import com.helger.commons.collection.impl.ICommonsSet;
-import com.helger.commons.lang.GenericReflection;
+import com.helger.annotation.style.IsSPIImplementation;
+import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.reflection.GenericReflection;
+import com.helger.collection.CollectionFind;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashMap;
+import com.helger.collection.commons.CommonsHashSet;
+import com.helger.collection.commons.CommonsTreeMap;
+import com.helger.collection.commons.CommonsTreeSet;
+import com.helger.collection.commons.ICommonsNavigableMap;
+import com.helger.collection.commons.ICommonsNavigableSet;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.jaxb.plugin.cm.MyTernaryOp;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
@@ -55,9 +52,12 @@ import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
- * Add special "value" constructors, setters and getters for JAXB generated
- * elements. This is used e.g. for UBL and CII code generation.
+ * Add special "value" constructors, setters and getters for JAXB generated elements. This is used
+ * e.g. for UBL and CII code generation.
  *
  * @author Philip Helger
  */
@@ -178,8 +178,8 @@ public class PluginValueExtender extends AbstractPlugin
     }
 
     /**
-     * Get the {@link JType} of the <code>value</code> field in the provided
-     * class or any super class (<code>extends</code>)
+     * Get the {@link JType} of the <code>value</code> field in the provided class or any super
+     * class (<code>extends</code>)
      *
      * @param jClass
      *        Class to inspect
@@ -619,8 +619,7 @@ public class PluginValueExtender extends AbstractPlugin
   }
 
   /**
-   * Main method to create methods for value: constructors, derived
-   * constructors, setter and getter.
+   * Main method to create methods for value: constructors, derived constructors, setter and getter.
    *
    * @param aOutline
    *        JAXB Outline
@@ -638,9 +637,9 @@ public class PluginValueExtender extends AbstractPlugin
     logInfo ("Running JAXB plugin -" + getOptionName ());
 
     // Check if the "Plugin OffsetDT plugin" is also registered
-    final boolean bHasPluginOffsetDT = CollectionHelper.containsAny (aOpts.getAllPlugins (),
-                                                                     p -> p.getOptionName ()
-                                                                           .equals (PluginOffsetDTExtension.OPT));
+    final boolean bHasPluginOffsetDT = CollectionFind.containsAny (aOpts.getAllPlugins (),
+                                                                   p -> p.getOptionName ()
+                                                                         .equals (PluginOffsetDTExtension.OPT));
     if (bHasPluginOffsetDT)
       logInfo ("  Found OffsetDTExtension plugin");
 

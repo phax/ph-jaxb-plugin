@@ -18,11 +18,11 @@ package com.helger.jaxb.plugin;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.collection.ArrayHelper;
-import com.helger.commons.collection.impl.ICommonsOrderedMap;
-import com.helger.commons.equals.EqualsHelper;
-import com.helger.commons.hashcode.HashCodeGenerator;
+import com.helger.annotation.style.IsSPIImplementation;
+import com.helger.base.array.ArrayHelper;
+import com.helger.base.equals.EqualsHelper;
+import com.helger.base.hashcode.HashCodeGenerator;
+import com.helger.collection.commons.ICommonsOrderedMap;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;

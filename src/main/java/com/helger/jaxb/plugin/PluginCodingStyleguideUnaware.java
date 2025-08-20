@@ -18,18 +18,18 @@ package com.helger.jaxb.plugin;
 
 import java.util.Iterator;
 
-import javax.annotation.Nonnull;
-
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.CodingStyleguideUnaware;
-import com.helger.commons.annotation.IsSPIImplementation;
+import com.helger.annotation.style.CodingStyleguideUnaware;
+import com.helger.annotation.style.IsSPIImplementation;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JPackage;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.Outline;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Create {@link CodingStyleguideUnaware} annotations in all bean generated

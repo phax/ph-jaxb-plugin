@@ -16,11 +16,11 @@
  */
 package com.helger.jaxb.plugin.cm;
 
-import javax.annotation.Nonnull;
-
 import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JExpressionImpl;
 import com.sun.codemodel.JFormatter;
+
+import jakarta.annotation.Nonnull;
 
 public class MyTernaryOp extends JExpressionImpl
 {

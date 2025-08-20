@@ -16,7 +16,7 @@
  */
 package com.helger.jaxb.plugin;
 
-import com.helger.commons.annotation.IsSPIImplementation;
+import com.helger.annotation.style.IsSPIImplementation;
 
 /**
  * big thanks to original author: cocorossello

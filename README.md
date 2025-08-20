@@ -12,9 +12,9 @@ Add something **like** the following to your pom.xml to use this artifact:
 
 ```xml
 <plugin>
-  <groupId>com.evolvedbinary.maven.jvnet</groupId>
-  <artifactId>jaxb2-maven-plugin</artifactId>
-  <version>0.15.0</version>
+  <groupId>org.jvnet.jaxb</groupId>
+  <artifactId>jaxb-maven-plugin</artifactId>
+  <version>4.0.9</version>
   <executions>
     <execution>
       <goals>
@@ -46,7 +46,7 @@ Add something **like** the following to your pom.xml to use this artifact:
       <groupId>com.helger</groupId>
       <artifactId>ph-jaxb-plugin</artifactId>
       <!-- Use the right version below -->
-      <version>4.0.0</version>
+      <version>4.0.3</version>
     </dependency>
   </dependencies>
 </plugin>
@@ -61,6 +61,7 @@ For usage with JAXB 2.2 use this dependency:
       <version>2.3.3.3</version>
     </dependency>
 ```
+
 
 # JAXB Plugins
 
@@ -90,89 +91,126 @@ For usage with JAXB 2.2 use this dependency:
 
 # News and noteworthy
 
-* v4.0.3 - 2023-09-20
-    * If the `ph-list-extension` is used and  `get...Count()` is already present, a `get...ListCount()` is created instead
-* v4.0.2 - 2023-04-20
-    * Improved debug logging further
-    * Fixed consistency error in `ph-value-extender` plugin. See [issue #5](https://github.com/phax/ph-jaxb-plugin/issues/5) - thx @hujian19
-* v4.0.1 - 2023-04-17
-    * Improved logging, so that the `-debug` switch of XJC is honoured
-* v4.0.0 - 2022-09-13
-    * Updated to JAXB 4.0
-    * Requires at least Java 11
-    * Changed the artifact ID from `ph-jaxb22-plugin` to `ph-jaxb-plugin`
-    * Changed all the internal namespaces from `com.helger.jaxb22.plugin` to `com.helger.jaxb.plugin`
-    * Added new plugin `-Xph-namespace-prefix` to force a certain prefix via `@XmlNs` annotation
-* v2.3.3.3 - 2021-05-02
-    * Requires ph-commons 10.1.0
-    * Plugin `-Xph-offset-dt-extension` now also supports `XMLOffsetDate`
-    * Added class `PeriodDuration` as being "not clonable"
-* v2.3.3.2 - 2021-03-21
-    * Updated to ph-commons 10
-    * Added new plugin `-Xph-offset-dt-extension`
-    * Removed plugin `-Xph-tostring-legacy`
-* v2.3.3.1 - 2020-10-05
-    * Cloneable plugins now create a "HashMap" instead of a "CommonsHashMap"
-* v2.3.3.0 - 2020-09-17
-    * Updated to Jakarta JAXB 2.3.3
-* v2.3.2.6 - 2020-04-29
-    * Fixed an error in cloning if an enumeration from an episode was referenced
-* v2.3.2.5 - 2020-04-24
-    * Ignoring static fields if the global binding `fixedAttributeAsConstantProperty="true"` is used
-* v2.3.2.4 - 2019-12-12
-    * Added class `DataHandler` as being "not clonable"
-* v2.3.2.3 - 2019-10-04
-    * Fixed a missing `@Valid` annotation for anonymous nested types ([issue #2](https://github.com/phax/ph-jaxb22-plugin/issues/2)) 
-* v2.3.2.2 - 2019-05-07
-    * Using unbounded version instead of limiting to Java 12.x
-* v2.3.2.1 - 2019-05-06
-    * Version number reflects latest JAXB version in use
-    * Updated to ph-commons 9.3.3 with Java 12 support
-* v2.3.1.5 - 2019-05-05
-    * Started Java 12 support 
-* v2.3.1.4 - 2019-01-26
-    * Fixed JavaDoc error in created code when constructor parameter is a List 
-* v2.3.1.3 - 2019-01-25
-    * Integrated `ph-ubl-value` from ph-ubl as as `ph-value-extender` into this project. 
-* v2.3.1.2 - 2018-12-01
-    * Added creation of bean validation `@Valid` annotation. Cascading bean validation now works properly.
-* v2.3.1.1 - 2018-11-22
-    * Added support for JAXB 2.3.1 when using Java 9 or higher - still works with JAXB 2.2.11 for Java 8
-    * Updated to ph-commons 9.2.0 
-    * Created code requires at least ph-commons 9.2.0
-* v2.2.11.13 - 2018-10-31
-    * Added `QName` as an immutable type for cloning
-* v2.2.11.12 - 2018-10-31
-    * Added option `-Xph-cloneable2` to implement `Cloneable` based on the `com.helger.commons.lang.IExplicitlyCloneable` interface. That means that created code requires at least ph-commons 9.1.8.
-* v2.2.11.11 - 2018-03-13
-    * Fixed a problem in `cloneTo` with `null` `List` values 
-* v2.2.11.10 - 2017-11-05
-    * Updated to ph-commons 9.0.0
-* v2.2.11.9 - 2017-02-16
-    * Added option `-Xph-tostring` requires ph-commons >= 8.6.2 
-    * Added option `-Xph-tostring-legacy`
-* v2.2.11.8 - 2016-07-27
-    * Fixed bug in cloning of abstract class
-* v2.2.11.7 - 2016-06-10
-    * JDK8 is required
-    * Added generic cloning 
-    * the `ph-csu` settings is now also applied on nested generated classes
-* v2.2.11.6 - 2015-07-21
-    * Fixed error in `getXXXCount` method name
-* v2.2.11.5 - 2015-07-01
-    * Extended `ph-list-extension` with the `add` method
-    * Updated to ph-commons 6.0.0
-* v2.2.11.4 - 2015-03-31
-    * Disabled the parameter renaming in the PluginCodeQuality so that JavaDocs can be generated with Java 8
-* v2.2.11.3 - 2015-03-11
-* v2.2.11.2 - 2015-02-06
-    * Extended `ph-csu` for all enums as well
-* v2.2.11.1 - 2015-02-06
-    * Added new option `ph-csu` to add the CodingStyleguideUnaware annotation to all classes
-* v2.2.11 - 2014-12-02
-    * linked against JAXB 2.2.11
-* v2.2.7 - 2014-08-24
-    * linked against JAXB 2.2.7
+v4.1.0 - work in progress
+* Requires Java 17 as the minimum version
+* Updated to ph-commons 12.0.0
+
+v4.0.3 - 2023-09-20
+* If the `ph-list-extension` is used and  `get...Count()` is already present, a `get...ListCount()` is created instead
+
+v4.0.2 - 2023-04-20
+* Improved debug logging further
+* Fixed consistency error in `ph-value-extender` plugin. See [issue #5](https://github.com/phax/ph-jaxb-plugin/issues/5) - thx @hujian19
+
+v4.0.1 - 2023-04-17
+* Improved logging, so that the `-debug` switch of XJC is honoured
+
+v4.0.0 - 2022-09-13
+* Updated to JAXB 4.0
+* Requires at least Java 11
+* Changed the artifact ID from `ph-jaxb22-plugin` to `ph-jaxb-plugin`
+* Changed all the internal namespaces from `com.helger.jaxb22.plugin` to `com.helger.jaxb.plugin`
+* Added new plugin `-Xph-namespace-prefix` to force a certain prefix via `@XmlNs` annotation
+
+v2.3.3.3 - 2021-05-02
+* Requires ph-commons 10.1.0
+* Plugin `-Xph-offset-dt-extension` now also supports `XMLOffsetDate`
+* Added class `PeriodDuration` as being "not clonable"
+
+v2.3.3.2 - 2021-03-21
+* Updated to ph-commons 10
+* Added new plugin `-Xph-offset-dt-extension`
+* Removed plugin `-Xph-tostring-legacy`
+
+v2.3.3.1 - 2020-10-05
+* Cloneable plugins now create a "HashMap" instead of a "CommonsHashMap"
+
+v2.3.3.0 - 2020-09-17
+* Updated to Jakarta JAXB 2.3.3
+
+v2.3.2.6 - 2020-04-29
+* Fixed an error in cloning if an enumeration from an episode was referenced
+
+v2.3.2.5 - 2020-04-24
+* Ignoring static fields if the global binding `fixedAttributeAsConstantProperty="true"` is used
+
+v2.3.2.4 - 2019-12-12
+* Added class `DataHandler` as being "not clonable"
+
+v2.3.2.3 - 2019-10-04
+* Fixed a missing `@Valid` annotation for anonymous nested types ([issue #2](https://github.com/phax/ph-jaxb22-plugin/issues/2)) 
+
+v2.3.2.2 - 2019-05-07
+* Using unbounded version instead of limiting to Java 12.x
+
+v2.3.2.1 - 2019-05-06
+* Version number reflects latest JAXB version in use
+* Updated to ph-commons 9.3.3 with Java 12 support
+
+v2.3.1.5 - 2019-05-05
+* Started Java 12 support 
+
+v2.3.1.4 - 2019-01-26
+* Fixed JavaDoc error in created code when constructor parameter is a List 
+
+v2.3.1.3 - 2019-01-25
+* Integrated `ph-ubl-value` from ph-ubl as as `ph-value-extender` into this project. 
+
+v2.3.1.2 - 2018-12-01
+* Added creation of bean validation `@Valid` annotation. Cascading bean validation now works properly.
+
+v2.3.1.1 - 2018-11-22
+* Added support for JAXB 2.3.1 when using Java 9 or higher - still works with JAXB 2.2.11 for Java 8
+* Updated to ph-commons 9.2.0 
+* Created code requires at least ph-commons 9.2.0
+
+v2.2.11.13 - 2018-10-31
+* Added `QName` as an immutable type for cloning
+
+v2.2.11.12 - 2018-10-31
+* Added option `-Xph-cloneable2` to implement `Cloneable` based on the `com.helger.commons.lang.IExplicitlyCloneable` interface. That means that created code requires at least ph-commons 9.1.8.
+
+v2.2.11.11 - 2018-03-13
+* Fixed a problem in `cloneTo` with `null` `List` values 
+
+v2.2.11.10 - 2017-11-05
+* Updated to ph-commons 9.0.0
+
+v2.2.11.9 - 2017-02-16
+* Added option `-Xph-tostring` requires ph-commons >= 8.6.2 
+* Added option `-Xph-tostring-legacy`
+
+v2.2.11.8 - 2016-07-27
+* Fixed bug in cloning of abstract class
+
+v2.2.11.7 - 2016-06-10
+* JDK8 is required
+* Added generic cloning 
+* the `ph-csu` settings is now also applied on nested generated classes
+
+v2.2.11.6 - 2015-07-21
+* Fixed error in `getXXXCount` method name
+
+v2.2.11.5 - 2015-07-01
+* Extended `ph-list-extension` with the `add` method
+* Updated to ph-commons 6.0.0
+
+v2.2.11.4 - 2015-03-31
+* Disabled the parameter renaming in the PluginCodeQuality so that JavaDocs can be generated with Java 8
+
+v2.2.11.3 - 2015-03-11
+
+v2.2.11.2 - 2015-02-06
+* Extended `ph-csu` for all enums as well
+
+v2.2.11.1 - 2015-02-06
+* Added new option `ph-csu` to add the CodingStyleguideUnaware annotation to all classes
+
+v2.2.11 - 2014-12-02
+* linked against JAXB 2.2.11
+
+v2.2.7 - 2014-08-24
+* linked against JAXB 2.2.7
 
 ---
 

@@ -25,24 +25,25 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.collection.ArrayHelper;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.io.file.FileHelper;
-import com.helger.commons.io.file.FileOperationManager;
-import com.helger.commons.io.file.FilenameHelper;
-import com.helger.commons.io.file.SimpleFileIO;
-import com.helger.commons.lang.ClassPathHelper;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.wrapper.Wrapper;
+import com.helger.base.CGlobal;
+import com.helger.base.lang.ClassPathHelper;
+import com.helger.base.string.StringImplode;
+import com.helger.base.string.StringReplace;
+import com.helger.base.wrapper.Wrapper;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.io.file.FileHelper;
+import com.helger.io.file.FileOperationManager;
+import com.helger.io.file.FilenameHelper;
+import com.helger.io.file.SimpleFileIO;
 import com.sun.tools.xjc.Driver;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 public final class Issue5FuncTest
 {
@@ -82,16 +83,16 @@ public final class Issue5FuncTest
         final File f = new File (URLDecoder.decode (x, StandardCharsets.ISO_8859_1));
         final Function <String, String> mod = FilenameHelper::getPathUsingUnixSeparator;
         if (f.getName ().startsWith ("ph-xsds-xmldsig-"))
-          aCatalogXML.set (StringHelper.replaceAll (aCatalogXML.get (), "$1", mod.apply (x)));
+          aCatalogXML.set (StringReplace.replaceAll (aCatalogXML.get (), "$1", mod.apply (x)));
         else
           if (f.getName ().startsWith ("ph-xsds-xades132-"))
-            aCatalogXML.set (StringHelper.replaceAll (aCatalogXML.get (), "$2", mod.apply (x)));
+            aCatalogXML.set (StringReplace.replaceAll (aCatalogXML.get (), "$2", mod.apply (x)));
           else
             if (f.getName ().startsWith ("ph-xsds-xades141-"))
-              aCatalogXML.set (StringHelper.replaceAll (aCatalogXML.get (), "$3", mod.apply (x)));
+              aCatalogXML.set (StringReplace.replaceAll (aCatalogXML.get (), "$3", mod.apply (x)));
             else
               if (f.getName ().startsWith ("ph-xsds-ccts-cct-schemamodule-"))
-                aCatalogXML.set (StringHelper.replaceAll (aCatalogXML.get (), "$4", mod.apply (x)));
+                aCatalogXML.set (StringReplace.replaceAll (aCatalogXML.get (), "$4", mod.apply (x)));
 
         aParams.add (x);
 
@@ -114,7 +115,7 @@ public final class Issue5FuncTest
     {
       // Don't use Driver.main because it calls System.exit
       FileOperationManager.INSTANCE.createDirRecursiveIfNotExisting (aDestDir);
-      return Driver.run (aParams.toArray (ArrayHelper.EMPTY_STRING_ARRAY), aPS, aPS);
+      return Driver.run (aParams.toArray (CGlobal.EMPTY_STRING_ARRAY), aPS, aPS);
     }
   }
 
@@ -144,6 +145,6 @@ public final class Issue5FuncTest
                    "-" +
                    aFileLines.size () +
                    "]\n" +
-                   StringHelper.imploder ().source (aFileLines).offset (nStart).separator ('\n').build ());
+                   StringImplode.imploder ().source (aFileLines).offset (nStart).separator ('\n').build ());
   }
 }

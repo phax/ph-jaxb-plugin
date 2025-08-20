@@ -22,13 +22,13 @@ import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
-import javax.annotation.Nonnull;
-
 import org.junit.Test;
 
-import com.helger.commons.io.file.FileHelper;
-import com.helger.commons.io.file.FileOperationManager;
+import com.helger.io.file.FileHelper;
+import com.helger.io.file.FileOperationManager;
 import com.sun.tools.xjc.Driver;
+
+import jakarta.annotation.Nonnull;
 
 public final class Issue2FuncTest
 {

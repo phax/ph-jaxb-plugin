@@ -24,12 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.collection.impl.CommonsArrayList;
+import com.helger.annotation.style.IsSPIImplementation;
+import com.helger.collection.commons.CommonsArrayList;
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClass;
@@ -48,6 +46,7 @@ import com.sun.xml.xsom.XSAnnotation;
 import com.sun.xml.xsom.XSSchema;
 import com.sun.xml.xsom.impl.SchemaImpl;
 
+import jakarta.annotation.Nonnull;
 import jakarta.xml.bind.annotation.XmlNs;
 import jakarta.xml.bind.annotation.XmlSchema;
 

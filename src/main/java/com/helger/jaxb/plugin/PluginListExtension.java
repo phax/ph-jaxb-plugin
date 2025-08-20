@@ -16,19 +16,15 @@
  */
 package com.helger.jaxb.plugin;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.annotation.ReturnsMutableObject;
-import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.CommonsHashSet;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.collection.impl.ICommonsSet;
+import com.helger.annotation.Nonnegative;
+import com.helger.annotation.style.IsSPIImplementation;
+import com.helger.annotation.style.ReturnsMutableObject;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashSet;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsSet;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
@@ -43,9 +39,11 @@ import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
- * Extend all bean List&lt;?&gt; getters with additional method to query the
- * content:
+ * Extend all bean List&lt;?&gt; getters with additional method to query the content:
  * <ul>
  * <li>void set...(List)</li>
  * <li>boolean has...Entries()</li>
@@ -63,8 +61,7 @@ public class PluginListExtension extends AbstractPlugin
   public static final String OPT = "Xph-list-extension";
 
   /**
-   * Does not work because upon reading the object gets filled with a regular
-   * java.util.ArrayList!
+   * Does not work because upon reading the object gets filled with a regular java.util.ArrayList!
    */
   private static final boolean USE_COMMONS_LIST = false;
 
@@ -148,7 +145,8 @@ public class PluginListExtension extends AbstractPlugin
         }
       }
 
-      for (final JMethod aMethod : CollectionHelper.newList (jClass.methods ()))
+      // Create a copy of the methods
+      for (final JMethod aMethod : new CommonsArrayList <> (jClass.methods ()))
         if (aMethod.name ().startsWith ("get") && aMethod.params ().isEmpty ())
         {
           final JType aReturnType = aMethod.type ();

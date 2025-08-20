@@ -20,9 +20,9 @@ import java.io.Serializable;
 
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.regex.RegExHelper;
+import com.helger.annotation.style.IsSPIImplementation;
+import com.helger.cache.regex.RegExHelper;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.graph.IMutableDirectedGraphNode;
 import com.helger.graph.simple.SimpleDirectedGraph;
 import com.sun.codemodel.JClass;

@@ -18,11 +18,11 @@ package com.helger.jaxb.plugin;
 
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
-
-import com.helger.commons.annotation.Nonempty;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.concurrent.Immutable;
 import com.sun.codemodel.JType;
+
+import jakarta.annotation.Nonnull;
 
 @Immutable
 public final class CJAXB

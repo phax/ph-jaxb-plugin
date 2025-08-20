@@ -16,16 +16,16 @@
  */
 package com.helger.jaxb.plugin;
 
-import javax.annotation.Nonnull;
-
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.IsSPIImplementation;
+import com.helger.annotation.style.IsSPIImplementation;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Plugin that makes all fields private instead of the default "protected"

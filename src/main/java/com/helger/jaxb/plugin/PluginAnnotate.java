@@ -18,16 +18,12 @@ package com.helger.jaxb.plugin;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.annotation.ReturnsMutableObject;
-import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.collection.impl.CommonsHashSet;
-import com.helger.commons.collection.impl.ICommonsSet;
+import com.helger.annotation.style.IsSPIImplementation;
+import com.helger.annotation.style.ReturnsMutableObject;
+import com.helger.collection.commons.CommonsHashSet;
+import com.helger.collection.commons.ICommonsSet;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JMethod;
@@ -38,9 +34,12 @@ import com.sun.tools.xjc.model.CElementInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
- * Create {@link Nonnull}/{@link Nullable} annotations in all bean generated
- * objects as well as in the ObjectFactory classes
+ * Create {@link Nonnull}/{@link Nullable} annotations in all bean generated objects as well as in
+ * the ObjectFactory classes
  *
  * @author Philip Helger
  */
@@ -78,7 +77,7 @@ public class PluginAnnotate extends AbstractPlugin
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
       final JDefinedClass jClass = aClassOutline.implClass;
-      for (final JMethod aMethod : CollectionHelper.newList (jClass.methods ()))
+      for (final JMethod aMethod : jClass.methods ())
       {
         final List <JVar> aParams = aMethod.params ();
         if (aMethod.name ().startsWith ("get") && aParams.isEmpty ())

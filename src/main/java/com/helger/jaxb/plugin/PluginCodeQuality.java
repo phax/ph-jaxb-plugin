@@ -18,14 +18,12 @@ package com.helger.jaxb.plugin;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.collection.impl.CommonsHashSet;
-import com.helger.commons.collection.impl.ICommonsSet;
+import com.helger.annotation.style.IsSPIImplementation;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashSet;
+import com.helger.collection.commons.ICommonsSet;
 import com.sun.codemodel.JAssignment;
 import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
@@ -39,9 +37,11 @@ import com.sun.tools.xjc.model.CElementInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
+import jakarta.annotation.Nonnull;
+
 /**
- * Improved the code quality by avoiding some compiler warnings, and by making
- * special constants accessible from the outside.
+ * Improved the code quality by avoiding some compiler warnings, and by making special constants
+ * accessible from the outside.
  *
  * @author Philip Helger
  */
@@ -99,7 +99,7 @@ public class PluginCodeQuality extends AbstractPlugin
         // And if this happens after the equals/hashCode plugin it will create
         // invalid code!
         // Change field name - copy the list!
-        for (final JFieldVar aField : CollectionHelper.newList (jClass.fields ().values ()))
+        for (final JFieldVar aField : new CommonsArrayList <> (jClass.fields ().values ()))
           if ((aField.mods ().getValue () & JMod.STATIC) == 0)
             if (!aField.name ().startsWith ("m_"))
               aField.name ("m_" + aField.name ());

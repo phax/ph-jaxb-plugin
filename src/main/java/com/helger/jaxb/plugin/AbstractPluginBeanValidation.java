@@ -22,13 +22,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.math.MathHelper;
-import com.helger.commons.string.StringParser;
+import com.helger.base.numeric.BigHelper;
+import com.helger.base.string.StringParser;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
@@ -56,6 +53,8 @@ import com.sun.xml.xsom.impl.ElementDecl;
 import com.sun.xml.xsom.impl.RestrictionSimpleTypeImpl;
 import com.sun.xml.xsom.impl.parser.DelayedRef;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -72,13 +71,13 @@ import jakarta.validation.constraints.Size;
 public abstract class AbstractPluginBeanValidation extends AbstractPlugin
 {
   private static final BigInteger UNBOUNDED = BigInteger.valueOf (XSParticle.UNBOUNDED);
-  private static final String [] NUMBER_TYPES = new String [] { "BigDecimal",
-                                                                "BigInteger",
-                                                                "String",
-                                                                "byte",
-                                                                "short",
-                                                                "int",
-                                                                "long" };
+  private static final String [] NUMBER_TYPES = { "BigDecimal",
+                                                  "BigInteger",
+                                                  "String",
+                                                  "byte",
+                                                  "short",
+                                                  "int",
+                                                  "long" };
 
   // JSR 303 = Bean Validation 1.0
   // JSR 349 = Bean Validation 1.1
@@ -144,7 +143,7 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
 
     // workaround for choices
     final boolean bRequired = aElement.isRequired ();
-    if (MathHelper.isLT0 (aMinOccurs) || (MathHelper.isGE1 (aMinOccurs) && bRequired))
+    if (BigHelper.isLT0 (aMinOccurs) || (BigHelper.isGE1 (aMinOccurs) && bRequired))
     {
       if (!_hasAnnotation (aField, NotNull.class))
         aField.annotate (NotNull.class);
@@ -156,7 +155,7 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
         aField.annotate (Size.class).param ("min", aMinOccurs.intValue ()).param ("max", aMaxOccurs.intValue ());
       }
     }
-    if (UNBOUNDED.equals (aMaxOccurs) && MathHelper.isGT0 (aMinOccurs))
+    if (UNBOUNDED.equals (aMaxOccurs) && BigHelper.isGT0 (aMinOccurs))
     {
       if (!_hasAnnotation (aField, Size.class))
       {
@@ -257,9 +256,9 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
     }
 
     /**
-     * <annox:annotate annox:class="jakarta.validation.constraints.Pattern"
-     * message= "Name can only contain capital letters, numbers and the symbols
-     * '-', '_', '/', ' '" regexp="^[A-Z0-9_\s//-]*" />
+     * <annox:annotate annox:class="jakarta.validation.constraints.Pattern" message= "Name can only
+     * contain capital letters, numbers and the symbols '-', '_', '/', ' '" regexp=
+     * "^[A-Z0-9_\s//-]*" />
      */
     final XSFacet aFacetPattern = aSimpleType.getFacet ("pattern");
     if (aFacetPattern != null)
@@ -309,10 +308,10 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
 
     final XSFacet aXSTotalDigits = aSimpleType.getFacet ("totalDigits");
     final XSFacet aXSFractionDigits = aSimpleType.getFacet ("fractionDigits");
-    final Integer aTotalDigits = aXSTotalDigits == null ? null
-                                                        : StringParser.parseIntObj (aXSTotalDigits.getValue ().value);
-    final Integer aFractionDigits = aXSFractionDigits == null ? null
-                                                              : StringParser.parseIntObj (aXSFractionDigits.getValue ().value);
+    final Integer aTotalDigits = aXSTotalDigits == null ? null : StringParser.parseIntObj (aXSTotalDigits
+                                                                                                         .getValue ().value);
+    final Integer aFractionDigits = aXSFractionDigits == null ? null : StringParser.parseIntObj (aXSFractionDigits
+                                                                                                                  .getValue ().value);
     if (!_hasAnnotation (aField, Digits.class) && aTotalDigits != null)
     {
       final JAnnotationUse aAnnotDigits = aField.annotate (Digits.class);

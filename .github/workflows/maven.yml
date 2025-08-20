@@ -22,8 +22,6 @@ name: Maven deploy Snapshots
 
 on:
   push:
-    branches:
-      - master
 
 jobs:
   build:
@@ -32,7 +30,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
-        java: [ 11, 17, 21, 24 ]
+        java: [ 17, 21, 24 ]
     name: Java ${{ matrix.java }} on ${{ matrix.os }} build
 
     steps:
@@ -56,11 +54,11 @@ jobs:
 
     - name: Publish to the Maven Central Repository
       run: mvn --batch-mode --update-snapshots -P release-snapshot deploy
-      if: matrix.java == 11
+      if: matrix.java == 17
       env:
         MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
 
     - name: Maven Build
       run: mvn --batch-mode --update-snapshots install
-      if: matrix.java != 11
+      if: matrix.java != 17

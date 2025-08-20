@@ -19,10 +19,8 @@ package com.helger.jaxb.plugin;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.collection.ArrayHelper;
-import com.helger.commons.lang.CloneHelper;
+import com.helger.base.array.ArrayHelper;
+import com.helger.base.clone.CloneHelper;
 import com.helger.jaxb.adapter.JAXBHelper;
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JClass;
@@ -32,6 +30,8 @@ import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JOp;
 import com.sun.codemodel.JType;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Abstract cloneable support.

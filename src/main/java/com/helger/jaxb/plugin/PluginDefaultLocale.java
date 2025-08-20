@@ -18,21 +18,20 @@ package com.helger.jaxb.plugin;
 
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
-
 import org.xml.sax.ErrorHandler;
 
-import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.locale.LocaleCache;
-import com.helger.commons.string.StringHelper;
+import com.helger.annotation.style.IsSPIImplementation;
+import com.helger.base.string.StringHelper;
+import com.helger.text.locale.LocaleCache;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.Outline;
 
+import jakarta.annotation.Nonnull;
+
 /**
- * Plugin implementation, that sets the default locale to "en_US" so that the
- * comments are generated in the chosen locale instead of the platform default
- * locale.
+ * Plugin implementation, that sets the default locale to "en_US" so that the comments are generated
+ * in the chosen locale instead of the platform default locale.
  *
  * @author Philip Helger
  */
@@ -59,7 +58,7 @@ public class PluginDefaultLocale extends AbstractPlugin
     if (args[i].equals ("-" + OPT))
     {
       final String sLocale = opt.requireArgument ("-" + OPT, args, i + 1);
-      if (StringHelper.hasNoText (sLocale))
+      if (StringHelper.isEmpty (sLocale))
         throw new BadCommandLineException ("No locale name provided. Use e.g. 'en_US'");
       Locale.setDefault (LocaleCache.getInstance ().getLocale (sLocale));
       logInfo ("Default Locale was set to '" + sLocale + "'");

@@ -22,10 +22,10 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>2.1.4</version>
+    <version>3.0.0</version>
   </parent>
   <artifactId>ph-jaxb-plugin</artifactId>
-  <version>4.0.4-SNAPSHOT</version>
+  <version>4.1.0-SNAPSHOT</version>
   <name>ph-jaxb-plugin</name>
   <description>JAXB 4.x plugin to improve created output</description>
   <url>https://github.com/phax/ph-jaxb-plugin</url>
@@ -65,10 +65,11 @@
       <dependency>
         <groupId>com.helger.commons</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>11.2.6</version>
+        <version>12.0.0-rc1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <!-- test only -->
       <dependency>
         <groupId>com.helger.xsd</groupId>
         <artifactId>ph-xsds-parent-pom</artifactId>
@@ -85,10 +86,6 @@
   </dependencyManagement>
 
   <dependencies>
-    <dependency>
-      <groupId>com.helger.commons</groupId>
-      <artifactId>ph-commons</artifactId>
-    </dependency>
     <dependency>
       <groupId>com.helger.commons</groupId>
       <artifactId>ph-graph</artifactId>
@@ -126,6 +123,11 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.helger.commons</groupId>
+      <artifactId>ph-unittest-support-ext</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- for issue #5 test -->
