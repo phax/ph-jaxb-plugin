@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
-  <public publicId="http://www.w3.org/2000/09/xmldsig#" uri="jar:file:C:/Users/phili/.m2/repository/com/helger/xsd/ph-xsds-xmldsig/3.0.0/ph-xsds-xmldsig-3.0.0.jar!/schemas/xmldsig-core-schema.xsd" />
-  <public publicId="http://uri.etsi.org/01903/v1.3.2#" uri="jar:file:C:/Users/phili/.m2/repository/com/helger/xsd/ph-xsds-xades132/3.0.0/ph-xsds-xades132-3.0.0.jar!/schemas/XAdES01903v132-201601.xsd" />
-  <public publicId="http://uri.etsi.org/01903/v1.4.1#" uri="jar:file:C:/Users/phili/.m2/repository/com/helger/xsd/ph-xsds-xades141/3.0.0/ph-xsds-xades141-3.0.0.jar!/schemas/XAdES01903v141-201601.xsd" />
-  <public publicId="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" uri="jar:file:C:/Users/phili/.m2/repository/com/helger/xsd/ph-xsds-ccts-cct-schemamodule/3.0.0/ph-xsds-ccts-cct-schemamodule-3.0.0.jar!/schemas/CCTS_CCT_SchemaModule.xsd" />
+  <public publicId="http://www.w3.org/2000/09/xmldsig#" uri="jar:file:/Users/philip/.m2/repository/com/helger/xsd/ph-xsds-xmldsig/3.0.0/ph-xsds-xmldsig-3.0.0.jar!/schemas/xmldsig-core-schema.xsd" />
+  <public publicId="http://uri.etsi.org/01903/v1.3.2#" uri="jar:file:/Users/philip/.m2/repository/com/helger/xsd/ph-xsds-xades132/3.0.0/ph-xsds-xades132-3.0.0.jar!/schemas/XAdES01903v132-201601.xsd" />
+  <public publicId="http://uri.etsi.org/01903/v1.4.1#" uri="jar:file:/Users/philip/.m2/repository/com/helger/xsd/ph-xsds-xades141/3.0.0/ph-xsds-xades141-3.0.0.jar!/schemas/XAdES01903v141-201601.xsd" />
+  <public publicId="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" uri="jar:file:/Users/philip/.m2/repository/com/helger/xsd/ph-xsds-ccts-cct-schemamodule/3.0.0/ph-xsds-ccts-cct-schemamodule-3.0.0.jar!/schemas/CCTS_CCT_SchemaModule.xsd" />
 </catalog>

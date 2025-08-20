@@ -68,6 +68,7 @@ public final class Issue5FuncTest
     if (aCatalogFile != null)
       aParams.addAll ("-catalog", aCatalogFile.getAbsolutePath ());
 
+    // Catalog base
     final Wrapper <String> aCatalogXML = new Wrapper <> ("<?xml version='1.0' encoding='utf-8'?>\n" +
                                                          "<catalog xmlns=\"urn:oasis:names:tc:entity:xmlns:xml:catalog\">\n" +
                                                          "  <public publicId=\"http://www.w3.org/2000/09/xmldsig#\" uri=\"jar:file:$1!/schemas/xmldsig-core-schema.xsd\" />\n" +
@@ -76,6 +77,7 @@ public final class Issue5FuncTest
                                                          "  <public publicId=\"urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2\" uri=\"jar:file:$4!/schemas/CCTS_CCT_SchemaModule.xsd\" />\n" +
                                                          "</catalog>");
 
+    // Put effective paths into catalog XML
     ClassPathHelper.forAllClassPathEntries (x -> {
       if (x.endsWith (".jar"))
       {
@@ -101,6 +103,7 @@ public final class Issue5FuncTest
       }
     });
 
+    // Store catalog file on disc?
     if (aCatalogFile != null)
     {
       if (false)
