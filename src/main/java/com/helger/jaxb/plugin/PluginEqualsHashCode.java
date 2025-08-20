@@ -135,7 +135,7 @@ public class PluginEqualsHashCode extends AbstractPlugin
                 final JClass aTypeParam = ((JClass) aField.type ()).getTypeParameters ().get (0);
 
                 if (false)
-                  logWarn ("  List [" + sFieldName + "] " + aTypeParam.erasure ().name ());
+                  logWarn ("  List: " + aTypeParam.erasure ().name ());
 
                 if (aTypeParam.erasure ().name ().equals ("JAXBElement"))
                 {
@@ -149,7 +149,7 @@ public class PluginEqualsHashCode extends AbstractPlugin
                   // b. [com.sun.codemodel.JDefinedClass(Ebi40ReductionAndSurchargeType)]
                   boolean bNeedsCast = aTypeParam.getTypeParameters ().get (0) instanceof JDefinedClass;
 
-                  final JExpression aThisExpr = jJaxbHelper.staticInvoke ("equalJAXBElementLists")
+                  final JExpression aThisExpr = jJaxbHelper.staticInvoke ("equalListJAXBElements")
                                                            .arg (bNeedsCast ? jGenericReflection.staticInvoke ("uncheckedCast")
                                                                                                 .arg (JExpr.ref (sFieldName))
                                                                             : JExpr.ref (sFieldName))
@@ -165,7 +165,7 @@ public class PluginEqualsHashCode extends AbstractPlugin
                     // List<Object> means a List of "anything" and needs special attention on
                     // JAXBElements and DOM nodes
 
-                    final JExpression aThisExpr = jJaxbHelper.staticInvoke ("equalAnyLists")
+                    final JExpression aThisExpr = jJaxbHelper.staticInvoke ("equalListAnys")
                                                              .arg (JExpr.ref (sFieldName))
                                                              .arg (jTyped.ref (sFieldName));
                     jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
