@@ -37,8 +37,7 @@ import com.sun.tools.xjc.outline.Outline;
 import jakarta.annotation.Nonnull;
 
 /**
- * Add default toString method using the {@link ToStringGenerator} class (using
- * getToString method).
+ * Add default toString method using the {@link ToStringGenerator} class (using getToString method).
  *
  * @author Philip Helger
  */
@@ -59,7 +58,7 @@ public class PluginToString extends AbstractPlugin
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + "    :  auto implement toString using com.helger.commons.string.ToStringGenerator";
+    return "  -" + OPT + "    :  auto implement toString using com.helger.base.string.ToStringGenerator";
   }
 
   @Override

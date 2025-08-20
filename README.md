@@ -94,6 +94,7 @@ For usage with JAXB 2.2 use this dependency:
 v4.1.0 - work in progress
 * Requires Java 17 as the minimum version
 * Updated to ph-commons 12.0.0
+* The generated code requires ph-commons 12.0.0
 
 v4.0.3 - 2023-09-20
 * If the `ph-list-extension` is used and  `get...Count()` is already present, a `get...ListCount()` is created instead

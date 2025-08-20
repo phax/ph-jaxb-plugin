@@ -31,7 +31,6 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JVar;
-import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.model.CElementInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
@@ -50,9 +49,6 @@ public class PluginCodeQuality extends AbstractPlugin
 {
   public static final String OPT = "Xph-code-quality";
 
-  private boolean m_bJDK7 = false;
-  private boolean m_bJDK8 = false;
-
   @Override
   public String getOptionName ()
   {
@@ -62,23 +58,7 @@ public class PluginCodeQuality extends AbstractPlugin
   @Override
   public String getUsage ()
   {
-    return "  -" + OPT + "  [jdk7|jdk8]? :  fix some issues that cause warnings in the generated code";
-  }
-
-  @Override
-  public int parseArgument (final Options opt, final String [] args, final int i) throws BadCommandLineException
-  {
-    if (args[i].equals ("-" + OPT))
-    {
-      if (i + 1 >= args.length)
-        return 1;
-
-      final String sArg = args[i + 1];
-      m_bJDK7 = "jdk7".equalsIgnoreCase (sArg);
-      m_bJDK8 = "jdk8".equalsIgnoreCase (sArg);
-      return m_bJDK7 || m_bJDK8 ? 2 : 1;
-    }
-    return 0;
+    return "  -" + OPT + "  fix some issues that cause warnings in the generated code";
   }
 
   @Override
@@ -132,27 +112,26 @@ public class PluginCodeQuality extends AbstractPlugin
         }
 
       if (false)
-        if (m_bJDK7 || m_bJDK8)
-        {
-          for (final JMethod jMethod : jClass.methods ())
-            if (jMethod.name ().startsWith ("get") &&
-                jMethod.params ().isEmpty () &&
-                jMethod.type ().erasure ().name ().equals ("List"))
+      {
+        for (final JMethod jMethod : jClass.methods ())
+          if (jMethod.name ().startsWith ("get") &&
+              jMethod.params ().isEmpty () &&
+              jMethod.type ().erasure ().name ().equals ("List"))
+          {
+            List <Object> aContents = jMethod.body ().getContents ();
+            Object aFirst = aContents.get (0);
+            if (aFirst instanceof JConditional)
             {
-              List <Object> aContents = jMethod.body ().getContents ();
-              Object aFirst = aContents.get (0);
-              if (aFirst instanceof JConditional)
+              aContents = ((JConditional) aFirst)._then ().getContents ();
+              aFirst = aContents.get (0);
+              if (aFirst instanceof JAssignment)
               {
-                aContents = ((JConditional) aFirst)._then ().getContents ();
-                aFirst = aContents.get (0);
-                if (aFirst instanceof JAssignment)
-                {
-                  final JAssignment aAss = (JAssignment) aFirst;
-                  // No way to change assignment :(
-                }
+                final JAssignment aAss = (JAssignment) aFirst;
+                // No way to change assignment :(
               }
             }
-        }
+          }
+      }
     }
 
     // Get all ObjectFactory classes

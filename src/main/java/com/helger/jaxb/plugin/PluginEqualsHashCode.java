@@ -41,8 +41,8 @@ import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
 
 /**
- * Add default equals and hashCode methods. For equals the {@link EqualsHelper}
- * class is used and for hashCode the {@link HashCodeGenerator} class is used.
+ * Add default equals and hashCode methods. For equals the {@link EqualsHelper} class is used and
+ * for hashCode the {@link HashCodeGenerator} class is used.
  *
  * @author Philip Helger
  */
@@ -62,7 +62,7 @@ public class PluginEqualsHashCode extends AbstractPlugin
   {
     return "  -" +
            OPT +
-           "    :  auto implement equals and hashCode using com.helger.commons.equals.EqualsHelper and com.helger.commons.hashcode.HashCodeGenerator";
+           "    :  auto implement equals and hashCode using com.helger.base.equals.EqualsHelper and com.helger.base.hashcode.HashCodeGenerator";
   }
 
   @Override
@@ -104,9 +104,7 @@ public class PluginEqualsHashCode extends AbstractPlugin
             jBody._if (param.eq (JExpr._null ())
                             .cor (JOp.not (JExpr.invoke ("getClass")
                                                 .invoke ("equals")
-                                                .arg (param.invoke ("getClass")))))
-                 ._then ()
-                 ._return (JExpr.FALSE);
+                                                .arg (param.invoke ("getClass")))))._then ()._return (JExpr.FALSE);
           }
           else
           {
@@ -123,10 +121,9 @@ public class PluginEqualsHashCode extends AbstractPlugin
               if (aField.type ().erasure ().name ().equals ("List"))
               {
                 /*
-                 * Ensure that "EqualsHelper.equals" is invoked on all child
-                 * elements. This is an issue with "List<JAXBElement<?>>" in
-                 * Java9 onwards, because JAXBElement does not implement equals.
-                 * Note: use "equalsCollection" to allow for null values as well
+                 * Ensure that "EqualsHelper.equals" is invoked on all child elements. This is an
+                 * issue with "List<JAXBElement<?>>" in Java9 onwards, because JAXBElement does not
+                 * implement equals. Note: use "equalsCollection" to allow for null values as well
                  */
                 final JExpression aThisExpr = jEqualsHelper.staticInvoke ("equalsCollection")
                                                            .arg (JExpr.ref (sFieldName))

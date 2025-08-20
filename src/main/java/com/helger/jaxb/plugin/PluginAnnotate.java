@@ -59,7 +59,7 @@ public class PluginAnnotate extends AbstractPlugin
   {
     return "  -" +
            OPT +
-           " :  add @javax.annotation.Nullable/@javax.annotation.Nonnull annotations to getters and setters";
+           " :  add @jakarta.annotation.Nullable/@jakarta.annotation.Nonnull annotations to getters and setters";
   }
 
   @Override
