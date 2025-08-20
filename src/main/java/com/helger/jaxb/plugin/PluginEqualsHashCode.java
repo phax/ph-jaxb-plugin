@@ -23,6 +23,7 @@ import com.helger.base.array.ArrayHelper;
 import com.helger.base.equals.EqualsHelper;
 import com.helger.base.hashcode.HashCodeGenerator;
 import com.helger.collection.commons.ICommonsOrderedMap;
+import com.helger.collection.helper.CollectionEqualsHelper;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
@@ -74,6 +75,7 @@ public class PluginEqualsHashCode extends AbstractPlugin
     final JCodeModel aCodeModel = aOutline.getCodeModel ();
     final JClass jObject = aCodeModel.ref (Object.class);
     final JClass jEqualsHelper = aCodeModel.ref (EqualsHelper.class);
+    final JClass jCollEqualsHelper = aCodeModel.ref (CollectionEqualsHelper.class);
     final JClass jHashCodeGenerator = aCodeModel.ref (HashCodeGenerator.class);
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
     {
@@ -125,9 +127,9 @@ public class PluginEqualsHashCode extends AbstractPlugin
                  * issue with "List<JAXBElement<?>>" in Java9 onwards, because JAXBElement does not
                  * implement equals. Note: use "equalsCollection" to allow for null values as well
                  */
-                final JExpression aThisExpr = jEqualsHelper.staticInvoke ("equalsCollection")
-                                                           .arg (JExpr.ref (sFieldName))
-                                                           .arg (jTyped.ref (sFieldName));
+                final JExpression aThisExpr = jCollEqualsHelper.staticInvoke ("equalsCollection")
+                                                               .arg (JExpr.ref (sFieldName))
+                                                               .arg (jTyped.ref (sFieldName));
                 jBody._if (JOp.not (aThisExpr))._then ()._return (JExpr.FALSE);
               }
               else
