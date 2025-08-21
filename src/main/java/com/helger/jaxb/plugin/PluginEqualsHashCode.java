@@ -22,6 +22,7 @@ import org.xml.sax.ErrorHandler;
 import com.helger.annotation.style.IsSPIImplementation;
 import com.helger.base.array.ArrayHelper;
 import com.helger.base.equals.EqualsHelper;
+import com.helger.base.hashcode.HashCodeCalculator;
 import com.helger.base.hashcode.HashCodeGenerator;
 import com.helger.base.reflection.GenericReflection;
 import com.helger.collection.commons.ICommonsOrderedMap;
@@ -81,6 +82,7 @@ public class PluginEqualsHashCode extends AbstractPlugin
     final JClass jEqualsHelper = aCodeModel.ref (EqualsHelper.class);
     final JClass jCollEqualsHelper = aCodeModel.ref (CollectionEqualsHelper.class);
     final JClass jJaxbHelper = aCodeModel.ref (JAXBHelper.class);
+    final JClass jHashCodeCalculator = aCodeModel.ref (HashCodeCalculator.class);
     final JClass jHashCodeGenerator = aCodeModel.ref (HashCodeGenerator.class);
     final JClass jGenericReflection = aCodeModel.ref (GenericReflection.class);
     for (final ClassOutline aClassOutline : aOutline.getClasses ())
@@ -286,9 +288,11 @@ public class PluginEqualsHashCode extends AbstractPlugin
                 if (aField.type ().erasure ().name ().equals ("Object"))
                 {
                   // Runtime check, if an xs:any "Object" is a DOM Node or not
+                  // Make sure, both expressions return "int"
                   final JExpression aNodeExpr = jJaxbHelper.staticInvoke ("getHashCode")
                                                            .arg (JExpr.cast (jNode, JExpr.ref (sFieldName)));
-                  final JExpression aThisExpr = JExpr.ref (sFieldName);
+                  final JExpression aThisExpr = jHashCodeCalculator.staticInvoke ("hashCode")
+                                                                   .arg (JExpr.ref (sFieldName));
                   JExpression aHashCode = JOp.cond (JExpr.ref (sFieldName)._instanceof (jNode), aNodeExpr, aThisExpr);
                   aInvocation = aInvocation.invoke ("append").arg (aHashCode);
                 }
