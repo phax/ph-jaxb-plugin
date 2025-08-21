@@ -61,6 +61,14 @@ public class PluginToString extends AbstractPlugin
     return "  -" + OPT + "    :  auto implement toString using com.helger.base.string.ToStringGenerator";
   }
 
+  @Nonnull
+  private static String _ucFirst (@Nonnull String s)
+  {
+    if (s.length () == 0)
+      return s;
+    return Character.toUpperCase (s.charAt (0)) + s.substring (1);
+  }
+
   @Override
   public boolean run (@Nonnull final Outline aOutline,
                       @Nonnull final Options aOpts,
@@ -103,7 +111,9 @@ public class PluginToString extends AbstractPlugin
           for (final JFieldVar aField : aFieldVars.keySet ())
           {
             final String sFieldName = aField.name ();
-            aInvocation = aInvocation.invoke ("append").arg (JExpr.lit (sFieldName)).arg (JExpr.ref (sFieldName));
+            aInvocation = aInvocation.invoke ("append")
+                                     .arg (JExpr.lit (_ucFirst (sFieldName)))
+                                     .arg (JExpr.ref (sFieldName));
           }
         }
         else
