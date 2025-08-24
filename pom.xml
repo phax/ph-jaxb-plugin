@@ -22,7 +22,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
   </parent>
   <artifactId>ph-jaxb-plugin</artifactId>
   <version>5.0.0-SNAPSHOT</version>
@@ -65,11 +65,11 @@
       <dependency>
         <groupId>com.helger.commons</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>12.0.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <!-- test only -->
+      <!-- test only; always release this plugin first -->
       <dependency>
         <groupId>com.helger.xsd</groupId>
         <artifactId>ph-xsds-parent-pom</artifactId>
