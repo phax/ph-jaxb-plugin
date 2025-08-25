@@ -196,7 +196,7 @@ public class PluginValueExtender extends AbstractPlugin
         if (aField.name ().equals (FIELD_VALUE))
         {
           aValueType = aField.type ();
-          logDebug ( () -> "  [" + aField.type ().name () + " " + FIELD_VALUE + "] directly found");
+          logDebug ( () -> "    [" + aField.type ().name () + " " + FIELD_VALUE + "] found directly in class");
           break;
         }
 
@@ -217,13 +217,13 @@ public class PluginValueExtender extends AbstractPlugin
             final JType vtFinal = aValueType;
             final JClass clsFinal = jCurClass;
             final int lvlFinal = nLevel;
-            logDebug ( () -> "  [" +
+            logDebug ( () -> "    [" +
                              vtFinal.name () +
                              " " +
                              FIELD_VALUE +
                              "] found in parent[" +
                              lvlFinal +
-                             "] '" +
+                             "] class '" +
                              clsFinal.name () +
                              "'");
           }
@@ -292,7 +292,7 @@ public class PluginValueExtender extends AbstractPlugin
     final ClassNameValueFieldTypeMap aClassValueFieldTypeMap = new ClassNameValueFieldTypeMap (aOutline);
 
     // Return map from class to value field type
-    final ICommonsNavigableMap <String, JType> aAllCtorClasses = new CommonsTreeMap <> ();
+    final ICommonsNavigableMap <String, JType> ret = new CommonsTreeMap <> ();
 
     logDebug ( () -> "Start creating value ctors");
 
@@ -328,23 +328,23 @@ public class PluginValueExtender extends AbstractPlugin
 
         if (bHasPluginOffsetDT)
         {
-          final JType aNewValueType = PluginOffsetDTExtension.getOtherType (aValueType, cm);
-          if (aNewValueType != null)
+          final JType aSecondaryValueType = PluginOffsetDTExtension.getSecondaryDataType (aValueType, cm);
+          if (aSecondaryValueType != null)
           {
-            logDebug ( () -> "    New value ctor '" + jClass.name () + "(" + aNewValueType.name () + ")'");
+            logDebug ( () -> "    New value ctor '" + jClass.name () + "(" + aSecondaryValueType.name () + ")'");
 
             final JMethod aValueCtor = jClass.constructor (JMod.PUBLIC);
-            final JVar aParam = aValueCtor.param (JMod.FINAL, aNewValueType, "valueParam");
+            final JVar aParam = aValueCtor.param (JMod.FINAL, aSecondaryValueType, "valueParam");
             aParam.annotate (Nullable.class);
             // Just call "setValue" in the constructor
             aValueCtor.body ().invoke ("setValue").arg (aParam);
-            aValueCtor.javadoc ().add ("Constructor for value of type " + aNewValueType.name ());
+            aValueCtor.javadoc ().add ("Constructor for value of type " + aSecondaryValueType.name ());
             aValueCtor.javadoc ().addParam (aParam).add ("The value to be set. May be <code>null</code>.");
             aValueCtor.javadoc ().add (AUTHOR);
           }
         }
 
-        aAllCtorClasses.put (sClassFullName, aValueType);
+        ret.put (sClassFullName, aValueType);
       }
       else
       {
@@ -352,7 +352,7 @@ public class PluginValueExtender extends AbstractPlugin
       }
     }
 
-    return aAllCtorClasses;
+    return ret;
   }
 
   private void _addValueSetters (@Nonnull final Outline aOutline,
@@ -382,7 +382,12 @@ public class PluginValueExtender extends AbstractPlugin
           final JType aParamType = aParams.get (0).type ();
           final JType aValueType = aAllCtorClasses.get (aParamType.fullName ());
           if (aValueType == null)
+          {
+            logDebug ( () -> "    No setter for '" +
+                             aParamType.fullName () +
+                             "' because not found in constructor list");
             continue;
+          }
 
           {
             logDebug ( () -> "    New setter '" +
@@ -421,20 +426,21 @@ public class PluginValueExtender extends AbstractPlugin
             if (bHasPluginOffsetDT)
             {
               // Add the setter for the 2nd data type as well
-              final JType aNewValueType = PluginOffsetDTExtension.getOtherType (aValueType, aOutline.getCodeModel ());
-              if (aNewValueType != null)
+              final JType aSecondaryValueType = PluginOffsetDTExtension.getSecondaryDataType (aValueType,
+                                                                                              aOutline.getCodeModel ());
+              if (aSecondaryValueType != null)
               {
                 logDebug ( () -> "    New setter '" +
                                  aParamType.name () +
                                  " " +
                                  aMethod.name () +
                                  "(" +
-                                 aNewValueType.name () +
+                                 aSecondaryValueType.name () +
                                  ")'");
 
                 final JMethod aSetter = jClass.method (JMod.PUBLIC, aParamType, aMethod.name ());
                 aSetter.annotate (Nonnull.class);
-                final JVar aParam = aSetter.param (JMod.FINAL, aNewValueType, "valueParam");
+                final JVar aParam = aSetter.param (JMod.FINAL, aSecondaryValueType, "valueParam");
                 aParam.annotate (Nullable.class);
                 final JVar aObj = aSetter.body ()
                                          .decl (aParamType,
@@ -591,12 +597,16 @@ public class PluginValueExtender extends AbstractPlugin
 
               if (bHasPluginOffsetDT)
               {
-                final JType aNewValueType = PluginOffsetDTExtension.getOtherType (aValueType, cm);
-                if (aNewValueType != null)
+                final JType aSecondaryValueType = PluginOffsetDTExtension.getSecondaryDataType (aValueType, cm);
+                if (aSecondaryValueType != null)
                 {
-                  logDebug ( () -> "    New value getter '" + aNewValueType.name () + " " + sMethodName + "Local()'");
+                  logDebug ( () -> "    New value getter '" +
+                                   aSecondaryValueType.name () +
+                                   " " +
+                                   sMethodName +
+                                   "Local()'");
 
-                  final JMethod aGetter = jClass.method (JMod.PUBLIC, aNewValueType, sMethodName + "Local");
+                  final JMethod aGetter = jClass.method (JMod.PUBLIC, aSecondaryValueType, sMethodName + "Local");
                   aGetter.annotate (Nullable.class);
                   final JVar aObj = aGetter.body ().decl (aReturnType, "aObj", JExpr.invoke (aMethod));
                   aGetter.body ()

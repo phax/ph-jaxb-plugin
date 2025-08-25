@@ -75,7 +75,7 @@ public class PluginOffsetDTExtension extends AbstractPlugin
   }
 
   @Nullable
-  public static JType getOtherType (@Nonnull final JType aType, @Nonnull final JCodeModel cm)
+  public static JType getSecondaryDataType (@Nonnull final JType aType, @Nonnull final JCodeModel cm)
   {
     switch (aType.name ())
     {
