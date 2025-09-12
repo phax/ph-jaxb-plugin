@@ -120,6 +120,7 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
            sTypeName.equals ("Period") ||
            sTypeName.equals ("PeriodDuration") ||
            sTypeName.equals ("QName") ||
+           sTypeName.equals ("Serializable") ||
            sTypeName.equals ("Short") ||
            sTypeName.equals ("String") ||
            sTypeName.equals ("W3CEndpointReference") ||
