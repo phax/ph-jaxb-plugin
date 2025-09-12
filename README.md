@@ -18,7 +18,7 @@ Add something **like** the following to your pom.xml to use this artifact:
 <plugin>
   <groupId>org.jvnet.jaxb</groupId>
   <artifactId>jaxb-maven-plugin</artifactId>
-  <version>5.0.0</version>
+  <version>4.0.9</version>
   <executions>
     <execution>
       <goals>
@@ -50,7 +50,7 @@ Add something **like** the following to your pom.xml to use this artifact:
       <groupId>com.helger</groupId>
       <artifactId>ph-jaxb-plugin</artifactId>
       <!-- Use the right version below -->
-      <version>4.0.3</version>
+      <version>5.0.1</version>
     </dependency>
   </dependencies>
 </plugin>
@@ -94,6 +94,9 @@ For usage with JAXB 2.2 use this dependency:
 * `ph-value-extender` (since 2.3.1.3) - create additional constructors with the 'value' as argument as well as getter and setter for the value
 
 # News and noteworthy
+
+v5.0.1 - 2025-09-12
+* Added handling for type `Serializable` in `clone` plugin
 
 v5.0.0 - 2025-08-24
 * Requires Java 17 as the minimum version
