@@ -18,11 +18,11 @@ package com.helger.jaxb.plugin;
 
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
 import com.sun.codemodel.JType;
-
-import jakarta.annotation.Nonnull;
 
 @Immutable
 public final class CJAXB
@@ -34,9 +34,9 @@ public final class CJAXB
   private CJAXB ()
   {}
 
-  @Nonnull
+  @NonNull
   @Nonempty
-  public static String getGetterName (@Nonnull final JType aType, @Nonnull final String sFieldName)
+  public static String getGetterName (@NonNull final JType aType, @NonNull final String sFieldName)
   {
     String sName = sFieldName;
     if (Character.isLowerCase (sName.charAt (0)))
@@ -47,9 +47,9 @@ public final class CJAXB
     return "get" + sName;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
-  public static String getSetterName (@Nonnull final String sFieldName)
+  public static String getSetterName (@NonNull final String sFieldName)
   {
     String sName = sFieldName;
     if (Character.isLowerCase (sName.charAt (0)))

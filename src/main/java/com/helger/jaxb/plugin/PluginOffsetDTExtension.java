@@ -23,6 +23,8 @@ import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.annotation.style.IsSPIImplementation;
@@ -44,9 +46,6 @@ import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Extend all bean members of type <code>OffsetDate</code>,
@@ -75,7 +74,7 @@ public class PluginOffsetDTExtension extends AbstractPlugin
   }
 
   @Nullable
-  public static JType getSecondaryDataType (@Nonnull final JType aType, @Nonnull final JCodeModel cm)
+  public static JType getSecondaryDataType (@NonNull final JType aType, @NonNull final JCodeModel cm)
   {
     switch (aType.name ())
     {

@@ -18,6 +18,7 @@ package com.helger.jaxb.plugin;
 
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.annotation.style.IsSPIImplementation;
@@ -26,8 +27,6 @@ import com.helger.text.locale.LocaleCache;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.Outline;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Plugin implementation, that sets the default locale to "en_US" so that the comments are generated
@@ -68,9 +67,9 @@ public class PluginDefaultLocale extends AbstractPlugin
   }
 
   @Override
-  public boolean run (@Nonnull final Outline aOutline,
-                      @Nonnull final Options aOpts,
-                      @Nonnull final ErrorHandler aErrorHandler)
+  public boolean run (@NonNull final Outline aOutline,
+                      @NonNull final Options aOpts,
+                      @NonNull final ErrorHandler aErrorHandler)
   {
     initPluginLogging (aOpts.debugMode);
     // Nothing to do here

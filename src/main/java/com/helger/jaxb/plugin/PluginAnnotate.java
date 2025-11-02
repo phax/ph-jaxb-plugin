@@ -18,6 +18,8 @@ package com.helger.jaxb.plugin;
 
 import java.util.List;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.annotation.style.IsSPIImplementation;
@@ -34,11 +36,8 @@ import com.sun.tools.xjc.model.CElementInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
- * Create {@link Nonnull}/{@link Nullable} annotations in all bean generated objects as well as in
+ * Create {@link NonNull}/{@link Nullable} annotations in all bean generated objects as well as in
  * the ObjectFactory classes
  *
  * @author Philip Helger
@@ -59,13 +58,13 @@ public class PluginAnnotate extends AbstractPlugin
   {
     return "  -" +
            OPT +
-           " :  add @jakarta.annotation.Nullable/@jakarta.annotation.Nonnull annotations to getters and setters";
+           " :  add @jakarta.annotation.Nullable/@jakarta.annotation.NonNull annotations to getters and setters";
   }
 
   @Override
-  public boolean run (@Nonnull final Outline aOutline,
-                      @Nonnull final Options aOpts,
-                      @Nonnull final ErrorHandler aErrorHandler)
+  public boolean run (@NonNull final Outline aOutline,
+                      @NonNull final Options aOpts,
+                      @NonNull final ErrorHandler aErrorHandler)
   {
     initPluginLogging (aOpts.debugMode);
     logInfo ("Running JAXB plugin -" + getOptionName ());
@@ -86,7 +85,7 @@ public class PluginAnnotate extends AbstractPlugin
           // Find e.g. List<ItemListType> getItemList()
           if (aReturnType.erasure ().name ().equals ("List"))
           {
-            aMethod.annotate (Nonnull.class);
+            aMethod.annotate (NonNull.class);
             aMethod.annotate (ReturnsMutableObject.class).param ("value", "JAXB implementation style");
             aEffectedClasses.add (jClass);
           }
@@ -135,14 +134,14 @@ public class PluginAnnotate extends AbstractPlugin
           aParams.get (0).annotate (Nullable.class);
 
           // Modify method
-          aMethod.annotate (Nonnull.class);
+          aMethod.annotate (NonNull.class);
           aEffectedClasses.add (aObjFactory);
         }
         else
           if (aMethod.name ().startsWith ("create") && aParams.isEmpty ())
           {
             // Modify all Object createObject() methods
-            aMethod.annotate (Nonnull.class);
+            aMethod.annotate (NonNull.class);
             aEffectedClasses.add (aObjFactory);
           }
       }

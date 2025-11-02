@@ -23,6 +23,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.annotation.style.IsSPIImplementation;
@@ -52,9 +54,6 @@ import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Add special "value" constructors, setters and getters for JAXB generated elements. This is used
  * e.g. for UBL and CII code generation.
@@ -73,9 +72,9 @@ public class PluginValueExtender extends AbstractPlugin
    */
   final class ClassNameValueFieldTypeMap extends CommonsHashMap <String, JType>
   {
-    private void _recursiveFill (@Nonnull final ICommonsSet <String> aHandledClasses,
-                                 @Nonnull final JCodeModel cm,
-                                 @Nonnull final JType jType)
+    private void _recursiveFill (@NonNull final ICommonsSet <String> aHandledClasses,
+                                 @NonNull final JCodeModel cm,
+                                 @NonNull final JType jType)
     {
       final String sClassFullName = jType.fullName ();
 
@@ -136,7 +135,7 @@ public class PluginValueExtender extends AbstractPlugin
       }
     }
 
-    private void _fill (@Nonnull final Outline aOutline)
+    private void _fill (@NonNull final Outline aOutline)
     {
       final JCodeModel cm = aOutline.getCodeModel ();
       final ICommonsSet <String> aHandledClasses = new CommonsHashSet <> ();
@@ -148,13 +147,13 @@ public class PluginValueExtender extends AbstractPlugin
       }
     }
 
-    private void _addIfNotPresent (@Nonnull final String sClassname, @Nonnull final JType aFieldType)
+    private void _addIfNotPresent (@NonNull final String sClassname, @NonNull final JType aFieldType)
     {
       if (!containsKey (sClassname))
         put (sClassname, aFieldType);
     }
 
-    public ClassNameValueFieldTypeMap (@Nonnull final Outline aOutline)
+    public ClassNameValueFieldTypeMap (@NonNull final Outline aOutline)
     {
       // Add some classes that are known to be such super types
       final JCodeModel cm = aOutline.getCodeModel ();
@@ -186,7 +185,7 @@ public class PluginValueExtender extends AbstractPlugin
      * @return <code>null</code> if none was found
      */
     @Nullable
-    public JType getValueFieldTypeIncludeHierarchy (@Nonnull final JDefinedClass jClass)
+    public JType getValueFieldTypeIncludeHierarchy (@NonNull final JDefinedClass jClass)
     {
       JType aValueType = null;
 
@@ -254,15 +253,15 @@ public class PluginValueExtender extends AbstractPlugin
 
   private static final Comparator <ClassOutline> COMP_CO = Comparator.comparing (x -> x.getImplClass ().fullName ());
 
-  @Nonnull
-  private static ICommonsNavigableSet <ClassOutline> _getSortedClassOutlines (@Nonnull final Outline aOutline)
+  @NonNull
+  private static ICommonsNavigableSet <ClassOutline> _getSortedClassOutlines (@NonNull final Outline aOutline)
   {
     final ICommonsNavigableSet <ClassOutline> aAllOutlineClasses = new CommonsTreeSet <> (COMP_CO);
     aAllOutlineClasses.addAll (aOutline.getClasses ());
     return aAllOutlineClasses;
   }
 
-  private void _addDefaultCtors (@Nonnull final Outline aOutline)
+  private void _addDefaultCtors (@NonNull final Outline aOutline)
   {
     // Add default constructors to all classes, because when adding other
     // constructors, the "default" one need to be added explicitly
@@ -281,9 +280,9 @@ public class PluginValueExtender extends AbstractPlugin
     logDebug ( () -> "Added default constructors to " + aOutline.getClasses ().size () + " classes");
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  private ICommonsNavigableMap <String, JType> _addValueCtors (@Nonnull final Outline aOutline,
+  private ICommonsNavigableMap <String, JType> _addValueCtors (@NonNull final Outline aOutline,
                                                                final boolean bHasPluginOffsetDT)
   {
     final JCodeModel cm = aOutline.getCodeModel ();
@@ -355,8 +354,8 @@ public class PluginValueExtender extends AbstractPlugin
     return ret;
   }
 
-  private void _addValueSetters (@Nonnull final Outline aOutline,
-                                 @Nonnull final ICommonsNavigableMap <String, JType> aAllCtorClasses,
+  private void _addValueSetters (@NonNull final Outline aOutline,
+                                 @NonNull final ICommonsNavigableMap <String, JType> aAllCtorClasses,
                                  final boolean bHasPluginOffsetDT)
   {
     logDebug ( () -> "Start creating setters for value ctors");
@@ -400,7 +399,7 @@ public class PluginValueExtender extends AbstractPlugin
 
             {
               final JMethod aSetter = jClass.method (JMod.PUBLIC, aParamType, aMethod.name ());
-              aSetter.annotate (Nonnull.class);
+              aSetter.annotate (NonNull.class);
               final JVar aParam = aSetter.param (JMod.FINAL, aValueType, "valueParam");
               if (!aValueType.isPrimitive ())
                 aParam.annotate (Nullable.class);
@@ -439,7 +438,7 @@ public class PluginValueExtender extends AbstractPlugin
                                  ")'");
 
                 final JMethod aSetter = jClass.method (JMod.PUBLIC, aParamType, aMethod.name ());
-                aSetter.annotate (Nonnull.class);
+                aSetter.annotate (NonNull.class);
                 final JVar aParam = aSetter.param (JMod.FINAL, aSecondaryValueType, "valueParam");
                 aParam.annotate (Nullable.class);
                 final JVar aObj = aSetter.body ()
@@ -466,8 +465,8 @@ public class PluginValueExtender extends AbstractPlugin
     }
   }
 
-  private static boolean _containsMethodWithoutParams (@Nonnull final Collection <JMethod> aMethods,
-                                                       @Nonnull final String sMethodName)
+  private static boolean _containsMethodWithoutParams (@NonNull final Collection <JMethod> aMethods,
+                                                       @NonNull final String sMethodName)
   {
     for (final JMethod aMethod : aMethods)
       if (aMethod.name ().equals (sMethodName) && aMethod.params ().isEmpty ())
@@ -485,8 +484,8 @@ public class PluginValueExtender extends AbstractPlugin
    * @param bHasPluginOffsetDT
    *        <code>true</code> if the "OffsetDTExtension" plugin is present
    */
-  private void _addValueGetter (@Nonnull final Outline aOutline,
-                                @Nonnull final ICommonsNavigableMap <String, JType> aAllCtorClasses,
+  private void _addValueGetter (@NonNull final Outline aOutline,
+                                @NonNull final ICommonsNavigableMap <String, JType> aAllCtorClasses,
                                 final boolean bHasPluginOffsetDT)
   {
     final JCodeModel cm = aOutline.getCodeModel ();
@@ -639,9 +638,9 @@ public class PluginValueExtender extends AbstractPlugin
    *        Error handler
    */
   @Override
-  public boolean run (@Nonnull final Outline aOutline,
-                      @Nonnull final Options aOpts,
-                      @Nonnull final ErrorHandler aErrorHandler)
+  public boolean run (@NonNull final Outline aOutline,
+                      @NonNull final Options aOpts,
+                      @NonNull final ErrorHandler aErrorHandler)
   {
     initPluginLogging (aOpts.debugMode);
     logInfo ("Running JAXB plugin -" + getOptionName ());

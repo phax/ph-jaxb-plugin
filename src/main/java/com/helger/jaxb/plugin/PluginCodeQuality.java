@@ -18,6 +18,7 @@ package com.helger.jaxb.plugin;
 
 import java.util.List;
 
+import org.jspecify.annotations.NonNull;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.annotation.style.IsSPIImplementation;
@@ -35,8 +36,6 @@ import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.model.CElementInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Improved the code quality by avoiding some compiler warnings, and by making special constants
@@ -62,9 +61,9 @@ public class PluginCodeQuality extends AbstractPlugin
   }
 
   @Override
-  public boolean run (@Nonnull final Outline aOutline,
-                      @Nonnull final Options aOpts,
-                      @Nonnull final ErrorHandler aErrorHandler)
+  public boolean run (@NonNull final Outline aOutline,
+                      @NonNull final Options aOpts,
+                      @NonNull final ErrorHandler aErrorHandler)
   {
     initPluginLogging (aOpts.debugMode);
     logInfo ("Running JAXB plugin -" + getOptionName ());

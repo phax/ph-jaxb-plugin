@@ -16,6 +16,7 @@
  */
 package com.helger.jaxb.plugin;
 
+import org.jspecify.annotations.NonNull;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.annotation.style.IsSPIImplementation;
@@ -24,8 +25,6 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Plugin that makes all fields private instead of the default "protected"
@@ -50,9 +49,9 @@ public class PluginFieldsPrivate extends AbstractPlugin
   }
 
   @Override
-  public boolean run (@Nonnull final Outline aOutline,
-                      @Nonnull final Options aOpts,
-                      @Nonnull final ErrorHandler aErrorHandler)
+  public boolean run (@NonNull final Outline aOutline,
+                      @NonNull final Options aOpts,
+                      @NonNull final ErrorHandler aErrorHandler)
   {
     initPluginLogging (aOpts.debugMode);
     logInfo ("Running JAXB plugin -" + getOptionName ());

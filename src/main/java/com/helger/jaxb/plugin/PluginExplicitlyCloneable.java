@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.annotation.style.IsSPIImplementation;
@@ -40,8 +41,6 @@ import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Add <code>getClone()</code> method based on {@link IExplicitlyCloneable} interface.
@@ -67,9 +66,9 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
   }
 
   @Override
-  public boolean run (@Nonnull final Outline aOutline,
-                      @Nonnull final Options aOpts,
-                      @Nonnull final ErrorHandler aErrorHandler)
+  public boolean run (@NonNull final Outline aOutline,
+                      @NonNull final Options aOpts,
+                      @NonNull final ErrorHandler aErrorHandler)
   {
     initPluginLogging (aOpts.debugMode);
     logInfo ("Running JAXB plugin -" + getOptionName ());
@@ -104,7 +103,7 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
                 .add ("This method clones all values from <code>this</code> to the passed object. All data in the parameter object is overwritten!");
 
         final JVar jRet = mCloneTo.param (jClass, "ret");
-        jRet.annotate (Nonnull.class);
+        jRet.annotate (NonNull.class);
         mCloneTo.javadoc ().addParam (jRet).add ("The target object to clone to. May not be <code>null</code>.");
 
         // Call from super class as well
@@ -172,7 +171,7 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
         // Do not use "getClone" as this is the name of a JAXB generated method
         // for the XSD Element "Clone" :(
         final JMethod mClone = jClass.method (JMod.PUBLIC | JMod.ABSTRACT, jClass, "clone");
-        mClone.annotate (Nonnull.class);
+        mClone.annotate (NonNull.class);
         mClone.annotate (ReturnsMutableCopy.class);
         mClone.annotate (Override.class);
 
@@ -186,7 +185,7 @@ public class PluginExplicitlyCloneable extends AbstractPluginCloneable
         // Do not use "getClone" as this is the name of a JAXB generated method
         // for the XSD Element "Clone" :(
         final JMethod mClone = jClass.method (JMod.PUBLIC, jClass, "clone");
-        mClone.annotate (Nonnull.class);
+        mClone.annotate (NonNull.class);
         mClone.annotate (ReturnsMutableCopy.class);
         mClone.annotate (Override.class);
 

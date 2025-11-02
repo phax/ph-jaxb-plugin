@@ -18,6 +18,7 @@ package com.helger.jaxb.plugin;
 
 import java.util.Iterator;
 
+import org.jspecify.annotations.NonNull;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.annotation.style.CodingStyleguideUnaware;
@@ -28,8 +29,6 @@ import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JPackage;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.Outline;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Create {@link CodingStyleguideUnaware} annotations in all bean generated
@@ -54,7 +53,7 @@ public class PluginCodingStyleguideUnaware extends AbstractPlugin
     return "  -" + OPT + "       :  add @CodingStyleguideUnaware annotations to all classes";
   }
 
-  private static void _apply (@Nonnull final JDefinedClass aDefinedClass)
+  private static void _apply (@NonNull final JDefinedClass aDefinedClass)
   {
     // Add annotation
     aDefinedClass.annotate (CodingStyleguideUnaware.class);
@@ -66,9 +65,9 @@ public class PluginCodingStyleguideUnaware extends AbstractPlugin
   }
 
   @Override
-  public boolean run (@Nonnull final Outline aOutline,
-                      @Nonnull final Options aOpts,
-                      @Nonnull final ErrorHandler aErrorHandler)
+  public boolean run (@NonNull final Outline aOutline,
+                      @NonNull final Options aOpts,
+                      @NonNull final ErrorHandler aErrorHandler)
   {
     initPluginLogging (aOpts.debugMode);
     logInfo ("Running JAXB plugin -" + getOptionName ());

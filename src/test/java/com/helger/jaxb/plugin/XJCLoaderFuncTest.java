@@ -22,19 +22,18 @@ import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
 import com.helger.io.file.FileHelper;
 import com.helger.io.file.FileOperationManager;
 import com.sun.tools.xjc.Driver;
 
-import jakarta.annotation.Nonnull;
-
 public final class XJCLoaderFuncTest
 {
-  private static void _run (@Nonnull final File aXSDFile,
-                            @Nonnull final File aDestDir,
-                            @Nonnull final File aLogFile) throws Exception
+  private static void _run (@NonNull final File aXSDFile,
+                            @NonNull final File aDestDir,
+                            @NonNull final File aLogFile) throws Exception
   {
     try (final PrintStream aPS = new PrintStream (FileHelper.getOutputStream (aLogFile),
                                                   true,

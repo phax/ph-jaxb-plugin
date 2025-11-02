@@ -25,6 +25,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -43,17 +45,14 @@ import com.helger.io.file.FilenameHelper;
 import com.helger.io.file.SimpleFileIO;
 import com.sun.tools.xjc.Driver;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 public final class Issue5FuncTest
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (Issue5FuncTest.class);
 
-  private static int _run (@Nonnull final File aXSDFile,
+  private static int _run (@NonNull final File aXSDFile,
                            @Nullable final File aBindingFile,
                            @Nullable final File aCatalogFile,
-                           @Nonnull final File aDestDir,
+                           @NonNull final File aDestDir,
                            @Nullable final File aLogFile) throws Exception
   {
     final ICommonsList <String> aParams = new CommonsArrayList <> (aXSDFile.getAbsolutePath (),

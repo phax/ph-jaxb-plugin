@@ -22,20 +22,19 @@ import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Test;
 
 import com.helger.io.file.FileHelper;
 import com.helger.io.file.FileOperationManager;
 import com.sun.tools.xjc.Driver;
 
-import jakarta.annotation.Nonnull;
-
 public final class EnumFuncTest
 {
-  private static int _run (@Nonnull final File aXSDFile,
-                           @Nonnull final File aBindingFile,
-                           @Nonnull final File aDestDir,
-                           @Nonnull final File aLogFile) throws Exception
+  private static int _run (@NonNull final File aXSDFile,
+                           @NonNull final File aBindingFile,
+                           @NonNull final File aDestDir,
+                           @NonNull final File aLogFile) throws Exception
   {
     try (final PrintStream aPS = new PrintStream (FileHelper.getOutputStream (aLogFile),
                                                   true,

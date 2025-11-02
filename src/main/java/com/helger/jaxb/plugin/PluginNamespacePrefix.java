@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jspecify.annotations.NonNull;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.annotation.style.IsSPIImplementation;
@@ -46,7 +47,6 @@ import com.sun.xml.xsom.XSAnnotation;
 import com.sun.xml.xsom.XSSchema;
 import com.sun.xml.xsom.impl.SchemaImpl;
 
-import jakarta.annotation.Nonnull;
 import jakarta.xml.bind.annotation.XmlNs;
 import jakarta.xml.bind.annotation.XmlSchema;
 
@@ -177,7 +177,7 @@ public class PluginNamespacePrefix extends AbstractPlugin
     return true;
   }
 
-  @Nonnull
+  @NonNull
   private static Set <String> _getPackageNamespace (final PackageOutline packageOutline)
   {
     final Map <String, Integer> map = _getUriCountMap (packageOutline);

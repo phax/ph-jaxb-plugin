@@ -16,6 +16,7 @@
  */
 package com.helger.jaxb.plugin;
 
+import org.jspecify.annotations.NonNull;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.annotation.style.IsSPIImplementation;
@@ -33,8 +34,6 @@ import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Add default toString method using the {@link ToStringGenerator} class (using getToString method).
@@ -61,8 +60,8 @@ public class PluginToString extends AbstractPlugin
     return "  -" + OPT + "    :  auto implement toString using com.helger.base.string.ToStringGenerator";
   }
 
-  @Nonnull
-  private static String _ucFirst (@Nonnull String s)
+  @NonNull
+  private static String _ucFirst (@NonNull String s)
   {
     if (s.length () == 0)
       return s;
@@ -70,9 +69,9 @@ public class PluginToString extends AbstractPlugin
   }
 
   @Override
-  public boolean run (@Nonnull final Outline aOutline,
-                      @Nonnull final Options aOpts,
-                      @Nonnull final ErrorHandler aErrorHandler)
+  public boolean run (@NonNull final Outline aOutline,
+                      @NonNull final Options aOpts,
+                      @NonNull final ErrorHandler aErrorHandler)
   {
     initPluginLogging (aOpts.debugMode);
     logInfo ("Running JAXB plugin -" + getOptionName ());

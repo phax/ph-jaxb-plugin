@@ -16,11 +16,11 @@
  */
 package com.helger.jaxb.plugin.cm;
 
+import org.jspecify.annotations.NonNull;
+
 import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JExpressionImpl;
 import com.sun.codemodel.JFormatter;
-
-import jakarta.annotation.Nonnull;
 
 public class MyTernaryOp extends JExpressionImpl
 {
@@ -48,7 +48,7 @@ public class MyTernaryOp extends JExpressionImpl
     f.g (m_e1).p (m_op1).g (m_e2).p (m_op2).g (m_e3);
   }
 
-  @Nonnull
+  @NonNull
   public static MyTernaryOp cond (final JExpression e1, final JExpression e2, final JExpression e3)
   {
     return new MyTernaryOp ("?", ":", e1, e2, e3);

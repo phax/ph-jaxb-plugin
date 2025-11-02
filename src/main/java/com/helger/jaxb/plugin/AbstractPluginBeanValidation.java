@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.base.numeric.BigHelper;
@@ -53,8 +55,6 @@ import com.sun.xml.xsom.impl.ElementDecl;
 import com.sun.xml.xsom.impl.RestrictionSimpleTypeImpl;
 import com.sun.xml.xsom.impl.parser.DelayedRef;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -131,8 +131,8 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
   /*
    * XS:Element
    */
-  private void _processElementProperty (@Nonnull final CElementPropertyInfo aElement,
-                                        @Nonnull final ClassOutline aClassOutline)
+  private void _processElementProperty (@NonNull final CElementPropertyInfo aElement,
+                                        @NonNull final ClassOutline aClassOutline)
   {
     // It's a ParticleImpl
     final XSParticle aParticle = (XSParticle) aElement.getSchemaComponent ();
@@ -216,7 +216,7 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
           logWarn ("Unsupported particle term '" + aTerm + "'");
   }
 
-  private void _processElement (@Nonnull final JFieldVar aField, final ElementDecl aElement)
+  private void _processElement (@NonNull final JFieldVar aField, final ElementDecl aElement)
   {
     final XSType aElementType = aElement.getType ();
 
@@ -227,12 +227,12 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
         _processType ((XSSimpleType) aElementType.getBaseType (), aField);
   }
 
-  private boolean _isSizeAnnotationApplicable (@Nonnull final JFieldVar aField)
+  private boolean _isSizeAnnotationApplicable (@NonNull final JFieldVar aField)
   {
     return aField.type ().name ().equals ("String") || aField.type ().isArray ();
   }
 
-  private void _processType (final XSSimpleType aSimpleType, @Nonnull final JFieldVar aField)
+  private void _processType (final XSSimpleType aSimpleType, @NonNull final JFieldVar aField)
   {
     if (!_hasAnnotation (aField, Size.class) && _isSizeAnnotationApplicable (aField))
     {
@@ -328,7 +328,7 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
   /*
    * attribute from parent declaration
    */
-  private void _processValueProperty (@Nonnull final CValuePropertyInfo aProperty, final ClassOutline aClassOutline)
+  private void _processValueProperty (@NonNull final CValuePropertyInfo aProperty, final ClassOutline aClassOutline)
   {
     final String sPropertyName = aProperty.getName (false);
 
@@ -374,7 +374,7 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
     return Long.toString (nVal).equals (sValue);
   }
 
-  private static boolean _isValidMinMaxValue (@Nonnull final XSFacet aFacet)
+  private static boolean _isValidMinMaxValue (@NonNull final XSFacet aFacet)
   {
     final String sValue = aFacet.getValue ().value;
     // cxf-codegen puts max and min as value when there is not anything defined
@@ -386,7 +386,7 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
            !_isEqualStr (Integer.MIN_VALUE, sValue);
   }
 
-  private static boolean _hasAnnotation (@Nonnull final JFieldVar aField, @Nonnull final Class <?> aAnnotationClass)
+  private static boolean _hasAnnotation (@NonNull final JFieldVar aField, @NonNull final Class <?> aAnnotationClass)
   {
     final Collection <JAnnotationUse> aAnnotations = aField.annotations ();
     if (aAnnotations != null)
@@ -399,7 +399,7 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
     return false;
   }
 
-  private static boolean _isNumericType (@Nonnull final JFieldVar aFieldVar)
+  private static boolean _isNumericType (@NonNull final JFieldVar aFieldVar)
   {
     final JType aFieldType = aFieldVar.type ();
     for (final String sType : NUMBER_TYPES)

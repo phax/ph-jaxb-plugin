@@ -19,6 +19,8 @@ package com.helger.jaxb.plugin;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.base.array.ArrayHelper;
 import com.helger.base.clone.CloneHelper;
 import com.helger.jaxb.adapter.JAXBHelper;
@@ -30,8 +32,6 @@ import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JOp;
 import com.sun.codemodel.JType;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Abstract cloneable support.
@@ -65,7 +65,7 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
     return false;
   }
 
-  protected boolean _isImmutable (@Nonnull final JType aType)
+  protected boolean _isImmutable (@NonNull final JType aType)
   {
     // int, byte, boolean etc?
     if (aType.isPrimitive ())
@@ -130,19 +130,19 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
            sTypeName.equals ("ZonedDateTime");
   }
 
-  protected static boolean _isJavaCloneable (@Nonnull final JType aType)
+  protected static boolean _isJavaCloneable (@NonNull final JType aType)
   {
     // Check by name :)
     final String sTypeName = aType.name ();
     return sTypeName.equals ("XMLGregorianCalendar");
   }
 
-  protected boolean _isImmutableArray (@Nonnull final JType aType)
+  protected boolean _isImmutableArray (@NonNull final JType aType)
   {
     return aType.isArray () && _isImmutable (aType.elementType ());
   }
 
-  @Nonnull
+  @NonNull
   protected JExpression _getCloneCode (final JCodeModel aCodeModel, final JExpression aGetter, final JType aTypeParam)
   {
     if (_isImmutable (aTypeParam))

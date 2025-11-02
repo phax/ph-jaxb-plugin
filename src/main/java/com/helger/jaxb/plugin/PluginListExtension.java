@@ -16,6 +16,8 @@
  */
 package com.helger.jaxb.plugin;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.xml.sax.ErrorHandler;
 
 import com.helger.annotation.Nonnegative;
@@ -38,9 +40,6 @@ import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Extend all bean List&lt;?&gt; getters with additional method to query the content:
@@ -127,7 +126,7 @@ public class PluginListExtension extends AbstractPlugin
             final JMethod aOldGetter = jClass.getMethod (CJAXB.getGetterName (aField.type (), sFieldName), JTYPE_EMPTY);
             jClass.methods ().remove (aOldGetter);
             final JMethod aNewGetter = jClass.method (JMod.PUBLIC, aNewType, aOldGetter.name ());
-            aNewGetter.annotate (Nonnull.class);
+            aNewGetter.annotate (NonNull.class);
             aNewGetter.annotate (ReturnsMutableObject.class).param ("value", "JAXB style");
             final JVar aJRet = aNewGetter.body ().decl (aNewType, "ret", JExpr.cast (aNewType, aField));
             aNewGetter.body ()
@@ -228,7 +227,7 @@ public class PluginListExtension extends AbstractPlugin
             {
               final JMethod mAdd = jClass.method (JMod.PUBLIC, aCodeModel.VOID, "add" + sRelevantTypeName);
               final JVar aParam = mAdd.param (JMod.FINAL, aListElementType, "elem");
-              aParam.annotate (Nonnull.class);
+              aParam.annotate (NonNull.class);
               mAdd.body ().add (JExpr.invoke (aMethod).invoke ("add").arg (aParam));
 
               mAdd.javadoc ().addParam (aParam).add ("The element to be added. May not be <code>null</code>.");

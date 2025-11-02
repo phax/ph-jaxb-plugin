@@ -19,6 +19,8 @@ package com.helger.jaxb.plugin;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +37,6 @@ import com.sun.codemodel.JMod;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Abstract plugin stuff.
@@ -60,7 +59,7 @@ public abstract class AbstractPlugin extends Plugin
     m_bDebugMode = bDebugMode;
   }
 
-  protected final void logDebug (@Nonnull final Supplier <String> a)
+  protected final void logDebug (@NonNull final Supplier <String> a)
   {
     if (m_bDebugMode)
       logInfo (a.get ());
@@ -93,9 +92,9 @@ public abstract class AbstractPlugin extends Plugin
     return CollectionHelper.makeUnmodifiable (CJAXB.NSURI_PH);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  protected ICommonsOrderedMap <JFieldVar, String> getAllInstanceFields (@Nonnull final ClassOutline aClassOutline)
+  protected ICommonsOrderedMap <JFieldVar, String> getAllInstanceFields (@NonNull final ClassOutline aClassOutline)
   {
     final ICommonsOrderedMap <JFieldVar, String> ret = new CommonsLinkedHashMap <> ();
 
