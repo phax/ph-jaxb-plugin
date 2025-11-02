@@ -50,7 +50,7 @@ Add something **like** the following to your pom.xml to use this artifact:
       <groupId>com.helger</groupId>
       <artifactId>ph-jaxb-plugin</artifactId>
       <!-- Use the right version below -->
-      <version>5.0.1</version>
+      <version>5.1.0</version>
     </dependency>
   </dependencies>
 </plugin>
