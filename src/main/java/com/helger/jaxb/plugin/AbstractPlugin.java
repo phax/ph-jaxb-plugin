@@ -34,6 +34,7 @@ import com.helger.collection.helper.CollectionSort;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMod;
+import com.sun.codemodel.JType;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
@@ -117,12 +118,7 @@ public abstract class AbstractPlugin extends Plugin
       String sFieldName;
       if (aPI == null)
       {
-        if ("otherAttributes".equals (sFieldVarName))
-        {
-          // Created by <xs:anyAttribute/>
-          sFieldName = sFieldVarName;
-        }
-        else
+        if (!"otherAttributes".equals (sFieldVarName))
         {
           throw new IllegalStateException ("'" +
                                            aFieldVar.name () +
@@ -132,6 +128,8 @@ public abstract class AbstractPlugin extends Plugin
                                            " of " +
                                            jClass.fullName ());
         }
+        // Created by <xs:anyAttribute/>
+        sFieldName = sFieldVarName;
       }
       else
       {
@@ -141,5 +139,35 @@ public abstract class AbstractPlugin extends Plugin
     }
 
     return ret;
+  }
+
+  protected boolean allowsJSpecifyAnnotations (@NonNull JDefinedClass jClass, @NonNull JType aLocalType)
+  {
+    if (aLocalType.isPrimitive ())
+    {
+      // Primitive types cannot be annotated
+      return false;
+    }
+    if (aLocalType.name ().equals (jClass.name ()))
+    {
+      // Type has the same name as the outer class and would therefore be generated as
+      // FQCN. This does not work with JSpecify.
+      return false;
+    }
+    if (aLocalType instanceof JDefinedClass jdc && jdc.outer () != null)
+    {
+      // It's an inner class and would be rendered as C1.C2 which does not work with
+      // JSpecify
+      return false;
+    }
+    if (aLocalType.name ().equals ("IdentifierType"))
+    {
+      // Special name usually imported
+      return false;
+    }
+
+    if (false)
+      logInfo (jClass.fullName () + " vs. " + aLocalType.fullName ());
+    return true;
   }
 }

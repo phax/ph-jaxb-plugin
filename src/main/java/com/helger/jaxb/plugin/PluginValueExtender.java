@@ -91,9 +91,8 @@ public class PluginValueExtender extends AbstractPlugin
 
       // We don't care about the classes we created
       // Take only "external", meaning non-generated super classes
-      if (jType instanceof JDefinedClass)
+      if (jType instanceof final JDefinedClass jdClass)
       {
-        final JDefinedClass jdClass = (JDefinedClass) jType;
         logDebug ( () -> "  Scanning defined super class '" + sClassFullName + "'");
         for (final Map.Entry <String, JFieldVar> aFieldEntry : jdClass.fields ().entrySet ())
           if (aFieldEntry.getKey ().equals (FIELD_VALUE))
@@ -314,7 +313,7 @@ public class PluginValueExtender extends AbstractPlugin
 
           final JMethod aValueCtor = jClass.constructor (JMod.PUBLIC);
           final JVar aParam = aValueCtor.param (JMod.FINAL, aValueType, "valueParam");
-          if (!aValueType.isPrimitive ())
+          if (allowsJSpecifyAnnotations (jClass, aValueType))
             aParam.annotate (Nullable.class);
           // Just call "setValue" in the constructor
           aValueCtor.body ().invoke ("setValue").arg (aParam);
@@ -334,7 +333,8 @@ public class PluginValueExtender extends AbstractPlugin
 
             final JMethod aValueCtor = jClass.constructor (JMod.PUBLIC);
             final JVar aParam = aValueCtor.param (JMod.FINAL, aSecondaryValueType, "valueParam");
-            aParam.annotate (Nullable.class);
+            if (allowsJSpecifyAnnotations (jClass, aSecondaryValueType))
+              aParam.annotate (Nullable.class);
             // Just call "setValue" in the constructor
             aValueCtor.body ().invoke ("setValue").arg (aParam);
             aValueCtor.javadoc ().add ("Constructor for value of type " + aSecondaryValueType.name ());
@@ -399,9 +399,13 @@ public class PluginValueExtender extends AbstractPlugin
 
             {
               final JMethod aSetter = jClass.method (JMod.PUBLIC, aParamType, aMethod.name ());
-              aSetter.annotate (NonNull.class);
+
+              // Work around for JSpecify issue
+              if (allowsJSpecifyAnnotations (jClass, aParamType))
+                aSetter.annotate (NonNull.class);
+
               final JVar aParam = aSetter.param (JMod.FINAL, aValueType, "valueParam");
-              if (!aValueType.isPrimitive ())
+              if (allowsJSpecifyAnnotations (jClass, aValueType))
                 aParam.annotate (Nullable.class);
               final JVar aObj = aSetter.body ()
                                        .decl (aParamType, "aObj", JExpr.invoke ("get" + aMethod.name ().substring (3)));
@@ -438,9 +442,11 @@ public class PluginValueExtender extends AbstractPlugin
                                  ")'");
 
                 final JMethod aSetter = jClass.method (JMod.PUBLIC, aParamType, aMethod.name ());
-                aSetter.annotate (NonNull.class);
+                if (allowsJSpecifyAnnotations (jClass, aParamType))
+                  aSetter.annotate (NonNull.class);
                 final JVar aParam = aSetter.param (JMod.FINAL, aSecondaryValueType, "valueParam");
-                aParam.annotate (Nullable.class);
+                if (allowsJSpecifyAnnotations (jClass, aSecondaryValueType))
+                  aParam.annotate (Nullable.class);
                 final JVar aObj = aSetter.body ()
                                          .decl (aParamType,
                                                 "aObj",
@@ -581,7 +587,8 @@ public class PluginValueExtender extends AbstractPlugin
                 logDebug ( () -> "    New value getter '" + aValueType.name () + " " + sMethodName + "()'");
 
                 final JMethod aGetter = jClass.method (JMod.PUBLIC, aValueType, sMethodName);
-                aGetter.annotate (Nullable.class);
+                if (allowsJSpecifyAnnotations (jClass, aValueType))
+                  aGetter.annotate (Nullable.class);
                 final JVar aObj = aGetter.body ().decl (aReturnType, "aObj", JExpr.invoke (aMethod));
                 aGetter.body ()
                        ._return (MyTernaryOp.cond (aObj.eq (JExpr._null ()), JExpr._null (), aObj.invoke ("getValue")));
@@ -606,7 +613,8 @@ public class PluginValueExtender extends AbstractPlugin
                                    "Local()'");
 
                   final JMethod aGetter = jClass.method (JMod.PUBLIC, aSecondaryValueType, sMethodName + "Local");
-                  aGetter.annotate (Nullable.class);
+                  if (allowsJSpecifyAnnotations (jClass, aSecondaryValueType))
+                    aGetter.annotate (Nullable.class);
                   final JVar aObj = aGetter.body ().decl (aReturnType, "aObj", JExpr.invoke (aMethod));
                   aGetter.body ()
                          ._return (MyTernaryOp.cond (aObj.eq (JExpr._null ()),

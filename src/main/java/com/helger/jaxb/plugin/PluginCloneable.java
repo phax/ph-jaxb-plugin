@@ -93,7 +93,7 @@ public class PluginCloneable extends AbstractPluginCloneable
       final ICommonsMap <JFieldVar, String> aAllFields = getAllInstanceFields (aClassOutline);
 
       // cloneTo
-      JMethod mCloneTo;
+      final JMethod mCloneTo;
       {
         mCloneTo = jClass.method (JMod.PUBLIC, aCodeModel.VOID, "cloneTo");
         // No @Override because parameter types are different in the class
@@ -102,7 +102,9 @@ public class PluginCloneable extends AbstractPluginCloneable
                 .add ("This method clones all values from <code>this</code> to the passed object. All data in the parameter object is overwritten!");
 
         final JVar jRet = mCloneTo.param (jClass, "ret");
-        jRet.annotate (NonNull.class);
+        if (allowsJSpecifyAnnotations (jClass, jClass))
+          jRet.annotate (NonNull.class);
+
         mCloneTo.javadoc ().addParam (jRet).add ("The target object to clone to. May not be <code>null</code>.");
 
         // Call from super class as well
@@ -170,7 +172,8 @@ public class PluginCloneable extends AbstractPluginCloneable
         // Do not use "getClone" as this is the name of a JAXB generated method
         // for the XSD Element "Clone" :(
         final JMethod mClone = jClass.method (JMod.PUBLIC | JMod.ABSTRACT, jClass, "clone");
-        mClone.annotate (NonNull.class);
+        if (allowsJSpecifyAnnotations (jClass, jClass))
+          mClone.annotate (NonNull.class);
         mClone.annotate (ReturnsMutableCopy.class);
         mClone.annotate (Override.class);
 
@@ -184,7 +187,8 @@ public class PluginCloneable extends AbstractPluginCloneable
         // Do not use "getClone" as this is the name of a JAXB generated method
         // for the XSD Element "Clone" :(
         final JMethod mClone = jClass.method (JMod.PUBLIC, jClass, "clone");
-        mClone.annotate (NonNull.class);
+        if (allowsJSpecifyAnnotations (jClass, jClass))
+          mClone.annotate (NonNull.class);
         mClone.annotate (ReturnsMutableCopy.class);
         mClone.annotate (Override.class);
 

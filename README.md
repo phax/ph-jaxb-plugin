@@ -1,12 +1,10 @@
 # ph-jaxb-plugin
 
-JAXB 4.0 plugin that adds some commonly needed functionality.
+JAXB 4.0.x plugin that adds some commonly needed functionality.
 
-Version 5.x requires Java 17 and builds on ph-commons v12.
-
-Version 4.0.3 was the last version requiring Java 11 and builds on ph-commons v11.
-
-The old version for JAXB 2.2 was called `ph-jaxb22-plugin`
+* Version 5.x requires Java 17 and builds on ph-commons v12.
+* Version 4.0.3 was the last version requiring Java 11 and builds on ph-commons v11.
+* The old version for JAXB 2.2 was called `ph-jaxb22-plugin`
 
 This project is licensed under the Apache 2 license.
 
@@ -18,7 +16,7 @@ Add something **like** the following to your pom.xml to use this artifact:
 <plugin>
   <groupId>org.jvnet.jaxb</groupId>
   <artifactId>jaxb-maven-plugin</artifactId>
-  <version>4.0.9</version>
+  <version>4.0.11</version>
   <executions>
     <execution>
       <goals>

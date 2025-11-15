@@ -95,7 +95,8 @@ public class PluginAnnotate extends AbstractPlugin
           else
             if (!aReturnType.isPrimitive ())
             {
-              aMethod.annotate (Nullable.class);
+              if (allowsJSpecifyAnnotations (jClass, aMethod.type ()))
+                aMethod.annotate (Nullable.class);
               aEffectedClasses.add (jClass);
             }
         }
@@ -105,7 +106,8 @@ public class PluginAnnotate extends AbstractPlugin
             final JVar aParam = aParams.get (0);
             if (!aParam.type ().isPrimitive ())
             {
-              aParam.annotate (Nullable.class);
+              if (allowsJSpecifyAnnotations (jClass, aParam.type ()))
+                aParam.annotate (Nullable.class);
               aEffectedClasses.add (jClass);
             }
           }
@@ -134,17 +136,20 @@ public class PluginAnnotate extends AbstractPlugin
           // Modify all JAXBElement<T> createT (Object o) methods
 
           // Modify parameter
-          aParams.get (0).annotate (Nullable.class);
+          if (allowsJSpecifyAnnotations (aObjFactory, aParams.get (0).type ()))
+            aParams.get (0).annotate (Nullable.class);
 
           // Modify method
-          aMethod.annotate (NonNull.class);
+          if (allowsJSpecifyAnnotations (aObjFactory, aMethod.type ()))
+            aMethod.annotate (NonNull.class);
           aEffectedClasses.add (aObjFactory);
         }
         else
           if (aMethod.name ().startsWith ("create") && aParams.isEmpty ())
           {
             // Modify all Object createObject() methods
-            aMethod.annotate (NonNull.class);
+            if (allowsJSpecifyAnnotations (aObjFactory, aMethod.type ()))
+              aMethod.annotate (NonNull.class);
             aEffectedClasses.add (aObjFactory);
           }
       }

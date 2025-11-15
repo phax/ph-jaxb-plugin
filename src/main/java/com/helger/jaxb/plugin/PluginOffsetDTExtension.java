@@ -48,9 +48,8 @@ import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
 /**
- * Extend all bean members of type <code>OffsetDate</code>,
- * <code>XMLOffsetDate</code> <code>OffsetTime</code> and
- * <code>OffsetDateTime</code> with method to access them as their
+ * Extend all bean members of type <code>OffsetDate</code>, <code>XMLOffsetDate</code>
+ * <code>OffsetTime</code> and <code>OffsetDateTime</code> with method to access them as their
  * <code>Local*</code> pendants.
  *
  * @author Philip Helger
@@ -124,7 +123,8 @@ public class PluginOffsetDTExtension extends AbstractPlugin
               final JMethod aGetter = jClass.method (JMod.PUBLIC,
                                                      aNewType,
                                                      CJAXB.getGetterName (aOldType, aField.name ()) + "Local");
-              aGetter.annotate (Nullable.class);
+              if (allowsJSpecifyAnnotations (jClass, aNewType))
+                aGetter.annotate (Nullable.class);
               aGetter.body ()
                      ._return (MyTernaryOp.cond (aField.eq (JExpr._null ()),
                                                  JExpr._null (),
@@ -141,7 +141,8 @@ public class PluginOffsetDTExtension extends AbstractPlugin
                                                      aCodeModel.VOID,
                                                      CJAXB.getSetterName (aField.name ()));
               final JVar aParam = aSetter.param (JMod.FINAL, aNewType, "aValue");
-              aParam.annotate (Nullable.class);
+              if (allowsJSpecifyAnnotations (jClass, aNewType))
+                aParam.annotate (Nullable.class);
               aSetter.body ()
                      .assign (aField,
                               MyTernaryOp.cond (aParam.eq (JExpr._null ()),
@@ -149,12 +150,12 @@ public class PluginOffsetDTExtension extends AbstractPlugin
                                                 bIsXML ? aCodeModel.ref (XMLOffsetDate.class)
                                                                    .staticInvoke ("of")
                                                                    .arg (aParam)
-                                                                   .arg (JExpr._null ())
-                                                       : aCodeModel.ref (OffsetDate.class)
-                                                                   .staticInvoke ("of")
-                                                                   .arg (aParam)
-                                                                   .arg (aCodeModel.ref (ZoneOffset.class)
-                                                                                   .staticRef ("UTC"))));
+                                                                   .arg (JExpr._null ()) : aCodeModel.ref (
+                                                                                                           OffsetDate.class)
+                                                                                                     .staticInvoke ("of")
+                                                                                                     .arg (aParam)
+                                                                                                     .arg (aCodeModel.ref (ZoneOffset.class)
+                                                                                                                     .staticRef ("UTC"))));
               aSetter.javadoc ().addParam (aParam).add ("The LocalDate to set. May be <code>null</code>.");
               aSetter.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
             }
@@ -174,7 +175,8 @@ public class PluginOffsetDTExtension extends AbstractPlugin
               final JMethod aGetter = jClass.method (JMod.PUBLIC,
                                                      aNewType,
                                                      CJAXB.getGetterName (aOldType, aField.name ()) + "Local");
-              aGetter.annotate (Nullable.class);
+              if (allowsJSpecifyAnnotations (jClass, aNewType))
+                aGetter.annotate (Nullable.class);
               aGetter.body ()
                      ._return (MyTernaryOp.cond (aField.eq (JExpr._null ()),
                                                  JExpr._null (),
@@ -191,7 +193,8 @@ public class PluginOffsetDTExtension extends AbstractPlugin
                                                      aCodeModel.VOID,
                                                      CJAXB.getSetterName (aField.name ()));
               final JVar aParam = aSetter.param (JMod.FINAL, aNewType, "aValue");
-              aParam.annotate (Nullable.class);
+              if (allowsJSpecifyAnnotations (jClass, aNewType))
+                aParam.annotate (Nullable.class);
               aSetter.body ()
                      .assign (aField,
                               MyTernaryOp.cond (aParam.eq (JExpr._null ()),
@@ -199,12 +202,12 @@ public class PluginOffsetDTExtension extends AbstractPlugin
                                                 bIsXML ? aCodeModel.ref (XMLOffsetTime.class)
                                                                    .staticInvoke ("of")
                                                                    .arg (aParam)
-                                                                   .arg (JExpr._null ())
-                                                       : aCodeModel.ref (OffsetTime.class)
-                                                                   .staticInvoke ("of")
-                                                                   .arg (aParam)
-                                                                   .arg (aCodeModel.ref (ZoneOffset.class)
-                                                                                   .staticRef ("UTC"))));
+                                                                   .arg (JExpr._null ()) : aCodeModel.ref (
+                                                                                                           OffsetTime.class)
+                                                                                                     .staticInvoke ("of")
+                                                                                                     .arg (aParam)
+                                                                                                     .arg (aCodeModel.ref (ZoneOffset.class)
+                                                                                                                     .staticRef ("UTC"))));
               aSetter.javadoc ().addParam (aParam).add ("The LocalTime to set. May be <code>null</code>.");
               aSetter.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
             }
@@ -224,7 +227,8 @@ public class PluginOffsetDTExtension extends AbstractPlugin
               final JMethod aGetter = jClass.method (JMod.PUBLIC,
                                                      aNewType,
                                                      CJAXB.getGetterName (aOldType, aField.name ()) + "Local");
-              aGetter.annotate (Nullable.class);
+              if (allowsJSpecifyAnnotations (jClass, aNewType))
+                aGetter.annotate (Nullable.class);
               aGetter.body ()
                      ._return (MyTernaryOp.cond (aField.eq (JExpr._null ()),
                                                  JExpr._null (),
@@ -241,7 +245,8 @@ public class PluginOffsetDTExtension extends AbstractPlugin
                                                      aCodeModel.VOID,
                                                      CJAXB.getSetterName (aField.name ()));
               final JVar aParam = aSetter.param (JMod.FINAL, aNewType, "aValue");
-              aParam.annotate (Nullable.class);
+              if (allowsJSpecifyAnnotations (jClass, aNewType))
+                aParam.annotate (Nullable.class);
               aSetter.body ()
                      .assign (aField,
                               MyTernaryOp.cond (aParam.eq (JExpr._null ()),
@@ -249,12 +254,12 @@ public class PluginOffsetDTExtension extends AbstractPlugin
                                                 bIsXML ? aCodeModel.ref (XMLOffsetDateTime.class)
                                                                    .staticInvoke ("of")
                                                                    .arg (aParam)
-                                                                   .arg (JExpr._null ())
-                                                       : aCodeModel.ref (OffsetDateTime.class)
-                                                                   .staticInvoke ("of")
-                                                                   .arg (aParam)
-                                                                   .arg (aCodeModel.ref (ZoneOffset.class)
-                                                                                   .staticRef ("UTC"))));
+                                                                   .arg (JExpr._null ()) : aCodeModel.ref (
+                                                                                                           OffsetDateTime.class)
+                                                                                                     .staticInvoke ("of")
+                                                                                                     .arg (aParam)
+                                                                                                     .arg (aCodeModel.ref (ZoneOffset.class)
+                                                                                                                     .staticRef ("UTC"))));
               aSetter.javadoc ().addParam (aParam).add ("The LocalDateTime to set. May be <code>null</code>.");
               aSetter.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
             }

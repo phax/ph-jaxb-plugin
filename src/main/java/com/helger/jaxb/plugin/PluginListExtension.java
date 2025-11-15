@@ -22,7 +22,6 @@ import org.xml.sax.ErrorHandler;
 
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.IsSPIImplementation;
-import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
@@ -51,6 +50,8 @@ import com.sun.tools.xjc.outline.Outline;
  * <li>T get...AtIndex(int)</li>
  * <li>void add...(T)</li>
  * </ul>
+ * Note: don't use ICommonsList here, because it is not supported in the underlying JAXB
+ * implementation, which explicitly checks for ArrayList.
  *
  * @author Philip Helger
  */
@@ -58,11 +59,6 @@ import com.sun.tools.xjc.outline.Outline;
 public class PluginListExtension extends AbstractPlugin
 {
   public static final String OPT = "Xph-list-extension";
-
-  /**
-   * Does not work because upon reading the object gets filled with a regular java.util.ArrayList!
-   */
-  private static final boolean USE_COMMONS_LIST = false;
 
   private static final JType [] JTYPE_EMPTY = {};
 
@@ -113,31 +109,12 @@ public class PluginListExtension extends AbstractPlugin
           // Create Setter
           {
             final JMethod aSetter = jClass.method (JMod.PUBLIC, aCodeModel.VOID, CJAXB.getSetterName (sFieldName));
-            final JVar aParam = aSetter.param (JMod.FINAL, USE_COMMONS_LIST ? aNewType : aField.type (), "aList");
-            aParam.annotate (Nullable.class);
+            final JVar aParam = aSetter.param (JMod.FINAL, aField.type (), "aList");
+            if (allowsJSpecifyAnnotations (jClass, aField.type ()))
+              aParam.annotate (Nullable.class);
             aSetter.body ().assign (aField, aParam);
             aSetter.javadoc ().addParam (aParam).add ("The new list member to set. May be <code>null</code>.");
             aSetter.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
-          }
-
-          // Create a new getter
-          if (USE_COMMONS_LIST)
-          {
-            final JMethod aOldGetter = jClass.getMethod (CJAXB.getGetterName (aField.type (), sFieldName), JTYPE_EMPTY);
-            jClass.methods ().remove (aOldGetter);
-            final JMethod aNewGetter = jClass.method (JMod.PUBLIC, aNewType, aOldGetter.name ());
-            aNewGetter.annotate (NonNull.class);
-            aNewGetter.annotate (ReturnsMutableObject.class).param ("value", "JAXB style");
-            final JVar aJRet = aNewGetter.body ().decl (aNewType, "ret", JExpr.cast (aNewType, aField));
-            aNewGetter.body ()
-                      ._if (aJRet.eq (JExpr._null ()))
-                      ._then ()
-                      .assign (aField,
-                               aJRet.assign (JExpr._new (aCodeModel.ref (CommonsArrayList.class)
-                                                                   .narrow (((JClass) aOldType).getTypeParameters ()))));
-            aNewGetter.body ()._return (aJRet);
-            aNewGetter.javadoc ().addReturn ().add ("The mutable list and never <code>null</code>");
-            aNewGetter.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
           }
 
           aEffectedClasses.add (jClass);
@@ -150,7 +127,7 @@ public class PluginListExtension extends AbstractPlugin
         {
           final JType aReturnType = aMethod.type ();
           // Find e.g. List<ItemListType> getItemList()
-          if (aReturnType.erasure ().name ().equals (USE_COMMONS_LIST ? "ICommonsList" : "List"))
+          if (aReturnType.erasure ().name ().equals ("List"))
           {
             final String sRelevantTypeName = aMethod.name ().substring (3);
             final JType aListElementType = ((JClass) aReturnType).getTypeParameters ().get (0);
@@ -160,10 +137,7 @@ public class PluginListExtension extends AbstractPlugin
               final JMethod mHasEntries = jClass.method (JMod.PUBLIC,
                                                          aCodeModel.BOOLEAN,
                                                          "has" + sRelevantTypeName + "Entries");
-              if (USE_COMMONS_LIST)
-                mHasEntries.body ()._return (JExpr.invoke (aMethod).invoke ("isNotEmpty"));
-              else
-                mHasEntries.body ()._return (JOp.not (JExpr.invoke (aMethod).invoke ("isEmpty")));
+              mHasEntries.body ()._return (JOp.not (JExpr.invoke (aMethod).invoke ("isEmpty")));
 
               mHasEntries.javadoc ()
                          .addReturn ()
@@ -208,14 +182,12 @@ public class PluginListExtension extends AbstractPlugin
               final JMethod mAtIndex = jClass.method (JMod.PUBLIC,
                                                       aListElementType,
                                                       "get" + sRelevantTypeName + "AtIndex");
-              mAtIndex.annotate (Nullable.class);
+              if (allowsJSpecifyAnnotations (jClass, aListElementType))
+                mAtIndex.annotate (Nullable.class);
               mAtIndex._throws (IndexOutOfBoundsException.class);
               final JVar aParam = mAtIndex.param (JMod.FINAL, aCodeModel.INT, "index");
               aParam.annotate (Nonnegative.class);
-              if (USE_COMMONS_LIST)
-                mAtIndex.body ()._return (JExpr.invoke (aMethod).invoke ("getAtIndex").arg (aParam));
-              else
-                mAtIndex.body ()._return (JExpr.invoke (aMethod).invoke ("get").arg (aParam));
+              mAtIndex.body ()._return (JExpr.invoke (aMethod).invoke ("get").arg (aParam));
 
               mAtIndex.javadoc ().addParam (aParam).add ("The index to retrieve");
               mAtIndex.javadoc ().addReturn ().add ("The element at the specified index. May be <code>null</code>");
@@ -227,7 +199,8 @@ public class PluginListExtension extends AbstractPlugin
             {
               final JMethod mAdd = jClass.method (JMod.PUBLIC, aCodeModel.VOID, "add" + sRelevantTypeName);
               final JVar aParam = mAdd.param (JMod.FINAL, aListElementType, "elem");
-              aParam.annotate (NonNull.class);
+              if (allowsJSpecifyAnnotations (jClass, aListElementType))
+                aParam.annotate (NonNull.class);
               mAdd.body ().add (JExpr.invoke (aMethod).invoke ("add").arg (aParam));
 
               mAdd.javadoc ().addParam (aParam).add ("The element to be added. May not be <code>null</code>.");
