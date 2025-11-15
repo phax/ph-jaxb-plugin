@@ -25,7 +25,7 @@
     <version>3.0.2</version>
   </parent>
   <artifactId>ph-jaxb-plugin</artifactId>
-  <version>5.1.2-SNAPSHOT</version>
+  <version>5.1.1-SNAPSHOT</version>
   <name>ph-jaxb-plugin</name>
   <description>JAXB 4.x plugin to improve created output</description>
   <url>https://github.com/phax/ph-jaxb-plugin</url>
