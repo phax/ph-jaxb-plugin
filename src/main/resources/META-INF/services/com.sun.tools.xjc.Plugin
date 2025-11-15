@@ -12,5 +12,6 @@ com.helger.jaxb.plugin.PluginImplements
 com.helger.jaxb.plugin.PluginListExtension
 com.helger.jaxb.plugin.PluginNamespacePrefix
 com.helger.jaxb.plugin.PluginOffsetDTExtension
+com.helger.jaxb.plugin.PluginPackageNullMarked
 com.helger.jaxb.plugin.PluginToString
 com.helger.jaxb.plugin.PluginValueExtender

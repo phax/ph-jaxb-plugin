@@ -50,7 +50,7 @@ Add something **like** the following to your pom.xml to use this artifact:
       <groupId>com.helger</groupId>
       <artifactId>ph-jaxb-plugin</artifactId>
       <!-- Use the right version below -->
-      <version>5.1.0</version>
+      <version>5.1.1</version>
     </dependency>
   </dependencies>
 </plugin>
@@ -71,7 +71,7 @@ For usage with JAXB 2.2 use this dependency:
 
 # JAXB Plugins
 
-* `ph-annotate` - Create `@javax.annotation.Nonnull`/`@javax.annotation.Nullable` annotations in all bean generated objects as well as in the `ObjectFactory` classes
+* `ph-annotate` - Create `@org.jspecify.annotations.NonNull`/`@org.jspecify.annotations.Nullable` annotations in all bean generated objects as well as in the `ObjectFactory` classes
 * `ph-bean-validation10` - inject Bean validation 1.0 annotations (JSR 303)
 * `ph-bean-validation11` - inject Bean validation 1.1 annotations (JSR 349)
 * `ph-cloneable` (since 2.2.11.7) - implement `clone()` of `Cloneable` interface and `cloneTo(target)`. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons).
@@ -92,10 +92,14 @@ For usage with JAXB 2.2 use this dependency:
     * `T get...AtIndex(int)` - get the element at the specified index
     * `void add...(T)` - add a new entry to the list
 * `ph-offset-dt-extension` (since 2.3.3.2) - add additional methods for Offset* date time types using their `Local` counterparts
+* `ph-package-null-marked` (since 5.1.1) - add the `org.jspecify.annotations.NullMarked` annotation to all generated packages
 * `ph-tostring` - auto implement `toString` using `com.helger.commons.string.ToStringGenerator.getToString()`. This requires the created code to depend on [ph-commons >= 8.6.2](https://github.com/phax/ph-commons). 
 * `ph-value-extender` (since 2.3.1.3) - create additional constructors with the 'value' as argument as well as getter and setter for the value
 
 # News and noteworthy
+
+v5.1.1 - work in progress
+* Added new plugin `ph-package-null-marked`
 
 v5.1.0 - 2025-11-02
 * Updated to ph-commons 12.1.0
