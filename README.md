@@ -96,12 +96,13 @@ For usage with JAXB 2.2 use this dependency:
 
 # News and noteworthy
 
-v5.1.1 - work in progress
+v5.1.1 - 2025-11-16
 * Added new plugin `ph-package-null-marked`
+* Heavily improved for JSpecify annotations to avoid setting invalid ones
 
 v5.1.0 - 2025-11-02
 * Updated to ph-commons 12.1.0
-* Updated to use jspecify Nullable/NonNull annotations
+* Updated to use JSpecify Nullable/NonNull annotations
 
 v5.0.1 - 2025-09-12
 * Added handling for type `Serializable` in `clone` plugin
