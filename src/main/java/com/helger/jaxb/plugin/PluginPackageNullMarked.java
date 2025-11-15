@@ -29,7 +29,8 @@ import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
 /**
- * Makes sure that each package has a <code>package-info.java<code> which has the <code></code>
+ * Makes sure that each package has a <code>package-info.java</code> which has the
+ * <code>org.jspecify.annotations.NullMarked</code> annotation
  *
  * @author Philip Helger
  */
