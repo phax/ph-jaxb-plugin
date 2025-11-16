@@ -16,13 +16,12 @@
  */
 package com.helger.jaxb.plugin;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.jspecify.annotations.NonNull;
 
 import com.helger.base.array.ArrayHelper;
 import com.helger.base.clone.CloneHelper;
+import com.helger.collection.commons.CommonsHashMap;
+import com.helger.collection.commons.ICommonsMap;
 import com.helger.jaxb.adapter.JAXBHelper;
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JClass;
@@ -41,7 +40,7 @@ import com.sun.codemodel.JType;
  */
 public abstract class AbstractPluginCloneable extends AbstractPlugin
 {
-  private static final Map <String, Boolean> ENUM_CACHE = new HashMap <> ();
+  private static final ICommonsMap <String, Boolean> ENUM_CACHE = new CommonsHashMap <> ();
 
   private boolean _loadClassAndCheckIfEnum (final String sName)
   {
@@ -72,22 +71,19 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
       return true;
 
     // Is it an enum?
-    if (aType instanceof JDefinedClass)
+    if (aType instanceof final JDefinedClass aClass)
     {
       // Does not work for enums from episodes
-      final JDefinedClass aClass = (JDefinedClass) aType;
       if (aClass.getClassType () == ClassType.ENUM)
         return true;
     }
 
-    if (aType instanceof JClass)
+    if (aType instanceof final JClass aCls)
     {
       // If it is a "JDirectClass" -> it could not be loaded. Add as a
       // dependency to the Maven plugin to resolve this
       // If it is a "JCodeModel$JReferencedClass" -> it is in the classpath but
       // external
-      final JClass aCls = (JClass) aType;
-
       // -> try to load via reflection and analyze
       final Boolean aIsEnum = ENUM_CACHE.computeIfAbsent (aCls.binaryName (),
                                                           k -> Boolean.valueOf (_loadClassAndCheckIfEnum (k)));
