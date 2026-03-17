@@ -1,5 +1,10 @@
 # ph-jaxb-plugin
 
+<!-- ph-badge-start -->
+[![Sonatype Central](https://maven-badges.sml.io/sonatype-central/com.helger/ph-jaxb-plugin/badge.svg)](https://maven-badges.sml.io/sonatype-central/com.helger/ph-jaxb-plugin/)
+[![javadoc](https://javadoc.io/badge2/com.helger/ph-jaxb-plugin/javadoc.svg)](https://javadoc.io/doc/com.helger/ph-jaxb-plugin)
+<!-- ph-badge-end -->
+
 JAXB 4.0.x plugin that adds some commonly needed functionality.
 
 * Version 5.x requires Java 17 and builds on ph-commons v12.
