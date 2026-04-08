@@ -511,6 +511,9 @@ The other well-known XJC plugin library is [highsource/jaxb-tools](https://githu
 
 # News and noteworthy
 
+v5.1.2 - 2026-04-08
+* Fixed incorrect `@Digits` annotation generation when both `totalDigits` and `fractionDigits` XSD facets are present. See [issue #4](https://github.com/phax/ph-jaxb-plugin/issues/4).
+
 v5.1.1 - 2025-11-16
 * Added new plugin `ph-package-null-marked`
 * Heavily improved for JSpecify annotations to avoid setting invalid ones

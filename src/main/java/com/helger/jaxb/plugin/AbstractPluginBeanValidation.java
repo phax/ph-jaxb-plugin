@@ -315,13 +315,14 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
     if (!_hasAnnotation (aField, Digits.class) && aTotalDigits != null)
     {
       final JAnnotationUse aAnnotDigits = aField.annotate (Digits.class);
-      if (aFractionDigits == null)
-        aAnnotDigits.param ("integer", aTotalDigits.intValue ());
-      else
-      {
-        aAnnotDigits.param ("integer", aTotalDigits.intValue () - aFractionDigits.intValue ());
+      // Note: XSD "totalDigits" means the max number of digits in total,
+      // whereas JSR-303 @Digits has separate "integer" and "fraction" limits.
+      // There is no way to express "totalDigits" exactly in JSR-303, so we
+      // use totalDigits as the integer limit to avoid incorrectly rejecting
+      // valid values (see https://github.com/phax/ph-jaxb-plugin/issues/4).
+      aAnnotDigits.param ("integer", aTotalDigits.intValue ());
+      if (aFractionDigits != null)
         aAnnotDigits.param ("fraction", aFractionDigits.intValue ());
-      }
     }
   }
 
