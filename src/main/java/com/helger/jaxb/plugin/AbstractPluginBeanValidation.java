@@ -312,7 +312,7 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
                                                                                                          .getValue ().value);
     final Integer aFractionDigits = aXSFractionDigits == null ? null : StringParser.parseIntObj (aXSFractionDigits
                                                                                                                   .getValue ().value);
-    if (!_hasAnnotation (aField, Digits.class) && aTotalDigits != null)
+    if (!_hasAnnotation (aField, Digits.class) && aTotalDigits != null && _isNumericType (aField))
     {
       final JAnnotationUse aAnnotDigits = aField.annotate (Digits.class);
       // Note: XSD "totalDigits" means the max number of digits in total,
