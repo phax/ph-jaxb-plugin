@@ -450,23 +450,21 @@ public class AmountType {
 }
 ```
 
-# Comparison with other JAXB projects
+# Comparison with highsource/jaxb-tools
 
-There are two other well-known projects in the JAXB ecosystem: [mojohaus/jaxb2-maven-plugin](https://github.com/mojohaus/jaxb2-maven-plugin) and [highsource/jaxb-tools](https://github.com/highsource/jaxb-tools).
+The other well-known XJC plugin library is [highsource/jaxb-tools](https://github.com/highsource/jaxb-tools) (`org.jvnet.jaxb:jaxb-plugins`).
 
-## Project scope
+## Project overview
 
-| | ph-jaxb-plugin | mojohaus jaxb2-maven-plugin | highsource jaxb-tools |
-|---|---|---|---|
-| **Type** | XJC plugin library | Maven plugin (XJC invoker) | Maven plugin + XJC plugin library |
-| **Coordinates** | `com.helger:ph-jaxb-plugin` | `org.codehaus.mojo:jaxb2-maven-plugin` | `org.jvnet.jaxb:jaxb-maven-plugin` + `org.jvnet.jaxb:jaxb-plugins` |
-| **JAXB version** | JAXB 4.x (Jakarta) | JAXB 2.x / 3.x | JAXB 4.x (Jakarta) |
-| **Java baseline** | Java 17+ | Java 8+ | Java 11+ |
-| **Ships XJC plugins?** | Yes (17 plugins) | No (just invokes XJC) | Yes (25+ plugins) |
+| | ph-jaxb-plugin | highsource jaxb-tools |
+|---|---|---|
+| **Type** | XJC plugin library | Maven plugin + XJC plugin library |
+| **Coordinates** | `com.helger:ph-jaxb-plugin` | `org.jvnet.jaxb:jaxb-maven-plugin` + `org.jvnet.jaxb:jaxb-plugins` |
+| **JAXB version** | JAXB 4.x (Jakarta) | JAXB 4.x (Jakarta) |
+| **Java baseline** | Java 17+ | Java 11+ |
+| **XJC plugins** | 17 plugins | 25+ plugins |
 
-**Note:** `mojohaus/jaxb2-maven-plugin` is **not** a competing XJC plugin library -- it is a build tool that *invokes* XJC. It can be used *together* with either ph-jaxb-plugin or jaxb-tools. The real comparison is between **ph-jaxb-plugin** and **highsource/jaxb-tools plugins**.
-
-## Feature comparison: ph-jaxb-plugin vs. jaxb-tools
+## Feature comparison
 
 | Feature | ph-jaxb-plugin | jaxb-tools |
 |---|---|---|
