@@ -74,30 +74,381 @@ For usage with JAXB 2.2 use this dependency:
 
 # JAXB Plugins
 
-* `ph-annotate` - Create `@org.jspecify.annotations.NonNull`/`@org.jspecify.annotations.Nullable` annotations in all bean generated objects as well as in the `ObjectFactory` classes
-* `ph-bean-validation10` - inject Bean validation 1.0 annotations (JSR 303)
-* `ph-bean-validation11` - inject Bean validation 1.1 annotations (JSR 349)
-* `ph-cloneable` (since 2.2.11.7) - implement `clone()` of `Cloneable` interface and `cloneTo(target)`. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons).
-* `ph-cloneable2` (since 2.2.11.12) - implement `clone()` of `Cloneable` using `com.helger.commons.lang.IExplicitlyCloneable` interface and `cloneTo(target)`. This requires the created code to depend on [ph-commons &ge; 9.1.8](https://github.com/phax/ph-commons).
-* `ph-code-quality` - fix some issues that cause warnings in the generated code.
-    * All `ObjectFactory` `QName` members are made public.
-    * Adding JavaDocs to all `ObjectFactory` `JAXBElement<...> create...` methods
-* `ph-csu` - add `@CodingStyleguideUnaware` annotations to all classes. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons).
-* `ph-default-locale` `locale` - set Java default locale to the specified parameter. Use e.g. `en_US`
-* `ph-equalshashcode` - auto implement `equals` and `hashCode` using `com.helger.commons.equals.EqualsHelper` and `com.helger.commons.hashcode.HashCodeGenerator`. This requires the created code to depend on [ph-commons](https://github.com/phax/ph-commons). 
-* `ph-fields-private` - mark all fields as private
-* `ph-implements` `fullyQualifiedInterfaceName[,otherInterfaceName]` - implement 1-n interfaces in all classes/enums (e.g. `java.io.Serializable`)
-* `ph-list-extension` - add additional methods for `List` types:
-    * `void set...(List)` - set a new `List`
-    * `boolean has...Entries()` - returns `true` if at least one entry is present
-    * `boolean hasNo...Entries()` - returns `true` if no entry is present
-    * `int get...Count()` (or `get...ListCount`) - returns the number of contained entries
-    * `T get...AtIndex(int)` - get the element at the specified index
-    * `void add...(T)` - add a new entry to the list
-* `ph-offset-dt-extension` (since 2.3.3.2) - add additional methods for Offset* date time types using their `Local` counterparts
-* `ph-package-null-marked` (since 5.1.1) - add the `org.jspecify.annotations.NullMarked` annotation to all generated packages
-* `ph-tostring` - auto implement `toString` using `com.helger.commons.string.ToStringGenerator.getToString()`. This requires the created code to depend on [ph-commons >= 8.6.2](https://github.com/phax/ph-commons). 
-* `ph-value-extender` (since 2.3.1.3) - create additional constructors with the 'value' as argument as well as getter and setter for the value
+All plugins are activated by passing `-Xph-<name>` as an XJC argument.
+Some plugins require additional runtime dependencies in the generated code (noted per plugin below).
+
+## ph-annotate
+
+**XJC argument:** `-Xph-annotate`
+
+Adds JSpecify nullability annotations to generated bean classes and `ObjectFactory` methods.
+
+On bean **getters**:
+* `@Nullable` for single-value object fields
+* `@NonNull @ReturnsMutableObject` for `List` fields
+
+On bean **setters**:
+* `@Nullable` on parameters for non-primitive types
+
+On `ObjectFactory` **create methods**:
+* `@NonNull` on the return type
+* `@Nullable` on parameters
+
+**Example** - a field `protected String name` will produce:
+
+```java
+@Nullable
+public String getName() { return name; }
+
+public void setName(@Nullable String value) { this.name = value; }
+```
+
+## ph-bean-validation10
+
+**XJC argument:** `-Xph-bean-validation10`
+
+Injects JSR 303 (Bean Validation 1.0) annotations based on XSD constraints.
+The generated code requires `jakarta.validation:jakarta.validation-api` at runtime.
+
+**Annotations added based on XSD facets:**
+
+| XSD Constraint | Generated Annotation |
+|---|---|
+| `minOccurs="1"` / `use="required"` | `@NotNull` |
+| `minLength` / `maxLength` | `@Size(min=..., max=...)` |
+| `pattern` | `@Pattern(regexp="...")` |
+| `minInclusive` / `maxInclusive` | `@DecimalMin("...") / @DecimalMax("...")` |
+| `minExclusive` / `maxExclusive` | `@DecimalMin(value="...", inclusive=false)` / `@DecimalMax(value="...", inclusive=false)` |
+| `totalDigits` / `fractionDigits` | `@Digits(integer=..., fraction=...)` |
+| Complex type reference | `@Valid` (for cascading validation) |
+
+**Example** - for an XSD element:
+```xml
+<xs:element name="email" type="xs:string" minOccurs="1">
+  <xs:simpleType>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="255"/>
+      <xs:pattern value="[^@]+@[^@]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:element>
+```
+
+The generated field will have:
+```java
+@NotNull
+@Size(max = 255)
+@Pattern(regexp = "[^@]+@[^@]+")
+protected String email;
+```
+
+## ph-bean-validation11
+
+**XJC argument:** `-Xph-bean-validation11`
+
+Same as `ph-bean-validation10` but uses JSR 349 (Bean Validation 1.1) annotations.
+The difference is in the package used for the `@DecimalMin`/`@DecimalMax` `inclusive` parameter which was added in Bean Validation 1.1.
+
+## ph-cloneable
+
+**XJC argument:** `-Xph-cloneable`
+
+Implements the `Cloneable` interface on all generated classes and adds deep-clone methods.
+The generated code requires [ph-commons](https://github.com/phax/ph-commons) at runtime.
+
+**Methods added:**
+* `public void cloneTo(TargetType ret)` - copies all fields from `this` to `ret` with proper deep cloning
+* `public Object clone()` - creates a new instance and calls `cloneTo`
+
+The plugin handles deep cloning correctly for:
+* Immutable types (primitives, `String`, `BigDecimal`, enums, etc.) - assigned directly
+* `XMLGregorianCalendar` and similar Java-cloneable types - cloned via `.clone()`
+* `List` fields - deep-cloned element by element via `CloneHelper`
+* Nested JAXB types - recursively cloned
+
+**Example** - generated code:
+
+```java
+public class AddressType implements Cloneable {
+    // ... fields ...
+
+    public void cloneTo(AddressType ret) {
+        ret.street = this.street;           // String is immutable
+        ret.lines = ((this.lines == null) ? null : new ArrayList<>(this.lines));  // List deep clone
+    }
+
+    public Object clone() {
+        AddressType ret = new AddressType();
+        cloneTo(ret);
+        return ret;
+    }
+}
+```
+
+## ph-cloneable2
+
+**XJC argument:** `-Xph-cloneable2`
+
+Same deep-clone functionality as `ph-cloneable`, but implements `com.helger.commons.lang.IExplicitlyCloneable` instead of `java.lang.Cloneable`.
+The generated code requires [ph-commons](https://github.com/phax/ph-commons) at runtime.
+
+Use this variant when you want explicit clone support that is visible in the type system via the `IExplicitlyCloneable` marker interface.
+
+## ph-code-quality
+
+**XJC argument:** `-Xph-code-quality`
+
+Fixes code quality issues in the generated code to suppress compiler warnings:
+* Makes all `QName` constants in `ObjectFactory` classes `public` (they are package-private by default)
+* Adds `final` modifier to parameters of `ObjectFactory` `JAXBElement<...> create...()` methods
+* Adds JavaDoc to `ObjectFactory` create methods
+
+No additional runtime dependencies required.
+
+## ph-csu
+
+**XJC argument:** `-Xph-csu`
+
+Adds the `@CodingStyleguideUnaware` annotation to all generated classes and inner classes.
+This is useful to exclude generated code from coding style checks.
+The generated code requires [ph-commons](https://github.com/phax/ph-commons) at runtime.
+
+**Example:**
+
+```java
+@CodingStyleguideUnaware
+public class AddressType {
+    @CodingStyleguideUnaware
+    public static class InnerType {
+        // ...
+    }
+}
+```
+
+## ph-default-locale
+
+**XJC argument:** `-Xph-default-locale locale`
+
+Sets the JVM default locale during XJC code generation. This does **not** modify the generated code - it only affects the XJC compilation process itself.
+
+**Example usage:**
+```xml
+<arg>-Xph-default-locale</arg>
+<arg>en_US</arg>
+```
+
+## ph-equalshashcode
+
+**XJC argument:** `-Xph-equalshashcode`
+
+Auto-generates `equals()` and `hashCode()` methods using ph-commons helpers.
+The generated code requires [ph-commons](https://github.com/phax/ph-commons) at runtime.
+
+The plugin correctly handles:
+* Inheritance hierarchies (calls `super.equals()` / includes super hashCode)
+* `JAXBElement` fields (compared via `JAXBHelper`)
+* `List` fields (compared via `CollectionEqualsHelper`)
+* `Object` fields (compared via `EqualsHelper`, which handles DOM nodes correctly)
+* Primitive and regular object fields
+
+**Example** - generated code:
+
+```java
+@Override
+public boolean equals(Object o) {
+    if (o == this) return true;
+    if (o == null || !getClass().equals(o.getClass())) return false;
+    AddressType rhs = ((AddressType) o);
+    if (!EqualsHelper.equals(street, rhs.street)) return false;
+    if (!EqualsHelper.equals(city, rhs.city)) return false;
+    return true;
+}
+
+@Override
+public int hashCode() {
+    return new HashCodeGenerator(this)
+        .append(street)
+        .append(city)
+        .getHashCode();
+}
+```
+
+## ph-fields-private
+
+**XJC argument:** `-Xph-fields-private`
+
+Changes the visibility of all generated fields from `protected` (JAXB default) to `private`.
+No additional runtime dependencies required.
+
+**Before:**
+```java
+protected String name;
+```
+
+**After:**
+```java
+private String name;
+```
+
+## ph-implements
+
+**XJC argument:** `-Xph-implements fullyQualifiedInterfaceName[,otherInterfaceName]`
+
+Makes all generated classes and enums implement one or more specified interfaces.
+Multiple interfaces can be separated by commas or semicolons.
+The interface is only added to root classes in an inheritance hierarchy (subclasses inherit it automatically).
+For enums, `java.io.Serializable` is automatically skipped (enums are already serializable).
+
+**Example usage:**
+```xml
+<arg>-Xph-implements</arg>
+<arg>java.io.Serializable</arg>
+```
+
+Generates:
+```java
+public class AddressType implements Serializable {
+    // ...
+}
+```
+
+## ph-list-extension
+
+**XJC argument:** `-Xph-list-extension`
+
+Adds convenience methods for all `List`-typed fields. Standard JAXB only generates a single `getXxx()` method that returns the list. This plugin adds methods that make working with lists more ergonomic.
+
+**Methods added for each List field (e.g. a field `items` of type `List<ItemType>`):**
+
+| Method | Description |
+|---|---|
+| `void setItem(List<ItemType> aList)` | Replace the entire list |
+| `boolean hasItemEntries()` | Returns `true` if at least one entry is present |
+| `boolean hasNoItemEntries()` | Returns `true` if the list is empty or null |
+| `int getItemCount()` | Returns the number of entries (0 if null) |
+| `ItemType getItemAtIndex(int index)` | Returns the element at the given index |
+| `void addItem(ItemType elem)` | Adds a single entry to the list |
+
+If `getItemCount()` clashes with an existing method, `getItemListCount()` is generated instead.
+
+## ph-namespace-prefix
+
+**XJC argument:** `-Xph-namespace-prefix`
+
+Forces specific namespace prefixes in the generated `@XmlSchema` annotation on `package-info.java`, instead of the auto-generated `ns1`, `ns2`, ... prefixes.
+Prefix mappings are defined via customization elements in the XJC bindings file.
+
+No additional runtime dependencies required.
+
+**Bindings file example:**
+
+```xml
+<?xml version="1.0"?>
+<jxb:bindings version="2.1"
+    xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:namespace="http://www.helger.com/namespaces/jaxb/plugin/namespace-prefix">
+
+    <jxb:bindings schemaLocation="myschema.xsd">
+        <jxb:schemaBindings>
+            <jxb:package name="com.example.schema.v1" />
+        </jxb:schemaBindings>
+        <jxb:bindings>
+            <namespace:prefix name="myns" />
+        </jxb:bindings>
+    </jxb:bindings>
+
+</jxb:bindings>
+```
+
+This generates a `package-info.java` with:
+```java
+@XmlSchema(xmlns = {
+    @XmlNs(prefix = "myns", namespaceURI = "http://example.com/schema/v1")
+})
+package com.example.schema.v1;
+```
+
+## ph-offset-dt-extension
+
+**XJC argument:** `-Xph-offset-dt-extension`
+
+Adds convenience getter and setter methods for `Offset*` date/time types (`OffsetDate`, `OffsetTime`, `OffsetDateTime` and their `XMLOffset*` variants) that accept and return `Local*` counterparts.
+
+**Methods added for each Offset date/time field (e.g. `OffsetDateTime created`):**
+
+| Method | Description |
+|---|---|
+| `LocalDateTime getCreatedLocal()` | Returns the local part of the offset value (or `null` if not set) |
+| `void setCreated(LocalDateTime value)` | Sets the field by converting from local to offset type |
+
+The same pattern applies for `OffsetDate`/`LocalDate` and `OffsetTime`/`LocalTime`.
+
+## ph-package-null-marked
+
+**XJC argument:** `-Xph-package-null-marked`
+
+Adds the `@org.jspecify.annotations.NullMarked` annotation to all generated `package-info.java` files.
+This declares that all types in the package use JSpecify null-safety by default.
+
+Since v5.1.1.
+
+## ph-tostring
+
+**XJC argument:** `-Xph-tostring`
+
+Auto-generates `toString()` methods using ph-commons `ToStringGenerator`.
+The generated code requires [ph-commons](https://github.com/phax/ph-commons) at runtime.
+
+Handles inheritance hierarchies correctly by using a derived `ToStringGenerator` for subclasses.
+
+**Example** - generated code:
+
+```java
+@Override
+public String toString() {
+    return new ToStringGenerator(this)
+        .append("street", street)
+        .append("city", city)
+        .getToString();
+}
+```
+
+## ph-value-extender
+
+**XJC argument:** `-Xph-value-extender`
+
+Creates additional constructors and methods for accessing the "value" field that is common in UBL/CII type systems where XSD types wrap a simple value with optional attributes.
+
+**What is added:**
+* A default no-arg constructor (if not already present)
+* A constructor taking the value as a parameter: `ClassName(valueType)`
+* Typed getter/setter for the value, e.g. `getStringValue()` / `setStringValue(String)`
+* For boolean values: `isValue()` instead of `getValue()`
+* For `Offset*` date/time values: additional `get...ValueLocal()` methods (if `ph-offset-dt-extension` is also active)
+
+**Example** - for a generated class wrapping a `BigDecimal` value:
+
+```java
+public class AmountType {
+    // Default no-arg constructor
+    public AmountType() {}
+
+    // Value constructor
+    public AmountType(BigDecimal value) {
+        setValue(value);
+    }
+
+    // Typed getter
+    public BigDecimal getBigDecimalValue() {
+        return getValue();
+    }
+
+    // Typed setter
+    public void setBigDecimalValue(BigDecimal value) {
+        setValue(value);
+    }
+}
+```
 
 # News and noteworthy
 
