@@ -1,8 +1,10 @@
+.claude/
 .settings/ 
 target/
 
 .pmd
-*.iml
 .project 
 .classpath 
 src/test/resources/external/ubl23/catalog.xml
+
+*.iml
