@@ -450,6 +450,67 @@ public class AmountType {
 }
 ```
 
+# Comparison with other JAXB projects
+
+There are two other well-known projects in the JAXB ecosystem: [mojohaus/jaxb2-maven-plugin](https://github.com/mojohaus/jaxb2-maven-plugin) and [highsource/jaxb-tools](https://github.com/highsource/jaxb-tools).
+
+## Project scope
+
+| | ph-jaxb-plugin | mojohaus jaxb2-maven-plugin | highsource jaxb-tools |
+|---|---|---|---|
+| **Type** | XJC plugin library | Maven plugin (XJC invoker) | Maven plugin + XJC plugin library |
+| **Coordinates** | `com.helger:ph-jaxb-plugin` | `org.codehaus.mojo:jaxb2-maven-plugin` | `org.jvnet.jaxb:jaxb-maven-plugin` + `org.jvnet.jaxb:jaxb-plugins` |
+| **JAXB version** | JAXB 4.x (Jakarta) | JAXB 2.x / 3.x | JAXB 4.x (Jakarta) |
+| **Java baseline** | Java 17+ | Java 8+ | Java 11+ |
+| **Ships XJC plugins?** | Yes (17 plugins) | No (just invokes XJC) | Yes (25+ plugins) |
+
+**Note:** `mojohaus/jaxb2-maven-plugin` is **not** a competing XJC plugin library -- it is a build tool that *invokes* XJC. It can be used *together* with either ph-jaxb-plugin or jaxb-tools. The real comparison is between **ph-jaxb-plugin** and **highsource/jaxb-tools plugins**.
+
+## Feature comparison: ph-jaxb-plugin vs. jaxb-tools
+
+| Feature | ph-jaxb-plugin | jaxb-tools |
+|---|---|---|
+| **equals/hashCode** | Via ph-commons `EqualsHelper` / `HashCodeGenerator` | Two variants: "simple" (self-contained) or "strategic" (pluggable `EqualsStrategy` / `HashCodeStrategy`) |
+| **toString** | Via ph-commons `ToStringGenerator` | "Strategic" (pluggable `ToStringStrategy`) or via Apache Commons Lang 3 |
+| **Deep clone/copy** | `clone()` + `cloneTo()` via `Cloneable` or `IExplicitlyCloneable` | `copyTo()` via pluggable `CopyStrategy` |
+| **Merge two objects** | -- | `mergeFrom()` via `MergeStrategy` |
+| **Bean validation** | JSR 303 + JSR 349 annotations from XSD facets (`@NotNull`, `@Size`, `@Pattern`, `@DecimalMin/Max`, `@Digits`, `@Valid`) | -- |
+| **Nullability annotations** | JSpecify `@NonNull` / `@Nullable` on getters, setters, ObjectFactory | -- |
+| **Package @NullMarked** | Yes | -- |
+| **Fields private** | Yes | -- |
+| **Implements interfaces** | Yes (any interface, on classes + enums) | Yes (`-Xinheritance` + `-XautoInheritance`, supports extends too) |
+| **List convenience methods** | `set`, `has...Entries`, `hasNo...Entries`, `get...Count`, `get...AtIndex`, `add` | `set` only (`-Xsetters`) |
+| **Fluent API** | -- | Yes (chained setters returning `this`) |
+| **Namespace prefix** | Yes (`@XmlNs` via bindings) | Yes (similar approach) |
+| **Value constructor** | Yes (value field constructor + typed getters/setters, designed for UBL/CII) | Yes (all-args constructor) |
+| **Offset date/time helpers** | Yes (Local/Offset conversion) | -- |
+| **Default values from XSD** | -- | Yes (`-Xdefault-value`) |
+| **Code quality fixes** | Yes (public QName, final params, JavaDoc on ObjectFactory) | -- |
+| **@CodingStyleguideUnaware** | Yes | -- |
+| **Annotation manipulation** | -- | Yes (add/remove arbitrary annotations via bindings) |
+| **Property simplification** | -- | Yes (simplify `aOrBOrC` choice properties) |
+| **Enum value interface** | -- | Yes (`EnumValue<T>`) |
+| **Parent pointer** | -- | Yes (child to parent navigation) |
+| **Property change listeners** | -- | Yes |
+
+## What makes ph-jaxb-plugin stand out
+
+* **Bean Validation from XSD** -- Automatically derives `@NotNull`, `@Size`, `@Pattern`, `@DecimalMin/Max`, `@Digits`, and `@Valid` annotations directly from XSD facets. jaxb-tools has no equivalent.
+* **JSpecify null-safety** -- Automatic `@NonNull`/`@Nullable` annotations on getters, setters, and ObjectFactory methods, plus `@NullMarked` on packages. Makes generated code compatible with modern null-safety tooling (NullAway, Error Prone, etc.).
+* **Rich List API** -- Six convenience methods per list field vs. just a setter in jaxb-tools. Methods like `hasEntries()`, `getCount()`, `getAtIndex()`, and `add()` significantly reduce boilerplate when working with JAXB lists.
+* **UBL/CII-oriented value extender** -- Purpose-built for document type systems (UBL, CII) where types wrap a simple value with attributes. Generates typed value constructors and getters (e.g., `AmountType(BigDecimal)`, `getBigDecimalValue()`).
+* **Offset date/time conversion** -- Automatic Local/Offset date-time conversion helpers, useful when working with XML date types that carry timezone offsets but application logic uses local times.
+* **Single JAR, opinionated** -- All 17 plugins in one artifact, no module sprawl. jaxb-tools splits functionality across many modules and offers pluggable strategies (useful for customization, but adds complexity). ph-jaxb-plugin uses ph-commons directly, which is simpler if you already depend on ph-commons.
+
+## Trade-offs
+
+| ph-jaxb-plugin | jaxb-tools |
+|---|---|
+| Simpler setup (one dependency) | More modular (pick only what you need) |
+| Tied to ph-commons runtime | Strategic plugins allow custom strategies; simple plugins have zero runtime deps |
+| No fluent API, no merge, no property listeners | Broader feature set for general-purpose use |
+| Strongest in validation + null-safety | Strongest in flexibility + annotation manipulation |
+
 # News and noteworthy
 
 v5.1.1 - 2025-11-16
