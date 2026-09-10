@@ -150,12 +150,12 @@ public class PluginOffsetDTExtension extends AbstractPlugin
                                                 bIsXML ? aCodeModel.ref (XMLOffsetDate.class)
                                                                    .staticInvoke ("of")
                                                                    .arg (aParam)
-                                                                   .arg (JExpr._null ()) : aCodeModel.ref (
-                                                                                                           OffsetDate.class)
-                                                                                                     .staticInvoke ("of")
-                                                                                                     .arg (aParam)
-                                                                                                     .arg (aCodeModel.ref (ZoneOffset.class)
-                                                                                                                     .staticRef ("UTC"))));
+                                                                   .arg (JExpr._null ())
+                                                       : aCodeModel.ref (OffsetDate.class)
+                                                                   .staticInvoke ("of")
+                                                                   .arg (aParam)
+                                                                   .arg (aCodeModel.ref (ZoneOffset.class)
+                                                                                   .staticRef ("UTC"))));
               aSetter.javadoc ().addParam (aParam).add ("The LocalDate to set. May be <code>null</code>.");
               aSetter.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
             }
@@ -202,12 +202,12 @@ public class PluginOffsetDTExtension extends AbstractPlugin
                                                 bIsXML ? aCodeModel.ref (XMLOffsetTime.class)
                                                                    .staticInvoke ("of")
                                                                    .arg (aParam)
-                                                                   .arg (JExpr._null ()) : aCodeModel.ref (
-                                                                                                           OffsetTime.class)
-                                                                                                     .staticInvoke ("of")
-                                                                                                     .arg (aParam)
-                                                                                                     .arg (aCodeModel.ref (ZoneOffset.class)
-                                                                                                                     .staticRef ("UTC"))));
+                                                                   .arg (JExpr._null ())
+                                                       : aCodeModel.ref (OffsetTime.class)
+                                                                   .staticInvoke ("of")
+                                                                   .arg (aParam)
+                                                                   .arg (aCodeModel.ref (ZoneOffset.class)
+                                                                                   .staticRef ("UTC"))));
               aSetter.javadoc ().addParam (aParam).add ("The LocalTime to set. May be <code>null</code>.");
               aSetter.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
             }
@@ -254,12 +254,12 @@ public class PluginOffsetDTExtension extends AbstractPlugin
                                                 bIsXML ? aCodeModel.ref (XMLOffsetDateTime.class)
                                                                    .staticInvoke ("of")
                                                                    .arg (aParam)
-                                                                   .arg (JExpr._null ()) : aCodeModel.ref (
-                                                                                                           OffsetDateTime.class)
-                                                                                                     .staticInvoke ("of")
-                                                                                                     .arg (aParam)
-                                                                                                     .arg (aCodeModel.ref (ZoneOffset.class)
-                                                                                                                     .staticRef ("UTC"))));
+                                                                   .arg (JExpr._null ())
+                                                       : aCodeModel.ref (OffsetDateTime.class)
+                                                                   .staticInvoke ("of")
+                                                                   .arg (aParam)
+                                                                   .arg (aCodeModel.ref (ZoneOffset.class)
+                                                                                   .staticRef ("UTC"))));
               aSetter.javadoc ().addParam (aParam).add ("The LocalDateTime to set. May be <code>null</code>.");
               aSetter.javadoc ().add ("Created by " + CJAXB.PLUGIN_NAME + " -" + OPT);
             }

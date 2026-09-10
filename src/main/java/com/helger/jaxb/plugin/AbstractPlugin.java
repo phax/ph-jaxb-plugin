@@ -110,7 +110,7 @@ public abstract class AbstractPlugin extends Plugin
       // Ignore static fields
       if ((aFieldVar.mods ().getValue () & JMod.STATIC) == JMod.STATIC)
       {
-        logDebug ( () -> "Ignoring static field '" + sFieldVarName + "'");
+        logDebug (() -> "Ignoring static field '" + sFieldVarName + "'");
         continue;
       }
 

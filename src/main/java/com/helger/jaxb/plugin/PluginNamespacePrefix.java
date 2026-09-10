@@ -52,10 +52,9 @@ import jakarta.xml.bind.annotation.XmlSchema;
 
 /**
  * This plugin adds {@link jakarta.xml.bind.annotation.XmlNs} annotations to
- * <i>package-info.java</i> files. Those annotations tells Jaxb2 to generate XML
- * schema's instances with specific namespaces prefixes, instead of the
- * auto-generated (ns1, ns2, ...) prefixes. Definition of those prefixes is done
- * in the bindings.xml file. <br>
+ * <i>package-info.java</i> files. Those annotations tells Jaxb2 to generate XML schema's instances
+ * with specific namespaces prefixes, instead of the auto-generated (ns1, ns2, ...) prefixes.
+ * Definition of those prefixes is done in the bindings.xml file. <br>
  * Bindings.xml file example:
  *
  * <pre>
@@ -204,9 +203,8 @@ public class PluginNamespacePrefix extends AbstractPlugin
   }
 
   /**
-   * This method detects prefixes for a given package as specified in the
-   * bindings file. Usually, there is only one namespace per package, but there
-   * may be more.
+   * This method detects prefixes for a given package as specified in the bindings file. Usually,
+   * there is only one namespace per package, but there may be more.
    *
    * @param packageModel
    *        the package model

@@ -44,9 +44,7 @@ public final class Issue2FuncTest
       return Driver.run (new String [] { aXSDFile.getAbsolutePath (),
                                          "-d",
                                          aDestDir.getAbsolutePath (),
-                                         "-Xph-bean-validation11" },
-                         aPS,
-                         aPS);
+                                         "-Xph-bean-validation11" }, aPS, aPS);
     }
   }
 

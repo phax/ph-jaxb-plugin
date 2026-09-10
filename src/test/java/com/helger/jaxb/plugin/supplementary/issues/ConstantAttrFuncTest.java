@@ -47,9 +47,7 @@ public final class ConstantAttrFuncTest
                                          aBindingFile.getAbsolutePath (),
                                          "-d",
                                          aDestDir.getAbsolutePath (),
-                                         "-Xph-equalshashcode" },
-                         aPS,
-                         aPS);
+                                         "-Xph-equalshashcode" }, aPS, aPS);
     }
   }
 

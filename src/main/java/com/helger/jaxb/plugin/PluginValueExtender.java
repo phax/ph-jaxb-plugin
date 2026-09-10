@@ -87,18 +87,18 @@ public class PluginValueExtender extends AbstractPlugin
         return;
 
       if (false)
-        logDebug ( () -> "!!" + jType.getClass ().getSimpleName () + " -- " + sClassFullName);
+        logDebug (() -> "!!" + jType.getClass ().getSimpleName () + " -- " + sClassFullName);
 
       // We don't care about the classes we created
       // Take only "external", meaning non-generated super classes
       if (jType instanceof final JDefinedClass jdClass)
       {
-        logDebug ( () -> "  Scanning defined super class '" + sClassFullName + "'");
+        logDebug (() -> "  Scanning defined super class '" + sClassFullName + "'");
         for (final Map.Entry <String, JFieldVar> aFieldEntry : jdClass.fields ().entrySet ())
           if (aFieldEntry.getKey ().equals (FIELD_VALUE))
           {
             put (sClassFullName, aFieldEntry.getValue ().type ());
-            logDebug ( () -> "    Found value field of type '" + aFieldEntry.getValue ().type ().name () + "'");
+            logDebug (() -> "    Found value field of type '" + aFieldEntry.getValue ().type ().name () + "'");
             break;
           }
 
@@ -111,7 +111,7 @@ public class PluginValueExtender extends AbstractPlugin
         final Class <?> aSuperClass = GenericReflection.getClassFromNameSafe (sClassFullName);
         if (aSuperClass != null)
         {
-          logDebug ( () -> "  Successfully loaded super class '" + sClassFullName + "' via reflection");
+          logDebug (() -> "  Successfully loaded super class '" + sClassFullName + "' via reflection");
 
           // Check if that class has a "value" field (name of the variable
           // created by JAXB to indicate the content of an XML element)
@@ -120,7 +120,7 @@ public class PluginValueExtender extends AbstractPlugin
             {
               // Map from super class name to codemodel value field type
               put (sClassFullName, cm._ref (aField.getType ()));
-              logDebug ( () -> "    Found value field of type '" + aField.getType ().getName () + "'");
+              logDebug (() -> "    Found value field of type '" + aField.getType ().getName () + "'");
               break;
             }
 
@@ -172,7 +172,7 @@ public class PluginValueExtender extends AbstractPlugin
       _addIfNotPresent ("com.helger.xsds.ccts.cct.schemamodule.QuantityType", cm.ref (BigDecimal.class));
       _addIfNotPresent ("com.helger.xsds.ccts.cct.schemamodule.TextType", cm.ref (String.class));
 
-      logDebug ( () -> "Found " + size () + " super classes with '" + FIELD_VALUE + "' fields");
+      logDebug (() -> "Found " + size () + " super classes with '" + FIELD_VALUE + "' fields");
     }
 
     /**
@@ -194,7 +194,7 @@ public class PluginValueExtender extends AbstractPlugin
         if (aField.name ().equals (FIELD_VALUE))
         {
           aValueType = aField.type ();
-          logDebug ( () -> "    [" + aField.type ().name () + " " + FIELD_VALUE + "] found directly in class");
+          logDebug (() -> "    [" + aField.type ().name () + " " + FIELD_VALUE + "] found directly in class");
           break;
         }
 
@@ -215,15 +215,15 @@ public class PluginValueExtender extends AbstractPlugin
             final JType vtFinal = aValueType;
             final JClass clsFinal = jCurClass;
             final int lvlFinal = nLevel;
-            logDebug ( () -> "    [" +
-                             vtFinal.name () +
-                             " " +
-                             FIELD_VALUE +
-                             "] found in parent[" +
-                             lvlFinal +
-                             "] class '" +
-                             clsFinal.name () +
-                             "'");
+            logDebug (() -> "    [" +
+                            vtFinal.name () +
+                            " " +
+                            FIELD_VALUE +
+                            "] found in parent[" +
+                            lvlFinal +
+                            "] class '" +
+                            clsFinal.name () +
+                            "'");
           }
         }
         ++nLevel;
@@ -276,7 +276,7 @@ public class PluginValueExtender extends AbstractPlugin
       // General information
       jClass.javadoc ().add ("<p>This class contains methods created by " + CJAXB.PLUGIN_NAME + " -" + OPT + "</p>\n");
     }
-    logDebug ( () -> "Added default constructors to " + aOutline.getClasses ().size () + " classes");
+    logDebug (() -> "Added default constructors to " + aOutline.getClasses ().size () + " classes");
   }
 
   @NonNull
@@ -292,7 +292,7 @@ public class PluginValueExtender extends AbstractPlugin
     // Return map from class to value field type
     final ICommonsNavigableMap <String, JType> ret = new CommonsTreeMap <> ();
 
-    logDebug ( () -> "Start creating value ctors");
+    logDebug (() -> "Start creating value ctors");
 
     // Check all defined classes
     for (final ClassOutline aClassOutline : _getSortedClassOutlines (aOutline))
@@ -300,7 +300,7 @@ public class PluginValueExtender extends AbstractPlugin
       final JDefinedClass jClass = aClassOutline.implClass;
       final String sClassFullName = jClass.fullName ();
 
-      logDebug ( () -> "  Handling class '" + sClassFullName + "'");
+      logDebug (() -> "  Handling class '" + sClassFullName + "'");
 
       final JType aValueType = aClassValueFieldTypeMap.getValueFieldTypeIncludeHierarchy (jClass);
       if (aValueType != null)
@@ -309,7 +309,7 @@ public class PluginValueExtender extends AbstractPlugin
 
         // Create constructor with value (if available)
         {
-          logDebug ( () -> "    New value ctor '" + jClass.name () + "(" + aValueType.name () + ")'");
+          logDebug (() -> "    New value ctor '" + jClass.name () + "(" + aValueType.name () + ")'");
 
           final JMethod aValueCtor = jClass.constructor (JMod.PUBLIC);
           final JVar aParam = aValueCtor.param (JMod.FINAL, aValueType, "valueParam");
@@ -329,7 +329,7 @@ public class PluginValueExtender extends AbstractPlugin
           final JType aSecondaryValueType = PluginOffsetDTExtension.getSecondaryDataType (aValueType, cm);
           if (aSecondaryValueType != null)
           {
-            logDebug ( () -> "    New value ctor '" + jClass.name () + "(" + aSecondaryValueType.name () + ")'");
+            logDebug (() -> "    New value ctor '" + jClass.name () + "(" + aSecondaryValueType.name () + ")'");
 
             final JMethod aValueCtor = jClass.constructor (JMod.PUBLIC);
             final JVar aParam = aValueCtor.param (JMod.FINAL, aSecondaryValueType, "valueParam");
@@ -347,7 +347,7 @@ public class PluginValueExtender extends AbstractPlugin
       }
       else
       {
-        logDebug ( () -> "    Found no [" + FIELD_VALUE + "] field");
+        logDebug (() -> "    Found no [" + FIELD_VALUE + "] field");
       }
     }
 
@@ -358,7 +358,7 @@ public class PluginValueExtender extends AbstractPlugin
                                  @NonNull final ICommonsNavigableMap <String, JType> aAllCtorClasses,
                                  final boolean bHasPluginOffsetDT)
   {
-    logDebug ( () -> "Start creating setters for value ctors");
+    logDebug (() -> "Start creating setters for value ctors");
 
     // For all classes
     for (final ClassOutline aClassOutline : _getSortedClassOutlines (aOutline))
@@ -366,7 +366,7 @@ public class PluginValueExtender extends AbstractPlugin
       final JDefinedClass jClass = aClassOutline.implClass;
       final String sClassFullName = jClass.fullName ();
 
-      logDebug ( () -> "  Handling class '" + sClassFullName + "'");
+      logDebug (() -> "  Handling class '" + sClassFullName + "'");
 
       // Work on a copy of the methods, because they are changed
       for (final JMethod aMethod : new CommonsArrayList <> (jClass.methods ()))
@@ -382,20 +382,18 @@ public class PluginValueExtender extends AbstractPlugin
           final JType aValueType = aAllCtorClasses.get (aParamType.fullName ());
           if (aValueType == null)
           {
-            logDebug ( () -> "    No setter for '" +
-                             aParamType.fullName () +
-                             "' because not found in constructor list");
+            logDebug (() -> "    No setter for '" + aParamType.fullName () + "' because not found in constructor list");
             continue;
           }
 
           {
-            logDebug ( () -> "    New setter '" +
-                             aParamType.name () +
-                             " " +
-                             aMethod.name () +
-                             "(" +
-                             aValueType.name () +
-                             ")'");
+            logDebug (() -> "    New setter '" +
+                            aParamType.name () +
+                            " " +
+                            aMethod.name () +
+                            "(" +
+                            aValueType.name () +
+                            ")'");
 
             {
               final JMethod aSetter = jClass.method (JMod.PUBLIC, aParamType, aMethod.name ());
@@ -433,13 +431,13 @@ public class PluginValueExtender extends AbstractPlugin
                                                                                               aOutline.getCodeModel ());
               if (aSecondaryValueType != null)
               {
-                logDebug ( () -> "    New setter '" +
-                                 aParamType.name () +
-                                 " " +
-                                 aMethod.name () +
-                                 "(" +
-                                 aSecondaryValueType.name () +
-                                 ")'");
+                logDebug (() -> "    New setter '" +
+                                aParamType.name () +
+                                " " +
+                                aMethod.name () +
+                                "(" +
+                                aSecondaryValueType.name () +
+                                ")'");
 
                 final JMethod aSetter = jClass.method (JMod.PUBLIC, aParamType, aMethod.name ());
                 if (allowsJSpecifyAnnotations (jClass, aParamType))
@@ -496,7 +494,7 @@ public class PluginValueExtender extends AbstractPlugin
   {
     final JCodeModel cm = aOutline.getCodeModel ();
 
-    logDebug ( () -> "Start creating setters for value ctors");
+    logDebug (() -> "Start creating setters for value ctors");
 
     // For all generated classes
     for (final ClassOutline aClassOutline : _getSortedClassOutlines (aOutline))
@@ -505,7 +503,7 @@ public class PluginValueExtender extends AbstractPlugin
       final JDefinedClass jClass = aClassOutline.implClass;
       final String sClassFullName = jClass.fullName ();
 
-      logDebug ( () -> "  Handling class '" + sClassFullName + "'");
+      logDebug (() -> "  Handling class '" + sClassFullName + "'");
 
       // For all methods in the class (copy!)
       for (final JMethod aMethod : new CommonsArrayList <> (jClass.methods ()))
@@ -539,13 +537,13 @@ public class PluginValueExtender extends AbstractPlugin
             // The return type is a generated class
             if (aValueType.isPrimitive ())
             {
-              logDebug ( () -> "    New value getter '" +
-                               aValueType.name () +
-                               " " +
-                               sMethodName +
-                               "(" +
-                               aValueType.name () +
-                               ")'");
+              logDebug (() -> "    New value getter '" +
+                              aValueType.name () +
+                              " " +
+                              sMethodName +
+                              "(" +
+                              aValueType.name () +
+                              ")'");
 
               final JMethod aGetter;
               final JVar aParam;
@@ -584,7 +582,7 @@ public class PluginValueExtender extends AbstractPlugin
             {
               // Create the Object get...Value() method
               {
-                logDebug ( () -> "    New value getter '" + aValueType.name () + " " + sMethodName + "()'");
+                logDebug (() -> "    New value getter '" + aValueType.name () + " " + sMethodName + "()'");
 
                 final JMethod aGetter = jClass.method (JMod.PUBLIC, aValueType, sMethodName);
                 if (allowsJSpecifyAnnotations (jClass, aValueType))
@@ -606,11 +604,11 @@ public class PluginValueExtender extends AbstractPlugin
                 final JType aSecondaryValueType = PluginOffsetDTExtension.getSecondaryDataType (aValueType, cm);
                 if (aSecondaryValueType != null)
                 {
-                  logDebug ( () -> "    New value getter '" +
-                                   aSecondaryValueType.name () +
-                                   " " +
-                                   sMethodName +
-                                   "Local()'");
+                  logDebug (() -> "    New value getter '" +
+                                  aSecondaryValueType.name () +
+                                  " " +
+                                  sMethodName +
+                                  "Local()'");
 
                   final JMethod aGetter = jClass.method (JMod.PUBLIC, aSecondaryValueType, sMethodName + "Local");
                   if (allowsJSpecifyAnnotations (jClass, aSecondaryValueType))

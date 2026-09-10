@@ -35,8 +35,8 @@ import com.sun.tools.xjc.outline.EnumOutline;
 import com.sun.tools.xjc.outline.Outline;
 
 /**
- * Make all classes implement special interfaces that need to be passed as
- * arguments. A typical example is "java.io.Serializable"
+ * Make all classes implement special interfaces that need to be passed as arguments. A typical
+ * example is "java.io.Serializable"
  *
  * @author Philip Helger
  */

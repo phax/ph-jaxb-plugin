@@ -46,20 +46,20 @@ public abstract class AbstractPluginCloneable extends AbstractPlugin
   {
     try
     {
-      logDebug ( () -> "Trying to load class '" + sName + "'");
+      logDebug (() -> "Trying to load class '" + sName + "'");
 
       final Class <?> aClass = Class.forName (sName);
       if (Enum.class.isAssignableFrom (aClass))
       {
-        logDebug ( () -> "Class '" + sName + "' was loaded and is an enum");
+        logDebug (() -> "Class '" + sName + "' was loaded and is an enum");
         return true;
       }
-      logDebug ( () -> "Class '" + sName + "' was loaded and is NOT an enum");
+      logDebug (() -> "Class '" + sName + "' was loaded and is NOT an enum");
     }
     catch (final Throwable t)
     {
       // Just ignore whatever can go wrong in loading
-      logDebug ( () -> "Class '" + sName + "' was not loaded and is therefore NOT an enum");
+      logDebug (() -> "Class '" + sName + "' was not loaded and is therefore NOT an enum");
     }
     return false;
   }

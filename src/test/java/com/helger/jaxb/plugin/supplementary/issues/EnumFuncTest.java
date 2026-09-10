@@ -47,9 +47,7 @@ public final class EnumFuncTest
                                          aBindingFile.getAbsolutePath (),
                                          "-d",
                                          aDestDir.getAbsolutePath (),
-                                         "-Xph-cloneable" },
-                         aPS,
-                         aPS);
+                                         "-Xph-cloneable" }, aPS, aPS);
     }
   }
 

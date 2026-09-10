@@ -308,10 +308,10 @@ public abstract class AbstractPluginBeanValidation extends AbstractPlugin
 
     final XSFacet aXSTotalDigits = aSimpleType.getFacet ("totalDigits");
     final XSFacet aXSFractionDigits = aSimpleType.getFacet ("fractionDigits");
-    final Integer aTotalDigits = aXSTotalDigits == null ? null : StringParser.parseIntObj (aXSTotalDigits
-                                                                                                         .getValue ().value);
-    final Integer aFractionDigits = aXSFractionDigits == null ? null : StringParser.parseIntObj (aXSFractionDigits
-                                                                                                                  .getValue ().value);
+    final Integer aTotalDigits = aXSTotalDigits == null ? null
+                                                        : StringParser.parseIntObj (aXSTotalDigits.getValue ().value);
+    final Integer aFractionDigits = aXSFractionDigits == null ? null
+                                                              : StringParser.parseIntObj (aXSFractionDigits.getValue ().value);
     if (!_hasAnnotation (aField, Digits.class) && aTotalDigits != null && _isNumericType (aField))
     {
       final JAnnotationUse aAnnotDigits = aField.annotate (Digits.class);
