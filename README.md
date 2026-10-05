@@ -513,6 +513,9 @@ The other well-known XJC plugin library is [highsource/jaxb-tools](https://githu
 
 # News and noteworthy
 
+v5.1.3 - 2026-10-05
+* Fixed invalid JSpecify annotations on `java.util.List` getters and setters, if the generated class itself is called `List`
+
 v5.1.2 - 2026-04-08
 * Fixed incorrect `@Digits` annotation generation when both `totalDigits` and `fractionDigits` XSD facets are present. See [issue #4](https://github.com/phax/ph-jaxb-plugin/issues/4).
 * Fixed `@Digits` annotation being incorrectly placed on non-numeric fields when a complexType extends a simpleType with decimal restrictions. See [issue #3](https://github.com/phax/ph-jaxb-plugin/issues/3).

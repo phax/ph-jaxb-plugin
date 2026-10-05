@@ -88,7 +88,8 @@ public class PluginAnnotate extends AbstractPlugin
           // Find e.g. List<ItemListType> getItemList()
           if (aReturnType.erasure ().name ().equals ("List"))
           {
-            aMethod.annotate (NonNull.class);
+            if (allowsJSpecifyAnnotations (jClass, aReturnType))
+              aMethod.annotate (NonNull.class);
             aMethod.annotate (ReturnsMutableObject.class).param ("value", "JAXB implementation style");
             aEffectedClasses.add (jClass);
           }

@@ -148,7 +148,7 @@ public abstract class AbstractPlugin extends Plugin
       // Primitive types cannot be annotated
       return false;
     }
-    if (aLocalType.name ().equals (jClass.name ()))
+    if (aLocalType.erasure ().name ().equals (jClass.name ()))
     {
       // Type has the same name as the outer class and would therefore be generated as
       // FQCN. This does not work with JSpecify.
